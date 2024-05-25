@@ -32,20 +32,27 @@ public class BasicController {
 
 @GetMapping("/menuList")
 @Operation(summary = "메뉴명 리스트", description = "메뉴에 들어갈 게시판명을 보내주는 api")
-    public List<Map<String, Object>> getActiveMenus() {
-        List<MvcMenu> activeMenus = menuRepository.findByUseYnOrderBySeqAsc("Y");
+public Map<String, Object> getActiveMenus() {
+    List<MvcMenu> activeMenus = menuRepository.findByUseYnOrderBySeqAsc("Y");
 
-        List<Map<String, Object>> result = new ArrayList<>();
+    List<Map<String, Object>> menuList = new ArrayList<>();
 
-        for (MvcMenu menu : activeMenus) {
-            Map<String, Object> menuMap = new HashMap<>();
-            menuMap.put("menu_id", menu.getMenuId());
-            menuMap.put("menu_nm", menu.getMenuNm());
-            menuMap.put("menu_path", menu.getMenuPath());
-            menuMap.put("seq", menu.getSeq());
-            result.add(menuMap);
-        }
+    for (MvcMenu menu : activeMenus) {
+        Map<String, Object> menuMap = new HashMap<>();
+        menuMap.put("menu_id", menu.getMenuId());
+        menuMap.put("menu_nm", menu.getMenuNm());
+        menuMap.put("menu_path", menu.getMenuPath());
+        menuMap.put("seq", menu.getSeq());
+        menuList.add(menuMap);
+    }
 
-        return result;
+    Map<String, Object> data = new HashMap<>();
+    data.put("menu_list", menuList);
+
+    Map<String, Object> response = new HashMap<>();
+    response.put("code", 200); // 200 OK일 경우 이렇게 추가해주고 return 해주면 된다.
+    response.put("data", data); // 다를경우, code랑 int값 적고, data랑 not found 같은거 적으면 될지도
+
+    return response;
     }
 }
