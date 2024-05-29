@@ -14,7 +14,7 @@ public class MvcMbrInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "mvc_id", nullable = false)
-    private long mvcId; // 무비캣 ID
+    private Long mvcId; // 무비캣 ID
 
     @Column(name = "mbr_id", nullable = false, length = 20)
     private String mbrId; // 회원 ID (SNS 로그인의 경우 SNS에서 보내주는)
@@ -30,10 +30,6 @@ public class MvcMbrInfo {
 
     @Column(name = "pswd", nullable = false, length = 1000)
     private String pswd; // 비밀번호, 암호화 때문에 길이 늘림
-
-    public void setPswdEncryption(String password, PasswordEncoder passwordEncoder) {
-        this.pswd = passwordEncoder.encode(password);
-    }
 
     @Column(name = "email", nullable = false, length = 40)
     private String email; // 이메일
@@ -56,8 +52,8 @@ public class MvcMbrInfo {
     @Column(name = "mark_agre", nullable = false, length = 1)
     private String markAgre = "N"; // 마케팅목적동의 Y/N
 
-    @Column(name = "rgst_user_id", nullable = false)
-    private long rgstUserId; // 등록 ID
+    @Column(name = "rgst_user_id", nullable = false, length = 20)
+    private String rgstUserId; // 등록 ID
 
     @Column(name = "rgst_user_nm", nullable = false, length = 80)
     private String rgstUserNm; // 등록자
@@ -65,8 +61,8 @@ public class MvcMbrInfo {
     @Column(name = "rgst_day", nullable = false)
     private Timestamp rgstDay; // 등록일 (년 월 일 시 분 초)
 
-    @Column(name = "mdfcn_user_id", nullable = false)
-    private long mdfcnUserId; // 수정 ID
+    @Column(name = "mdfcn_user_id", nullable = false, length = 20)
+    private String mdfcnUserId; // 수정 ID
 
     @Column(name = "mdfcn_user_nm", nullable = false, length = 80)
     private String mdfcnUserNm; // 수정자

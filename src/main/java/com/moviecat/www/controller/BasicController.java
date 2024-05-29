@@ -2,6 +2,7 @@ package com.moviecat.www.controller;
 
 import com.moviecat.www.entity.MvcMenu;
 import com.moviecat.www.repository.MvcMenuRepository;
+import com.moviecat.www.service.MvcMenuService;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,37 +23,22 @@ import java.util.*;
 @RestController
 public class BasicController {
 
-    private final MvcMenuRepository menuRepository;
-    private String responseCode;
-
     @Autowired
-    public BasicController(MvcMenuRepository menuRepository) {
-        this.menuRepository = menuRepository;
-    }
+    private MvcMenuService menuService;
 
-@GetMapping("/menuList")
-@Operation(summary = "메뉴명 리스트", description = "메뉴에 들어갈 게시판명을 보내주는 api")
-public Map<String, Object> getActiveMenus() {
-    List<MvcMenu> activeMenus = menuRepository.findByUseYnOrderBySeqAsc("Y");
+    @GetMapping("/menuList")
+    @Operation(summary = "메뉴명 리스트", description = "메뉴에 들어갈 게시판명을 보내주는 api")
+    public Map<String, Object> getActiveMenus() {
+        List<Map<String, Object>> menuList = menuService.getActiveMenus(); // 서비스에서 메뉴 리스트 받아온다.
 
-    List<Map<String, Object>> menuList = new ArrayList<>();
+        Map<String, Object> data = new HashMap<>(); // 만약 메뉴 데이터를 보내줘야 한다면, 필요하다.
+        data.put("menu_list", menuList);
 
-    for (MvcMenu menu : activeMenus) {
-        Map<String, Object> menuMap = new HashMap<>();
-        menuMap.put("menu_id", menu.getMenuId());
-        menuMap.put("menu_nm", menu.getMenuNm());
-        menuMap.put("menu_path", menu.getMenuPath());
-        menuMap.put("seq", menu.getSeq());
-        menuList.add(menuMap);
-    }
+        Map<String, Object> response = new HashMap<>(); // 이 부분에 200과 데이터가 들어감, 오류 발생시 오류코드와 이유 보내게 수정
+        response.put("code", 200);
+        response.put("data", data);
 
-    Map<String, Object> data = new HashMap<>();
-    data.put("menu_list", menuList);
-
-    Map<String, Object> response = new HashMap<>();
-    response.put("code", 200); // 200 OK일 경우 이렇게 추가해주고 return 해주면 된다.
-    response.put("data", data); // 다를경우, code랑 int값 적고, data랑 not found 같은거 적으면 될지도
-
-    return response;
+        return response;
     }
 }
+

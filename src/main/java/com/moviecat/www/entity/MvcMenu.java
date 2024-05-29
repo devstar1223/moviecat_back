@@ -12,7 +12,7 @@ public class MvcMenu {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "menu_id", nullable = false)
-    private int menuId; // 메뉴 ID
+    private long menuId; // 메뉴 ID
 
     @Column(name = "menu_nm", nullable = false, length = 80)
     private String menuNm; // 메뉴명
@@ -26,8 +26,8 @@ public class MvcMenu {
     @Column(name = "expln", nullable = true, length = 400)
     private String expln; // 설명
 
-    @Column(name = "rgst_user_id", nullable = false)
-    private int rgstUserId; // 등록 ID
+    @Column(name = "rgst_user_id", nullable = false, length = 20)
+    private String rgstUserId; // 등록 ID
 
     @Column(name = "rgst_user_nm", nullable = false, length = 80)
     private String rgstUserNm; // 등록자
@@ -35,8 +35,8 @@ public class MvcMenu {
     @Column(name = "rgst_day", nullable = false)
     private Timestamp rgstDay; // 등록일 (년 월 일 시 분 초)
 
-    @Column(name = "mdfcn_user_id", nullable = false)
-    private int mdfcnUserId; // 수정 ID
+    @Column(name = "mdfcn_user_id", nullable = false, length = 20)
+    private String mdfcnUserId; // 수정 ID
 
     @Column(name = "mdfcn_user_nm", nullable = false, length = 80)
     private String mdfcnUserNm; // 수정자
