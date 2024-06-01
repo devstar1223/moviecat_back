@@ -1,8 +1,11 @@
 package com.moviecat.www.repository;
 
+import com.moviecat.www.dto.MvcMbrInfoDto;
 import com.moviecat.www.entity.MvcMbrInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface MvcMbrInfoRepository extends JpaRepository<MvcMbrInfo, Long> {
+import java.util.Optional;
 
+public interface MvcMbrInfoRepository extends JpaRepository<MvcMbrInfo, Long> {
+    Optional<MvcMbrInfo> findByMbrId(String mbrId);
 }

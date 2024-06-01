@@ -15,7 +15,7 @@ import java.util.Map;
 public class MvcMenuService {
 
     private final MvcMenuRepository mvcMenuRepository;
-    public List<Map<String, Object>> getActiveMenus() {
+    public List<Map<String, Object>> getActiveMenus() { // 메뉴 정보만을 주는 service모듈
         List<MvcMenu> activeMenus = mvcMenuRepository.findByUseYnOrderBySeqAsc("Y"); // 활성화된 메뉴를 리스트로 담아와서
         List<Map<String, Object>> menuList = new ArrayList<>(); // menuList라는 새로운 List의 원소를 만든다
 

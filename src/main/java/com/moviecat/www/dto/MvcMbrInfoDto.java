@@ -27,4 +27,5 @@ public class MvcMbrInfoDto {
     private String mdfcnUserId; // 수정 ID
     private String mdfcnUserNm; // 수정자
     private Timestamp mdfcnDay; // 수정일
+
 }

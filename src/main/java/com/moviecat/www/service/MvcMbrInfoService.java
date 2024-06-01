@@ -40,4 +40,15 @@ public class MvcMbrInfoService {
         mvcMbrInfo.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
         mvcMbrInfoRepository.save(mvcMbrInfo);
     }
+
+//    public void login(String mbrId, String pswd) throws Exception {
+//        MvcMbrInfo mvcMbrInfo = mvcMbrInfoRepository.findByMbrId(mbrId);
+//        if (mvcMbrInfo == null) {
+//            throw new Exception("사용자 정보가 없습니다.");
+//        }
+//
+//        if (!passwordEncoder.matches(pswd, mvcMbrInfo.getPswd())) {
+//            throw new Exception("비밀번호가 일치하지 않습니다.");
+//        }
+//    }
 }
