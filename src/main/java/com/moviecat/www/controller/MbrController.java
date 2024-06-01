@@ -2,6 +2,7 @@ package com.moviecat.www.controller;
 
 import com.moviecat.www.dto.MvcMbrInfoDto;
 import com.moviecat.www.service.MvcMbrInfoService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,18 +23,10 @@ public class MbrController {
 
 
     @PostMapping("/register")
+    @Operation(summary = "회원 가입", description = "회원가입 api")
     public ResponseEntity<String> registerMember(@RequestBody MvcMbrInfoDto mvcMbrInfoDto) {
         mvcMbrInfoService.registerMember(mvcMbrInfoDto);
-        return new ResponseEntity<>("Member registered successfully", HttpStatus.OK);
+        return new ResponseEntity<>("회원 가입 성공", HttpStatus.OK);
     }
 
-    @PostMapping("/login")
-    public String login(@RequestBody MvcMbrInfoDto mvcMbrInfoDto) {
-
-        String mbrId = mvcMbrInfoDto.getMbrId();
-        String pswd = mvcMbrInfoDto.getPswd();
-
-        System.out.println(mbrId + " " + pswd);
-        return mbrId + " " + pswd;
-    }
 }
