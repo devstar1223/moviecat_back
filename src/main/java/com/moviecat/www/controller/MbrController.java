@@ -22,7 +22,6 @@ public class MbrController {
 
     private final MvcMbrInfoService mvcMbrInfoService;
 
-
     @PostMapping("/register")
     @Operation(summary = "회원 가입", description = "회원가입 api")
     public ResponseEntity<String> registerMember(@RequestBody MvcMbrInfoDto mvcMbrInfoDto) {
@@ -36,5 +35,4 @@ public class MbrController {
         mvcMbrInfoService.editMember(mvcMbrInfoDto);
         return new ResponseEntity<>("정보 수정 성공", HttpStatus.OK);
     }
-
 }

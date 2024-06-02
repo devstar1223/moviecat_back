@@ -51,8 +51,8 @@ public class MvcMbrInfoService {
         mbrInfo.setPhoneNo(newMbrInfoDto.getPhoneNo());
         mbrInfo.setIntrIntrcn(newMbrInfoDto.getIntrIntrcn());
         mbrInfo.setAtchFileId(newMbrInfoDto.getAtchFileId());
-        mbrInfo.setMdfcnUserId(mbrInfo.getMbrId()); // 수정 id는 현재 id를 등록 (id는 변경 불가)
-        mbrInfo.setMdfcnUserNm(newMbrInfoDto.getNickNm()); // 수정 닉네임은 바꾼 닉네임을 등록
+        mbrInfo.setMdfcnUserId(mbrInfo.getMbrId()); // 수정 id는 현재 id를 등록 (id는 변경 불가) (admin 고려 x)
+        mbrInfo.setMdfcnUserNm(newMbrInfoDto.getNickNm()); // 수정 닉네임은 바꾼 닉네임을 등록 (admin 고려 x)
         mbrInfo.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now())); // 수정 날짜 현재로 등록
         mvcMbrInfoRepository.save(mbrInfo);
     }

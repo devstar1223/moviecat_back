@@ -14,7 +14,7 @@ public class MvcMbrInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "mvc_id", nullable = false)
-    private Long mvcId; // 무비캣 ID
+    private long mvcId; // 무비캣 ID
 
     @Column(name = "mbr_id", nullable = false, length = 20)
     private String mbrId; // 회원 ID (SNS 로그인의 경우 SNS에서 보내주는)
