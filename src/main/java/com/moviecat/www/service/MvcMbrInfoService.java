@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -41,14 +42,18 @@ public class MvcMbrInfoService {
         mvcMbrInfoRepository.save(mvcMbrInfo);
     }
 
-//    public void login(String mbrId, String pswd) throws Exception {
-//        MvcMbrInfo mvcMbrInfo = mvcMbrInfoRepository.findByMbrId(mbrId);
-//        if (mvcMbrInfo == null) {
-//            throw new Exception("사용자 정보가 없습니다.");
-//        }
-//
-//        if (!passwordEncoder.matches(pswd, mvcMbrInfo.getPswd())) {
-//            throw new Exception("비밀번호가 일치하지 않습니다.");
-//        }
-//    }
+    public void editMember(MvcMbrInfoDto newMbrInfoDto) {
+        Optional<MvcMbrInfo> mbrInfoOptional = mvcMbrInfoRepository.findById(newMbrInfoDto.getMvcId()); // 받아온 정보로 회원 찾기
+        MvcMbrInfo mbrInfo = mbrInfoOptional.get();
+        mbrInfo.setNickNm(newMbrInfoDto.getNickNm());
+        mbrInfo.setPswd(passwordEncoder.encode(newMbrInfoDto.getPswd()));
+        mbrInfo.setEmail(newMbrInfoDto.getEmail());
+        mbrInfo.setPhoneNo(newMbrInfoDto.getPhoneNo());
+        mbrInfo.setIntrIntrcn(newMbrInfoDto.getIntrIntrcn());
+        mbrInfo.setAtchFileId(newMbrInfoDto.getAtchFileId());
+        mbrInfo.setMdfcnUserId(mbrInfo.getMbrId()); // 수정 id는 현재 id를 등록 (id는 변경 불가)
+        mbrInfo.setMdfcnUserNm(newMbrInfoDto.getNickNm()); // 수정 닉네임은 바꾼 닉네임을 등록
+        mbrInfo.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now())); // 수정 날짜 현재로 등록
+        mvcMbrInfoRepository.save(mbrInfo);
+    }
 }
