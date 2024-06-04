@@ -1,5 +1,7 @@
 package com.moviecat.www.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moviecat.www.dto.MvcBbsDto;
 import com.moviecat.www.entity.MvcBbs;
 import com.moviecat.www.repository.MvcBbsRepository;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -53,5 +56,15 @@ public class MvcBbsService {
         post.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now())); // 현재 시간
         post.setDeltYn("Y"); // 글 삭제 이므로, "Y"로 설정
         mvcBbsRepository.save(post);
+    }
+
+    public String bbsReadBoard(long boardId) throws JsonProcessingException {
+        List<MvcBbs> postList = mvcBbsRepository.findByMenuIdAndDeltYnOrderByPstIdAsc(boardId, "N");
+
+        // Jackson ObjectMapper를 사용하여 List<MvcBbs>를 JSON 형식의 문자열로 변환
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonPostList = objectMapper.writeValueAsString(postList);
+
+        return jsonPostList;
     }
 }
