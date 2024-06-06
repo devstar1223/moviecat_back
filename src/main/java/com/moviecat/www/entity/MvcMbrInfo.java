@@ -34,23 +34,23 @@ public class MvcMbrInfo {
     @Column(name = "email", nullable = false, length = 40)
     private String email; // 이메일
 
-    @Column(name = "phone_no", nullable = true, length = 12)
+    @Column(name = "phone_no", nullable = true, length = 11)
     private String phoneNo; // 휴대폰번호
 
     @Column(name = "intr_intrcn", nullable = true, length = 800)
     private String intrIntrcn; // 자기소개
 
-    @Column(name = "atch_file_id", nullable = true)
-    private long atchFileId; // 첨부파일 id
+    @Column(name = "atch_file_url", nullable = true)
+    private String atchFileUrl; // 첨부파일 URL
 
-    @Column(name = "trms_agre", nullable = false, length = 1)
-    private String trmsAgre = "N"; // 이용약관동의 Y/N
+    @Column(name = "trms_agre", nullable = false)
+    private char trmsAgre = 'N'; // 이용약관동의 Y/N
 
-    @Column(name = "info_agre", nullable = false, length = 1)
-    private String infoAgre = "N"; // 개인정보수집동의 Y/N
+    @Column(name = "info_agre", nullable = false)
+    private char infoAgre = 'N'; // 개인정보수집동의 Y/N
 
-    @Column(name = "mark_agre", nullable = false, length = 1)
-    private String markAgre = "N"; // 마케팅목적동의 Y/N
+    @Column(name = "mark_agre", nullable = false)
+    private char markAgre = 'N'; // 마케팅목적동의 Y/N
 
     @Column(name = "rgst_user_id", nullable = false, length = 20)
     private String rgstUserId; // 등록 ID
@@ -69,5 +69,4 @@ public class MvcMbrInfo {
 
     @Column(name = "mdfcn_day", nullable = false)
     private Timestamp mdfcnDay; // 수정일
-
     }

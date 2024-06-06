@@ -19,7 +19,7 @@ public class MvcMbrInfoService {
     private final MvcMbrInfoRepository mvcMbrInfoRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public void registerMember(MvcMbrInfoDto mvcMbrInfoDto) {
+    public void joinMember(MvcMbrInfoDto mvcMbrInfoDto) {
         MvcMbrInfo mvcMbrInfo = new MvcMbrInfo();
         mvcMbrInfo.setMbrId(mvcMbrInfoDto.getMbrId());
         mvcMbrInfo.setMbrSe(mvcMbrInfoDto.getMbrSe());
@@ -27,17 +27,17 @@ public class MvcMbrInfoService {
         mvcMbrInfo.setNickNm(mvcMbrInfoDto.getNickNm());
         mvcMbrInfo.setPswd(passwordEncoder.encode(mvcMbrInfoDto.getPswd()));
         mvcMbrInfo.setEmail(mvcMbrInfoDto.getEmail());
-        mvcMbrInfo.setPhoneNo(mvcMbrInfoDto.getPhoneNo());
+        mvcMbrInfo.setPhoneNo((mvcMbrInfoDto.getPhoneNo()).replaceAll("-", ""));
         mvcMbrInfo.setIntrIntrcn(mvcMbrInfoDto.getIntrIntrcn());
-        mvcMbrInfo.setAtchFileId(mvcMbrInfoDto.getAtchFileId());
+        mvcMbrInfo.setAtchFileUrl(mvcMbrInfoDto.getAtchFileUrl());
         mvcMbrInfo.setTrmsAgre(mvcMbrInfoDto.getTrmsAgre());
         mvcMbrInfo.setInfoAgre(mvcMbrInfoDto.getInfoAgre());
         mvcMbrInfo.setMarkAgre(mvcMbrInfoDto.getMarkAgre());
-        mvcMbrInfo.setRgstUserId(mvcMbrInfoDto.getRgstUserId());
-        mvcMbrInfo.setRgstUserNm(mvcMbrInfoDto.getRgstUserNm());
+        mvcMbrInfo.setRgstUserId(mvcMbrInfoDto.getMbrId());
+        mvcMbrInfo.setRgstUserNm(mvcMbrInfoDto.getMbrNm());
         mvcMbrInfo.setRgstDay(Timestamp.valueOf(LocalDateTime.now()));
-        mvcMbrInfo.setMdfcnUserId(mvcMbrInfoDto.getMdfcnUserId());
-        mvcMbrInfo.setMdfcnUserNm(mvcMbrInfoDto.getMdfcnUserNm());
+        mvcMbrInfo.setMdfcnUserId(mvcMbrInfoDto.getMbrId());
+        mvcMbrInfo.setMdfcnUserNm(mvcMbrInfoDto.getMbrNm());
         mvcMbrInfo.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
         mvcMbrInfoRepository.save(mvcMbrInfo);
     }
@@ -50,10 +50,20 @@ public class MvcMbrInfoService {
         mbrInfo.setEmail(newMbrInfoDto.getEmail());
         mbrInfo.setPhoneNo(newMbrInfoDto.getPhoneNo());
         mbrInfo.setIntrIntrcn(newMbrInfoDto.getIntrIntrcn());
-        mbrInfo.setAtchFileId(newMbrInfoDto.getAtchFileId());
-        mbrInfo.setMdfcnUserId(mbrInfo.getMbrId()); // 수정 id는 현재 id를 등록 (id는 변경 불가) (admin 고려 x)
-        mbrInfo.setMdfcnUserNm(newMbrInfoDto.getNickNm()); // 수정 닉네임은 바꾼 닉네임을 등록 (admin 고려 x)
+        mbrInfo.setAtchFileUrl(newMbrInfoDto.getAtchFileUrl());
+        mbrInfo.setMdfcnUserId(mbrInfo.getMbrId()); // 수정 id는 현재 id를 등록 (id는 변경 불가) (admin이 재설정은 다른 api)
+        mbrInfo.setMdfcnUserNm(newMbrInfoDto.getNickNm()); // 수정 닉네임은 바꾼 닉네임을 등록 (admin이 재설정은 다른 api)
         mbrInfo.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now())); // 수정 날짜 현재로 등록
         mvcMbrInfoRepository.save(mbrInfo);
+    }
+
+    public boolean idDupCheck(String mbrId){
+        Optional<MvcMbrInfo> mbrIdOptional = mvcMbrInfoRepository.findByMbrId(mbrId); // 받아온 정보로 mbrId 찾기
+        return mbrIdOptional.isPresent();
+    }
+
+    public boolean nickNmDupCheck(String nickNm){
+        Optional<MvcMbrInfo> nickNmOptional = mvcMbrInfoRepository.findByNickNm(nickNm); // 받아온 정보로 nickNm 찾기
+        return nickNmOptional.isPresent();
     }
 }

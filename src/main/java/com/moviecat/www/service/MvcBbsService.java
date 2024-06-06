@@ -23,7 +23,7 @@ public class MvcBbsService {
         newPost.setMenuId(mvcBbsDto.getMenuId());
         newPost.setTtl(mvcBbsDto.getTtl());
         newPost.setCn(mvcBbsDto.getCn());
-        newPost.setAtchFileId(mvcBbsDto.getAtchFileId());
+        newPost.setAtchFileUrl(mvcBbsDto.getAtchFileUrl());
         newPost.setSpoYn(mvcBbsDto.getSpoYn());
         newPost.setRgstUserId(mvcBbsDto.getRgstUserId());
         newPost.setRgstUserNm(mvcBbsDto.getRgstUserNm());
@@ -40,7 +40,7 @@ public class MvcBbsService {
         MvcBbs post = bbsOptional.get();
         post.setTtl(newPostDto.getTtl());
         post.setCn(newPostDto.getCn());
-        post.setAtchFileId(newPostDto.getAtchFileId());
+        post.setAtchFileUrl(newPostDto.getAtchFileUrl());
         post.setSpoYn(newPostDto.getSpoYn());
         post.setMdfcnUserId(newPostDto.getMdfcnUserId()); // 들어온 데이터의 id로 수정 id 등록(admin 일부 고려)
         post.setMdfcnUserNm(newPostDto.getMdfcnUserNm()); // 들어온 데이터의 이름으로 수정자 등록(admin 일부 고려)
