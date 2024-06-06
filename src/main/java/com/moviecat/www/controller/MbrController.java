@@ -22,7 +22,7 @@ public class MbrController {
 
     private final MvcMbrInfoService mvcMbrInfoService;
 
-    @PostMapping("/register")
+    @PostMapping("/join")
     @Operation(summary = "회원 가입", description = "회원가입 api")
     public ResponseEntity<String> registerMember(@RequestBody MvcMbrInfoDto mvcMbrInfoDto) {
         mvcMbrInfoService.registerMember(mvcMbrInfoDto);
