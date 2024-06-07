@@ -66,4 +66,13 @@ public class MvcMbrInfoService {
         Optional<MvcMbrInfo> nickNmOptional = mvcMbrInfoRepository.findByNickNm(nickNm); // 받아온 정보로 nickNm 찾기
         return nickNmOptional.isPresent();
     }
+
+    public String findId(String mbrNm, String email) {
+        Optional<MvcMbrInfo> idOptional = mvcMbrInfoRepository.findByMbrNmAndEmail(mbrNm, email); // ID 있는지 확인
+        if (idOptional.isPresent()) {
+            return idOptional.get().getMbrId();
+        } else {
+            return null; // ID가 존재하지 않음을 나타내는 적절한 값으로 반환
+        }
+    }
 }
