@@ -10,13 +10,11 @@ import java.util.Collection;
 public class MvcUserDetails extends User {
 
     private final String nickNm;
-    private final String atchFileUrl;
     private final String token;
 
-    public MvcUserDetails(String username, String nickNm, String atchFileUrl, Collection<? extends GrantedAuthority> authorities, String token) {
-        super(username, "", authorities);
+    public MvcUserDetails(String mbrId, String pswd, Collection<? extends GrantedAuthority> auth, String nickNm, String token) {
+        super(mbrId, pswd, auth);
         this.nickNm = nickNm;
-        this.atchFileUrl = atchFileUrl;
         this.token = token;
     }
 }
