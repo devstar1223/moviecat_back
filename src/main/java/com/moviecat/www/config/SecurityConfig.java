@@ -1,5 +1,7 @@
 package com.moviecat.www.config;
 
+import com.moviecat.www.handler.CustomAuthenticationFailureHandler;
+import com.moviecat.www.handler.CustomAuthenticationSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -7,6 +9,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -26,8 +30,8 @@ public class SecurityConfig {
                         .loginProcessingUrl("/login") // 로그인 처리 url(엔드포인트)
                         .usernameParameter("mbrId") // 커스텀 사용자명 파라미터 (기본 username)
                         .passwordParameter("pswd") // 커스텀 비밀번호 파라미터 (기본 password)
-                        .defaultSuccessUrl("/success") // 로그인 성공 후 이동할 기본 URL
-                        .failureUrl("/fail") // 로그인 실패시 이동할 url (안적어주면 /login?error로 이동함)
+                        .successHandler(customAuthenticationSuccessHandler())
+                        .failureHandler(customAuthenticationFailureHandler())
                         .permitAll()
         );
         return http.build();
@@ -36,5 +40,15 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
+        return new CustomAuthenticationSuccessHandler();
+    }
+
+    @Bean
+    public AuthenticationFailureHandler customAuthenticationFailureHandler() {
+        return new CustomAuthenticationFailureHandler();
     }
 }
