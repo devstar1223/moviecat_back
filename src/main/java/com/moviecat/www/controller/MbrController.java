@@ -54,4 +54,15 @@ public class MbrController {
             return new ResponseEntity<>("사용 가능 닉네임", HttpStatus.OK);
         }
     }
+
+    @GetMapping("/idFind")
+    @Operation(summary = "아이디 찾기", description = "중복시 404 CONFLICT 반환. 없을시 200 OK")
+    public ResponseEntity<Object> idFind(@RequestParam String mbrNm,@RequestParam String email) {
+        String findId = mvcMbrInfoService.findId(mbrNm, email);
+        if (findId == null) {
+            return new ResponseEntity<>("해당 ID 없음", HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(findId, HttpStatus.OK);
+        }
+    }
 }
