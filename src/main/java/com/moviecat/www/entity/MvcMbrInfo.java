@@ -20,7 +20,7 @@ public class MvcMbrInfo {
     private String mbrId; // 회원 ID (SNS 로그인의 경우 SNS에서 보내주는)
 
     @Column(name = "mbr_se", nullable = false)
-    private int mbrSe; // 회원 구분 (0 또는 1)
+    private int mbrSe; // 회원 구분 (카카오일 경우 1)
 
     @Column(name = "mbr_nm", nullable = false, length = 80)
     private String mbrNm; // 회원이름

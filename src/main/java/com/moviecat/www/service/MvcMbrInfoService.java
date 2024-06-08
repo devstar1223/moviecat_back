@@ -187,13 +187,36 @@ public class MvcMbrInfoService {
     //카카오 로그인 및 회원가입
     private MvcLoginDto kakaoUserLogin(HashMap<String, Object> userInfo){
 
-        Long mvcId= Long.valueOf(userInfo.get("mvcId").toString());
-        String email = userInfo.get("email").toString();
-        String nickNm = userInfo.get("nickNm").toString();
-        String atchFileUrl = userInfo.get("atchFileUrl").toString();
+        Long mvcId= Long.valueOf(userInfo.get("mvcId").toString()); // 카톡에서 보내주는 아이디
+        String email = userInfo.get("email").toString(); // 이메일
+        String nickNm = userInfo.get("nickNm").toString(); // 닉네임
+        String atchFileUrl = userInfo.get("atchFileUrl").toString(); // 프로필사진                                ----------------------------------------------------------*********************************************************************************************************************************************************************************************************************************************************************************/
 
         //TODO.강산님 회원가입 처리할 곳(아이디가 db에 존재하지 않을때만 회원가입)
-        
+        //아직 테스트 해보지 못했습니다.
+        String kakaoIdPlusK = "K"+mvcId;
+        Optional<MvcMbrInfo> kakaoIdOptional = mvcMbrInfoRepository.findByMbrId(kakaoIdPlusK);
+        if(!kakaoIdOptional.isPresent()){
+            MvcMbrInfo kakaoJoinInfo = kakaoIdOptional.get();
+            MvcMbrInfo kakaoMbr = new MvcMbrInfo();
+            kakaoMbr.setMbrId("K" + kakaoJoinInfo.getMvcId());
+            kakaoMbr.setEmail(kakaoJoinInfo.getEmail());
+            kakaoMbr.setNickNm(kakaoJoinInfo.getNickNm());
+            kakaoMbr.setAtchFileUrl(kakaoJoinInfo.getAtchFileUrl());
+            kakaoMbr.setMbrSe(1); // 카카오는 1
+            kakaoMbr.setMbrNm(""); // 이름칸 비워둠
+            kakaoMbr.setPswd(""); // 카카오 로그인 비밀번호 X
+            kakaoMbr.setTrmsAgre('Y');
+            kakaoMbr.setInfoAgre('Y');
+            kakaoMbr.setMarkAgre('N');
+            kakaoMbr.setRgstUserId("K" + kakaoJoinInfo.getMvcId());
+            kakaoMbr.setRgstUserNm(""); // 이름칸 비워져있기 때문에
+            kakaoMbr.setRgstDay(Timestamp.valueOf(LocalDateTime.now()));
+            kakaoMbr.setMdfcnUserId("K" + kakaoJoinInfo.getMvcId());
+            kakaoMbr.setMdfcnUserNm(""); // 이름칸 비워져있기 때문에
+            kakaoMbr.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
+            mvcMbrInfoRepository.save(kakaoMbr);
+        }
         return new MvcLoginDto(mvcId, nickNm, email, atchFileUrl, jwtTokenProvider.generateToken(mvcId.toString()));
     }
 }
