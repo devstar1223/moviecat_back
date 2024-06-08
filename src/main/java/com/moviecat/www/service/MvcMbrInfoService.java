@@ -1,15 +1,27 @@
 package com.moviecat.www.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.moviecat.www.dto.MvcLoginDto;
 import com.moviecat.www.dto.MvcMbrInfoDto;
 import com.moviecat.www.entity.MvcMbrInfo;
 import com.moviecat.www.repository.MvcMbrInfoRepository;
+import com.moviecat.www.util.JwtTokenProvider;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.server.Session;
+import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Optional;
 
 @Service
@@ -18,6 +30,13 @@ public class MvcMbrInfoService {
 
     private final MvcMbrInfoRepository mvcMbrInfoRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider = new JwtTokenProvider();
+
+    @Value("${kakao.key.client-id}")
+    private String clientId;
+
+    @Value("${kakao.redirect-uri}")
+    private String redirectUri;
 
     public void joinMember(MvcMbrInfoDto mvcMbrInfoDto) {
         MvcMbrInfo mvcMbrInfo = new MvcMbrInfo();
@@ -74,5 +93,111 @@ public class MvcMbrInfoService {
         } else {
             return null; // ID가 존재하지 않음을 나타내는 적절한 값으로 반환
         }
+    }
+
+    //snsLogin 처리
+    public MvcLoginDto snsLogin(String code) {
+        //1.인가 코드로 토큰 요청
+        String accessToken = getAccessToken(code);
+
+        //2. 토큰으로 카카오 API 호출(회원정보 호출)
+        HashMap<String, Object> userInfo = getKakaoUserInfo(accessToken);
+
+        //3. 카카오ID로 회원가입 & 로그인 처리
+        MvcLoginDto mvcLoginDto = kakaoUserLogin(userInfo);
+
+        return mvcLoginDto;
+    }
+
+    //토큰 요청
+    private String getAccessToken(String code) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("grant_type", "authorization_code");
+        body.add("client_id", clientId);
+        body.add("redirect_uri", redirectUri);
+        body.add("code", code);
+
+        HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(body, headers);
+        RestTemplate rt = new RestTemplate();
+        ResponseEntity<String> response = rt.exchange(
+                "https://kauth.kakao.com/oauth/token",
+                HttpMethod.POST,
+                kakaoTokenRequest,
+                String.class
+        );
+
+        String responseBody = response.getBody();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = null;
+        try {
+            jsonNode = objectMapper.readTree(responseBody);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return jsonNode.get("access_token").asText();
+    }
+
+    //회원 정보 요청
+    private HashMap<String, Object> getKakaoUserInfo(String accessToken) {
+
+        HashMap<String, Object> userInfo= new HashMap<String,Object>();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+
+        HttpEntity<MultiValueMap<String, String>> kakaoUserInfoRequest = new HttpEntity<>(headers);
+        RestTemplate rt = new RestTemplate();
+        ResponseEntity<String> response = rt.exchange(
+                "https://kapi.kakao.com/v2/user/me",
+                HttpMethod.POST,
+                kakaoUserInfoRequest,
+                String.class
+        );
+
+        String responseBody = response.getBody();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = null;
+        try {
+            jsonNode = objectMapper.readTree(responseBody);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        Long mvcId = jsonNode.get("id").asLong();
+        //TODO.이메일 추가 필요
+        //String email = jsonNode.get("kakao_account").get("email").asText();
+        String nickNm = jsonNode.get("properties").get("nickname").asText();
+        String atchFileUrl = Optional.ofNullable(jsonNode)
+                .filter(node -> node.has("properties") && node.get("properties").has("profile_image_url"))
+                .map(node -> node.get("properties").get("profile_image_url").asText())
+                .orElse("");
+
+        userInfo.put("mvcId",mvcId);
+        //TODO.email 처리 후 주석 풀기
+        //userInfo.put("email",email);
+        userInfo.put("nickNm",nickNm);
+        userInfo.put("atchFileUrl",atchFileUrl);
+
+        return userInfo;
+    }
+
+    //카카오 로그인 및 회원가입
+    private MvcLoginDto kakaoUserLogin(HashMap<String, Object> userInfo){
+
+        Long mvcId= Long.valueOf(userInfo.get("mvcId").toString());
+        //TODO.email 처리 후 주석 풀기
+        //String kakaoEmail = userInfo.get("email").toString();
+        String nickNm = userInfo.get("nickNm").toString();
+        String atchFileUrl = userInfo.get("atchFileUrl").toString();
+
+        //TODO.강산님 회원가입 처리할 곳(아이디가 db에 존재하지 않을때만 회원가입)
+
+        //TODO. 메일 추가하기
+        return new MvcLoginDto(mvcId, nickNm, "test@test.com", atchFileUrl, jwtTokenProvider.generateToken(mvcId.toString()));
     }
 }

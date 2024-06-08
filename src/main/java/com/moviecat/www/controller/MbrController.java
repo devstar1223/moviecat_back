@@ -1,17 +1,16 @@
 package com.moviecat.www.controller;
 
+import com.moviecat.www.dto.MvcLoginDto;
 import com.moviecat.www.dto.MvcMbrInfoDto;
 import com.moviecat.www.service.MvcMbrInfoService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.NoSuchElementException;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,6 +24,17 @@ public class MbrController {
         System.out.println("=== 가입 요청 ===");
         mvcMbrInfoService.joinMember(mvcMbrInfoDto);
         return new ResponseEntity<>("회원 가입 성공", HttpStatus.OK);
+    }
+
+    @ResponseBody
+    @GetMapping("/snsLogin")
+    @Operation(summary = "sns 로그인 및 회원가입", description ="kakao 로그인 및 회원가입 처리")
+    public ResponseEntity<MvcLoginDto> snsLogin(@RequestParam String code){
+        try{
+            return ResponseEntity.ok(mvcMbrInfoService.snsLogin(code));
+        } catch (NoSuchElementException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
     }
 
     @PatchMapping("/editInfo")

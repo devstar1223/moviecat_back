@@ -2,10 +2,12 @@ package com.moviecat.www.util;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
 
+@Component
 public class JwtTokenProvider {
 
     // 보안을 위한 시크릿 키
