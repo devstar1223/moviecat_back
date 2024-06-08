@@ -169,8 +169,7 @@ public class MvcMbrInfoService {
         }
 
         Long mvcId = jsonNode.get("id").asLong();
-        //TODO.이메일 추가 필요
-        //String email = jsonNode.get("kakao_account").get("email").asText();
+        String email = jsonNode.get("kakao_account").get("email").asText();
         String nickNm = jsonNode.get("properties").get("nickname").asText();
         String atchFileUrl = Optional.ofNullable(jsonNode)
                 .filter(node -> node.has("properties") && node.get("properties").has("profile_image_url"))
@@ -178,8 +177,7 @@ public class MvcMbrInfoService {
                 .orElse("");
 
         userInfo.put("mvcId",mvcId);
-        //TODO.email 처리 후 주석 풀기
-        //userInfo.put("email",email);
+        userInfo.put("email",email);
         userInfo.put("nickNm",nickNm);
         userInfo.put("atchFileUrl",atchFileUrl);
 
@@ -190,14 +188,12 @@ public class MvcMbrInfoService {
     private MvcLoginDto kakaoUserLogin(HashMap<String, Object> userInfo){
 
         Long mvcId= Long.valueOf(userInfo.get("mvcId").toString());
-        //TODO.email 처리 후 주석 풀기
-        //String kakaoEmail = userInfo.get("email").toString();
+        String email = userInfo.get("email").toString();
         String nickNm = userInfo.get("nickNm").toString();
         String atchFileUrl = userInfo.get("atchFileUrl").toString();
 
         //TODO.강산님 회원가입 처리할 곳(아이디가 db에 존재하지 않을때만 회원가입)
-
-        //TODO. 메일 추가하기
-        return new MvcLoginDto(mvcId, nickNm, "test@test.com", atchFileUrl, jwtTokenProvider.generateToken(mvcId.toString()));
+        
+        return new MvcLoginDto(mvcId, nickNm, email, atchFileUrl, jwtTokenProvider.generateToken(mvcId.toString()));
     }
 }
