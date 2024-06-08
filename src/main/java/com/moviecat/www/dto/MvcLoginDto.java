@@ -10,6 +10,7 @@ import lombok.Setter;
 public class MvcLoginDto {
     private long mvcId;
     private String nickNm;
+    private String mbrNm;
     private String email;
     private String atchFileUrl;
     private String token;

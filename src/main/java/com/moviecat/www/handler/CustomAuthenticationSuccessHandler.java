@@ -25,6 +25,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         Map<String, Object> data = new HashMap<>();
         data.put("mbrId", userDetails.getUsername());
         data.put("nickNm", userDetails.getNickNm());
+        data.put("mbrNm", userDetails.getMbrNm());
         data.put("atchFileUrl", userDetails.getAtchFileUrl());
         data.put("token", userDetails.getToken());
 
