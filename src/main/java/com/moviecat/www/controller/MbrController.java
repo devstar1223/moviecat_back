@@ -64,9 +64,9 @@ public class MbrController {
         }
     }
 
-    @GetMapping("/idFind")
+    @GetMapping("/findId")
     @Operation(summary = "아이디 찾기", description = "없을경우 404 NOTFOUND 반환. 있을시 200 OK와 ID 반환")
-    public ResponseEntity<Object> idFind(@RequestParam String mbrNm,@RequestParam String email) {
+    public ResponseEntity<Object> findId(@RequestParam String mbrNm,@RequestParam String email) {
         String findId = mvcMbrInfoService.findId(mbrNm, email);
         if (findId == null) {
             return new ResponseEntity<>("해당 ID 없음", HttpStatus.NOT_FOUND);
@@ -75,9 +75,9 @@ public class MbrController {
         }
     }
 
-    @GetMapping("/pswdFind")
+    @GetMapping("/findPswd")
     @Operation(summary = "비밀번호 찾기", description = "없을경우 404 NOTFOUND 반환. 있을시 200 OK와 임시 비밀번호 이메일 전송")
-    public ResponseEntity<Object> pswdFind(@ModelAttribute MvcMbrInfoDto mvcMbrInfoDto) {
+    public ResponseEntity<Object> findPswd(@ModelAttribute MvcMbrInfoDto mvcMbrInfoDto) {
         Boolean findPswd = mvcMbrInfoService.findPswd(mvcMbrInfoDto.getMbrId(), mvcMbrInfoDto.getMbrNm(), mvcMbrInfoDto.getEmail());
         if(findPswd){
             return new ResponseEntity<>("메일로 전송 완료", HttpStatus.OK);
