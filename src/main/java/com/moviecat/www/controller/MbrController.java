@@ -21,7 +21,6 @@ public class MbrController {
     @PostMapping("/join")
     @Operation(summary = "회원 가입", description = "회원가입 api")
     public ResponseEntity<String> joinMember(@ModelAttribute MvcMbrInfoDto mvcMbrInfoDto) {
-        System.out.println("=== 가입 요청 ===");
         mvcMbrInfoService.joinMember(mvcMbrInfoDto);
         return new ResponseEntity<>("회원 가입 성공", HttpStatus.OK);
     }
@@ -66,7 +65,7 @@ public class MbrController {
     }
 
     @GetMapping("/idFind")
-    @Operation(summary = "아이디 찾기", description = "중복시 404 CONFLICT 반환. 없을시 200 OK")
+    @Operation(summary = "아이디 찾기", description = "없을경우 404 NOTFOUND 반환. 있을시 200 OK와 ID 반환")
     public ResponseEntity<Object> idFind(@RequestParam String mbrNm,@RequestParam String email) {
         String findId = mvcMbrInfoService.findId(mbrNm, email);
         if (findId == null) {
@@ -74,5 +73,18 @@ public class MbrController {
         } else {
             return new ResponseEntity<>(findId, HttpStatus.OK);
         }
+    }
+
+    @GetMapping("/pswdFind")
+    @Operation(summary = "비밀번호 찾기", description = "없을경우 404 NOTFOUND 반환. 있을시 200 OK와 임시 비밀번호 이메일 전송")
+    public ResponseEntity<Object> pswdFind(@ModelAttribute MvcMbrInfoDto mvcMbrInfoDto) {
+        Boolean findPswd = mvcMbrInfoService.findPswd(mvcMbrInfoDto.getMbrId(), mvcMbrInfoDto.getMbrNm(), mvcMbrInfoDto.getEmail());
+        if(findPswd){
+            return new ResponseEntity<>("메일로 전송 완료", HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>("일치하는 계정 없음", HttpStatus.NOT_FOUND);
+        }
+
     }
 }

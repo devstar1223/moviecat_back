@@ -8,16 +8,19 @@ import com.moviecat.www.dto.MvcMbrInfoDto;
 import com.moviecat.www.entity.MvcMbrInfo;
 import com.moviecat.www.repository.MvcMbrInfoRepository;
 import com.moviecat.www.util.JwtTokenProvider;
+import com.moviecat.www.util.PasswordGenerator;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.http.*;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.mail.MailSender;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -32,6 +35,7 @@ public class MvcMbrInfoService {
     private final MvcMbrInfoRepository mvcMbrInfoRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider = new JwtTokenProvider();
+    private final MailSender mailSender;
 
     @Value("${kakao.key.client-id}")
     private String clientId;
@@ -90,9 +94,33 @@ public class MvcMbrInfoService {
     public String findId(String mbrNm, String email) {
         Optional<MvcMbrInfo> idOptional = mvcMbrInfoRepository.findByMbrNmAndEmail(mbrNm, email); // ID 있는지 확인
         if (idOptional.isPresent()) {
-            return idOptional.get().getMbrId();
+            String foundId = idOptional.get().getMbrId();
+            return foundId.substring(0, foundId.length() - 3) + "***";
         } else {
-            return null; // ID가 존재하지 않음을 나타내는 적절한 값으로 반환
+            return null;
+        }
+    }
+
+    public boolean findPswd(String mbrId, String mbrNm, String email) {
+        Optional<MvcMbrInfo> pswdOptional = mvcMbrInfoRepository.findByMbrIdAndMbrNmAndEmail(mbrId, mbrNm, email);; // ID 있는지 확인
+        if (pswdOptional.isPresent()) {
+            MvcMbrInfo foundPswdMbr = pswdOptional.get();
+            String newPswd = PasswordGenerator.generatePassword(10);
+            foundPswdMbr.setPswd(passwordEncoder.encode(newPswd));
+            foundPswdMbr.setMdfcnUserId("admin"); // admin으로 수정 ID 변경
+            foundPswdMbr.setMdfcnUserNm("운영자"); // 운영자로 수정자 변경
+            foundPswdMbr.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now())); // 수정 날짜 현재로 등록
+            mvcMbrInfoRepository.save(foundPswdMbr);
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("devstar1223@gmail.com");
+            message.setTo(email);
+            message.setReplyTo("devstar1223@gmail.com");
+            message.setSubject("이메일 제목");
+            message.setText("본문 내용 : " + newPswd + " 입니다.");
+            mailSender.send(message);
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -208,28 +236,29 @@ public class MvcMbrInfoService {
         //TODO.에러나서 우선 주석처리했습니다.
         //아직 테스트 해보지 못했습니다.
         String kakaoIdPlusK = "K"+mvcId;
-//        Optional<MvcMbrInfo> kakaoIdOptional = mvcMbrInfoRepository.findByMbrId(kakaoIdPlusK);
-//        if(!kakaoIdOptional.isPresent()){
-//            MvcMbrInfo kakaoJoinInfo = kakaoIdOptional.get();
-//            MvcMbrInfo kakaoMbr = new MvcMbrInfo();
-//            kakaoMbr.setMbrId("K" + kakaoJoinInfo.getMvcId());
-//            kakaoMbr.setEmail(kakaoJoinInfo.getEmail());
-//            kakaoMbr.setNickNm(kakaoJoinInfo.getNickNm());
-//            kakaoMbr.setAtchFileUrl(kakaoJoinInfo.getAtchFileUrl());
-//            kakaoMbr.setMbrSe(1); // 카카오는 1
-//            kakaoMbr.setMbrNm(""); // 이름칸 비워둠
-//            kakaoMbr.setPswd(""); // 카카오 로그인 비밀번호 X
-//            kakaoMbr.setTrmsAgre('Y');
-//            kakaoMbr.setInfoAgre('Y');
-//            kakaoMbr.setMarkAgre('N');
-//            kakaoMbr.setRgstUserId("K" + kakaoJoinInfo.getMvcId());
-//            kakaoMbr.setRgstUserNm(""); // 이름칸 비워져있기 때문에
-//            kakaoMbr.setRgstDay(Timestamp.valueOf(LocalDateTime.now()));
-//            kakaoMbr.setMdfcnUserId("K" + kakaoJoinInfo.getMvcId());
-//            kakaoMbr.setMdfcnUserNm(""); // 이름칸 비워져있기 때문에
-//            kakaoMbr.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
-//            mvcMbrInfoRepository.save(kakaoMbr);
-//        }
+        Optional<MvcMbrInfo> kakaoIdOptional = mvcMbrInfoRepository.findByMbrId(kakaoIdPlusK);
+        if(!kakaoIdOptional.isPresent()){
+            MvcMbrInfo kakaoJoinInfo = kakaoIdOptional.get();
+            MvcMbrInfo kakaoMbr = new MvcMbrInfo();
+            kakaoMbr.setMbrId("K" + kakaoJoinInfo.getMvcId());
+            kakaoMbr.setEmail(kakaoJoinInfo.getEmail());
+            kakaoMbr.setNickNm(kakaoJoinInfo.getNickNm());
+            kakaoMbr.setAtchFileUrl(kakaoJoinInfo.getAtchFileUrl());
+            kakaoMbr.setPhoneNo(kakaoJoinInfo.getPhoneNo()); // 안들어오거나, 혹시 -가 붙여서 들어오진 않을까..
+            kakaoMbr.setMbrSe(1); // 카카오는 1
+            kakaoMbr.setMbrNm(kakaoJoinInfo.getMbrNm()); // 이름칸 비워둠
+            kakaoMbr.setPswd(""); // 카카오 로그인 비밀번호 X
+            kakaoMbr.setTrmsAgre('N');
+            kakaoMbr.setInfoAgre('N');
+            kakaoMbr.setMarkAgre('N');
+            kakaoMbr.setRgstUserId("K" + kakaoJoinInfo.getMvcId());
+            kakaoMbr.setRgstUserNm(kakaoJoinInfo.getMbrNm()); // 이름칸 비워져있기 때문에
+            kakaoMbr.setRgstDay(Timestamp.valueOf(LocalDateTime.now()));
+            kakaoMbr.setMdfcnUserId("K" + kakaoJoinInfo.getMvcId());
+            kakaoMbr.setMdfcnUserNm(kakaoJoinInfo.getMbrNm()); // 이름칸 비워져있기 때문에
+            kakaoMbr.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
+            mvcMbrInfoRepository.save(kakaoMbr);
+        }
         return new MvcLoginDto(mvcId, nickNm, mbrNm, email, atchFileUrl, jwtTokenProvider.generateToken(mvcId.toString()));
     }
 }
