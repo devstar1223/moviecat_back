@@ -46,7 +46,7 @@ public class MvcMbrInfoService {
     @Value("${kakao.redirect-uri}")
     private String redirectUri;
 
-    public void joinMember(MvcMbrInfoDto mvcMbrInfoDto, MultipartFile profileImage) {
+    public void joinMember(MvcMbrInfoDto mvcMbrInfoDto) {
         MvcMbrInfo mvcMbrInfo = new MvcMbrInfo();
         mvcMbrInfo.setMbrId(mvcMbrInfoDto.getMbrId());
         mvcMbrInfo.setMbrSe(mvcMbrInfoDto.getMbrSe());
@@ -65,8 +65,8 @@ public class MvcMbrInfoService {
         mvcMbrInfo.setMdfcnUserId(mvcMbrInfoDto.getMbrId());
         mvcMbrInfo.setMdfcnUserNm(mvcMbrInfoDto.getMbrNm());
         mvcMbrInfo.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
-        if(!profileImage.isEmpty()){
-            String path = mvcProfileImageService.uploadFile(profileImage);
+        if(mvcMbrInfoDto.getProfileImage() != null){
+            String path = mvcProfileImageService.uploadFile(mvcMbrInfoDto.getProfileImage());
             mvcMbrInfo.setAtchFileUrl(path);
         }
         mvcMbrInfoRepository.save(mvcMbrInfo);

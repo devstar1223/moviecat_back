@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.web.multipart.MultipartFile;
+import org.thymeleaf.util.MapUtils;
 
 import java.sql.Timestamp;
 
@@ -19,6 +20,7 @@ public class MvcMbrInfoDto {
     private String email; // 이메일
     private String phoneNo; // 휴대폰번호
     private String intrIntrcn; // 자기소개
+    private MultipartFile profileImage; //첨부파일
     private String atchFileUrl; // 첨부파일 url
     private char trmsAgre; // 이용약관동의 Y/N
     private char infoAgre; // 개인정보수집동의 Y/N
