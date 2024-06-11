@@ -22,6 +22,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.mail.MailSender;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -37,6 +38,7 @@ public class MvcMbrInfoService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider = new JwtTokenProvider();
     private final MailSender mailSender;
+    private final MvcProfileImageService mvcProfileImageService;
 
     @Value("${kakao.key.client-id}")
     private String clientId;
@@ -44,7 +46,7 @@ public class MvcMbrInfoService {
     @Value("${kakao.redirect-uri}")
     private String redirectUri;
 
-    public void joinMember(MvcMbrInfoDto mvcMbrInfoDto) {
+    public void joinMember(MvcMbrInfoDto mvcMbrInfoDto, MultipartFile profileImage) {
         MvcMbrInfo mvcMbrInfo = new MvcMbrInfo();
         mvcMbrInfo.setMbrId(mvcMbrInfoDto.getMbrId());
         mvcMbrInfo.setMbrSe(mvcMbrInfoDto.getMbrSe());
@@ -54,7 +56,6 @@ public class MvcMbrInfoService {
         mvcMbrInfo.setEmail(mvcMbrInfoDto.getEmail());
         mvcMbrInfo.setPhoneNo((mvcMbrInfoDto.getPhoneNo()).replaceAll("-", ""));
         mvcMbrInfo.setIntrIntrcn(mvcMbrInfoDto.getIntrIntrcn());
-        mvcMbrInfo.setAtchFileUrl(mvcMbrInfoDto.getAtchFileUrl());
         mvcMbrInfo.setTrmsAgre(mvcMbrInfoDto.getTrmsAgre());
         mvcMbrInfo.setInfoAgre(mvcMbrInfoDto.getInfoAgre());
         mvcMbrInfo.setMarkAgre(mvcMbrInfoDto.getMarkAgre());
@@ -64,6 +65,10 @@ public class MvcMbrInfoService {
         mvcMbrInfo.setMdfcnUserId(mvcMbrInfoDto.getMbrId());
         mvcMbrInfo.setMdfcnUserNm(mvcMbrInfoDto.getMbrNm());
         mvcMbrInfo.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
+        if(!profileImage.isEmpty()){
+            String path = mvcProfileImageService.uploadFile(profileImage);
+            mvcMbrInfo.setAtchFileUrl(path);
+        }
         mvcMbrInfoRepository.save(mvcMbrInfo);
     }
 

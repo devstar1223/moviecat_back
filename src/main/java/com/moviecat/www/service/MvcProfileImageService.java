@@ -1,7 +1,6 @@
 package com.moviecat.www.service;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,10 +20,14 @@ public class MvcProfileImageService {
         this.bucketName = bucketName;
     }
 
-    public String uploadFile(MultipartFile file) throws IOException {
+    public String uploadFile(MultipartFile file) {
         String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
-        amazonS3.putObject(new PutObjectRequest(bucketName, fileName, file.getInputStream(), null));
-//                .withCannedAcl(CannedAccessControlList.PublicRead)); // ACL PulbicRead로 설정
-        return amazonS3.getUrl(bucketName, fileName).toString();
+        try {
+            amazonS3.putObject(new PutObjectRequest(bucketName, fileName, file.getInputStream(), null));
+            return amazonS3.getUrl(bucketName, fileName).toString();
+        } catch (IOException e) {
+            // 예외 전파
+            throw new RuntimeException("파일 업로드 중 오류 발생", e);
+        }
     }
 }

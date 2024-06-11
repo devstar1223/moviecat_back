@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.NoSuchElementException;
@@ -19,9 +20,9 @@ public class MbrController {
     private final MvcMbrInfoService mvcMbrInfoService;
 
     @PostMapping("/join")
-    @Operation(summary = "회원 가입", description = "회원가입 api")
-    public ResponseEntity<String> joinMember(@ModelAttribute MvcMbrInfoDto mvcMbrInfoDto) {
-        mvcMbrInfoService.joinMember(mvcMbrInfoDto);
+    @Operation(summary = "회원 가입", description = "회원가입 api, 프로필 사진도 함께 받음.")
+    public ResponseEntity<String> joinMember(@RequestPart MvcMbrInfoDto mvcMbrInfoDto, @RequestPart MultipartFile multipartFile) {
+        mvcMbrInfoService.joinMember(mvcMbrInfoDto, multipartFile);
         return new ResponseEntity<>("회원 가입 성공", HttpStatus.OK);
     }
 
