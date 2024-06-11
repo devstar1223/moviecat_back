@@ -10,13 +10,10 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 public class MvcAtchFile {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "atch_file_id", nullable = true)
-    private long atchFileid; // 첨부파일 id
-
-    @Column(name = "pst_id", nullable = false)
-    private long pstId; // 순서
+    @EmbeddedId
+    private MvcAtchFilePK id;
+    
+    //이 밑으론 바꿔야함
 
     @Column(name = "ttl", nullable = false, length = 240)
     private String ttl; // 제목

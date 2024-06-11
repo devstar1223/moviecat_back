@@ -11,6 +11,7 @@ import com.moviecat.www.util.JwtTokenProvider;
 import com.moviecat.www.util.PasswordGenerator;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.http.*;
@@ -31,7 +32,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class MvcMbrInfoService {
-
+    
     private final MvcMbrInfoRepository mvcMbrInfoRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider = new JwtTokenProvider();
@@ -246,16 +247,16 @@ public class MvcMbrInfoService {
             kakaoMbr.setAtchFileUrl(kakaoJoinInfo.getAtchFileUrl());
             kakaoMbr.setPhoneNo(kakaoJoinInfo.getPhoneNo()); // 안들어오거나, 혹시 -가 붙여서 들어오진 않을까..
             kakaoMbr.setMbrSe(1); // 카카오는 1
-            kakaoMbr.setMbrNm(kakaoJoinInfo.getMbrNm()); // 이름칸 비워둠
+            kakaoMbr.setMbrNm(kakaoJoinInfo.getMbrNm());
             kakaoMbr.setPswd(""); // 카카오 로그인 비밀번호 X
             kakaoMbr.setTrmsAgre('N');
             kakaoMbr.setInfoAgre('N');
             kakaoMbr.setMarkAgre('N');
             kakaoMbr.setRgstUserId("K" + kakaoJoinInfo.getMvcId());
-            kakaoMbr.setRgstUserNm(kakaoJoinInfo.getMbrNm()); // 이름칸 비워져있기 때문에
+            kakaoMbr.setRgstUserNm(kakaoJoinInfo.getMbrNm());
             kakaoMbr.setRgstDay(Timestamp.valueOf(LocalDateTime.now()));
             kakaoMbr.setMdfcnUserId("K" + kakaoJoinInfo.getMvcId());
-            kakaoMbr.setMdfcnUserNm(kakaoJoinInfo.getMbrNm()); // 이름칸 비워져있기 때문에
+            kakaoMbr.setMdfcnUserNm(kakaoJoinInfo.getMbrNm());
             kakaoMbr.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
             mvcMbrInfoRepository.save(kakaoMbr);
         }
