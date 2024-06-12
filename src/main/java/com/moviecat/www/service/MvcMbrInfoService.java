@@ -9,11 +9,8 @@ import com.moviecat.www.entity.MvcMbrInfo;
 import com.moviecat.www.repository.MvcMbrInfoRepository;
 import com.moviecat.www.util.JwtTokenProvider;
 import com.moviecat.www.util.PasswordGenerator;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.http.*;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,12 +19,10 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.mail.MailSender;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -38,7 +33,7 @@ public class MvcMbrInfoService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider = new JwtTokenProvider();
     private final MailSender mailSender;
-    private final MvcProfileImageService mvcProfileImageService;
+    private final MvcFileUploadService mvcFileUploadService;
 
     @Value("${kakao.key.client-id}")
     private String clientId;
@@ -66,7 +61,7 @@ public class MvcMbrInfoService {
         mvcMbrInfo.setMdfcnUserNm(mvcMbrInfoDto.getMbrNm());
         mvcMbrInfo.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
         if(mvcMbrInfoDto.getProfileImage() != null){
-            String path = mvcProfileImageService.uploadFile(mvcMbrInfoDto.getProfileImage());
+            String path = mvcFileUploadService.uploadFile(mvcMbrInfoDto.getProfileImage());
             mvcMbrInfo.setAtchFileUrl(path);
         }
         mvcMbrInfoRepository.save(mvcMbrInfo);

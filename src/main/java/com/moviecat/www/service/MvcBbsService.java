@@ -23,13 +23,13 @@ public class MvcBbsService {
         newPost.setMenuId(mvcBbsDto.getMenuId());
         newPost.setTtl(mvcBbsDto.getTtl());
         newPost.setCn(mvcBbsDto.getCn());
-        newPost.setAtchFileUrl(mvcBbsDto.getAtchFileUrl());
+//        newPost.setAtchFileUrl(mvcBbsDto.getAtchFileUrl());
         newPost.setSpoYn(mvcBbsDto.getSpoYn());
         newPost.setRgstUserId(mvcBbsDto.getRgstUserId());
         newPost.setRgstUserNm(mvcBbsDto.getRgstUserNm());
         newPost.setRgstDay(Timestamp.valueOf(LocalDateTime.now())); // 현재시간
-        newPost.setMdfcnUserId(mvcBbsDto.getMdfcnUserId());
-        newPost.setMdfcnUserNm(mvcBbsDto.getMdfcnUserNm());
+        newPost.setMdfcnUserId(mvcBbsDto.getRgstUserId());
+        newPost.setMdfcnUserNm(mvcBbsDto.getRgstUserNm());
         newPost.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now())); // 현재시간 (수정 api 따로)
         newPost.setDeltYn("N"); // 글 쓰기 이므로, 기본적으로 "N"으로 설정
         mvcBbsRepository.save(newPost);
@@ -40,7 +40,7 @@ public class MvcBbsService {
         MvcBbs post = bbsOptional.get();
         post.setTtl(newPostDto.getTtl());
         post.setCn(newPostDto.getCn());
-        post.setAtchFileUrl(newPostDto.getAtchFileUrl());
+//        post.setAtchFileUrl(newPostDto.getAtchFileUrl());
         post.setSpoYn(newPostDto.getSpoYn());
         post.setMdfcnUserId(newPostDto.getMdfcnUserId()); // 들어온 데이터의 id로 수정 id 등록(admin 일부 고려)
         post.setMdfcnUserNm(newPostDto.getMdfcnUserNm()); // 들어온 데이터의 이름으로 수정자 등록(admin 일부 고려)
@@ -67,4 +67,15 @@ public class MvcBbsService {
 
         return jsonPostList;
     }
+
+//    public String bbsReadPost(long pstId) throws JsonProcessingException {
+//        Optional<MvcBbs> postOptional = mvcBbsRepository.findById(pstId);
+//
+//        if(postOptional.isPresent()){
+//            MvcBbs post = postOptional.get();
+//
+//        }
+//
+//
+//    }
 }

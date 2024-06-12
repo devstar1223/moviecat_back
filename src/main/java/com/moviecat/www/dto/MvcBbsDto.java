@@ -2,11 +2,13 @@ package com.moviecat.www.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.sql.Timestamp;
 
 @Getter
 @Setter
+@ToString
 public class MvcBbsDto {
     private long pstId; // 게시글 id
     private long menuId; // 메뉴 id

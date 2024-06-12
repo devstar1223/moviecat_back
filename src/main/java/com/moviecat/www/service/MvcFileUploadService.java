@@ -10,12 +10,12 @@ import java.io.IOException;
 import java.util.UUID;
 
 @Service
-public class MvcProfileImageService {
+public class MvcFileUploadService {
 
     private final AmazonS3 amazonS3;
     private final String bucketName;
 
-    public MvcProfileImageService(AmazonS3 amazonS3, @Value("${spring.cloud.aws.s3.bucket}") String bucketName) {
+    public MvcFileUploadService(AmazonS3 amazonS3, @Value("${spring.cloud.aws.s3.bucket}") String bucketName) {
         this.amazonS3 = amazonS3;
         this.bucketName = bucketName;
     }

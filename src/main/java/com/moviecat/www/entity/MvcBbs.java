@@ -24,8 +24,8 @@ public class MvcBbs {
     @Column(name = "cn", nullable = false, length = 5000)
     private String cn; // 내용
 
-    @Column(name = "atch_file_url", nullable = true)
-    private Long atchFileUrl; // 첨부파일 id
+//    @Column(name = "atch_file_url", nullable = true)
+//    private Long atchFileid; // 첨부파일 id
 
     @Column(name = "spo_yn", nullable = false, length = 1)
     private String spoYn = "N"; // 스포일러 유뮤, 기본 "N"
