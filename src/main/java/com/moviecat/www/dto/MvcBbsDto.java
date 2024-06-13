@@ -14,7 +14,7 @@ public class MvcBbsDto {
     private long menuId; // 메뉴 id
     private String ttl; // 제목
     private String cn; // 내용
-    private Long atchFileUrl; // 첨부파일 id
+    private Long atchFileId; // 첨부파일 id
     private String spoYn; // 스포일러 유무
     private String rgstUserId; // 등록 ID
     private String rgstUserNm; // 등록자

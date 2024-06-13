@@ -23,7 +23,7 @@ public class MvcBbsService {
         newPost.setMenuId(mvcBbsDto.getMenuId());
         newPost.setTtl(mvcBbsDto.getTtl());
         newPost.setCn(mvcBbsDto.getCn());
-//        newPost.setAtchFileUrl(mvcBbsDto.getAtchFileUrl());
+        newPost.setAtchFileid(mvcBbsDto.getAtchFileId());
         newPost.setSpoYn(mvcBbsDto.getSpoYn());
         newPost.setRgstUserId(mvcBbsDto.getRgstUserId());
         newPost.setRgstUserNm(mvcBbsDto.getRgstUserNm());

@@ -27,14 +27,18 @@ public class MvcBbsController {
     @PostMapping("/bbsWritePost")
     @Operation(summary = "글 작성", description = "글 작성 api")
     public ResponseEntity<String> bbsWritePost(@RequestPart MvcBbsDto mvcBbsDto, @RequestPart(value = "files", required = false) List<MultipartFile> files) {
-        mvcBbsService.bbsWritePost(mvcBbsDto);
-        if (!files.isEmpty()) {
-            for (int i = 1; i < files.size()+1; i++) {
-                MultipartFile file = files.get(i-1);
-                MvcAtchFileDto mvcAtchFileDto = mvcAtchFileService.writeSetDto(file,mvcBbsDto,i);  // dto를 서비스에서 설정
+        MvcAtchFileDto mvcAtchFileDto = null;
+        if (files != null && !files.isEmpty()) {
+            for (int i = 1; i < files.size() + 1; i++) {
+                MultipartFile file = files.get(i - 1);
+                mvcAtchFileDto = mvcAtchFileService.writeSetDto(file, mvcBbsDto, i);  // dto를 서비스에서 설정
                 mvcAtchFileService.uploadAtchFile(mvcAtchFileDto); // 받은 dto 기반으로 파일 업로드
             }
         }
+        if (mvcAtchFileDto != null) {
+            mvcBbsDto.setAtchFileId(mvcAtchFileDto.getAtchFileId());
+        }
+        mvcBbsService.bbsWritePost(mvcBbsDto);
         return new ResponseEntity<>("글 작성 성공", HttpStatus.OK);
     }
 
