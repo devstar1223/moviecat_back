@@ -22,34 +22,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MvcBbsController {
     private final MvcBbsService mvcBbsService;
-    private final MvcFileUploadService mvcFileUploadService;
     private final MvcAtchFileService mvcAtchFileService;
 
     @PostMapping("/bbsWritePost")
     @Operation(summary = "글 작성", description = "글 작성 api")
-    // TODO. 현재 컨트롤레엇 dto에 전부 설정한 후, db에는 dto의 정보대로 또다시 등록하는 비효율적인 방식 / 수정예정.
     public ResponseEntity<String> bbsWritePost(@RequestPart MvcBbsDto mvcBbsDto, @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         mvcBbsService.bbsWritePost(mvcBbsDto);
         if (!files.isEmpty()) {
-            for (int i = 0; i < files.size(); i++) {
-                MultipartFile file = files.get(i);
-                MvcAtchFileDto newFileDto = new MvcAtchFileDto();
-                newFileDto.setSeq(i + 1);
-                newFileDto.setMultipartFile(file);
-                newFileDto.setActlFileNm(file.getOriginalFilename());
-                newFileDto.setStrgFileNm("임시 이름"); //TODO. S3 저장 파일명 규칙 생성 예정
-                newFileDto.setStrgFilePath(mvcFileUploadService.uploadFile(file)); // 파일업로드 서비스에서 등록하고 주소명 반환
-                newFileDto.setStrgFileSize((int) file.getSize());
-                newFileDto.setStrgFileExtn(FileUtils.getFileExtension(file.getOriginalFilename())); // 파일 확장자 추출은 util에서
-                newFileDto.setRgstUserId(mvcBbsDto.getRgstUserId()); // 글 등록자 ID와 같음
-                newFileDto.setRgstUserNm(mvcBbsDto.getRgstUserNm()); // 글 등록자 이름과 같음
-                newFileDto.setRgstDay(Timestamp.valueOf(LocalDateTime.now())); // 현재시간
-                newFileDto.setMdfcnUserId(mvcBbsDto.getRgstUserId()); // 글 등록자 ID와 같음
-                newFileDto.setMdfcnUserNm(mvcBbsDto.getRgstUserNm()); // 글 등록자 이름과 같음
-                newFileDto.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now())); // 현재시간
-                newFileDto.setDeltYn("N"); // 등록시엔 삭제유무 기본 N
-                System.out.println(newFileDto.toString());
-                mvcAtchFileService.uploadAtchFile(newFileDto); // 하나씩 DB에 저장
+            for (int i = 1; i < files.size()+1; i++) {
+                MultipartFile file = files.get(i-1);
+                MvcAtchFileDto mvcAtchFileDto = mvcAtchFileService.writeSetDto(file,mvcBbsDto,i);  // dto를 서비스에서 설정
+                mvcAtchFileService.uploadAtchFile(mvcAtchFileDto); // 받은 dto 기반으로 파일 업로드
             }
         }
         return new ResponseEntity<>("글 작성 성공", HttpStatus.OK);

@@ -11,19 +11,8 @@ import java.sql.Timestamp;
 @Setter
 public class MvcAtchFile {
 
-//    @EmbeddedId
-//    private MvcAtchFilePK id; // ID와 순서를 PK로 묶어서 받아온다.
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ATCH_FILE_ID")
-    private long atchFileId; // 파일 id
-
-    @Column(name = "pst_id", nullable = false)
-    private long pstId; // 게시글 id
-
-    @Column(name = "SEQ", nullable = false)
-    private long seq; // 순서
+    @EmbeddedId
+    private MvcAtchFilePK atchFileIdCk; // ID와 순서를 PK로 묶어서 받아온다.
 
     @Column(name = "actl_file_nm", nullable = false, length = 1036)
     private String actlFileNm; // 실제파일명
