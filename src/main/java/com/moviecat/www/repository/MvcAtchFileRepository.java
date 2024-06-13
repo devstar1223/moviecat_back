@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface MvcAtchFileRepository extends JpaRepository<MvcAtchFile, Long> {
     Optional<MvcAtchFile> findTopByOrderByAtchFileIdCkAtchFileIdDesc();
+    Optional<MvcAtchFile> findTopByAtchFileIdCkAtchFileIdOrderByAtchFileIdCkSeqDesc(long atchFileId);
 }

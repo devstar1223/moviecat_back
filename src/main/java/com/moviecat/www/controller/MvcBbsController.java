@@ -44,7 +44,15 @@ public class MvcBbsController {
 
     @PatchMapping("/bbsEditPost")
     @Operation(summary = "글 수정", description = "글 수정 api")
-    public ResponseEntity<String> bbsEditPost(@RequestBody MvcBbsDto mvcBbsDto) {
+    public ResponseEntity<String> bbsEditPost(@RequestPart MvcBbsDto mvcBbsDto, @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+        if (files != null && !files.isEmpty()) {
+            for (int i = 1; i < files.size() + 1; i++) {
+                MultipartFile file = files.get(i - 1);
+                MvcAtchFileDto mvcAtchFileDto = mvcAtchFileService.editSetDto(file, mvcBbsDto, mvcBbsDto.getAtchFileId());  // dto를 서비스에서 설정
+                mvcBbsDto.setAtchFileId(mvcAtchFileDto.getAtchFileId()); // 파일이 있으므로, 파일id가 없었다면 넣어줘야함(반복 되도, 여기 넣어줘야 새로 번호 부여 X)
+                mvcAtchFileService.uploadAtchFile(mvcAtchFileDto); // 받은 dto 기반으로 파일 업로드
+            }
+        }
         mvcBbsService.bbsEditPost(mvcBbsDto);
         return new ResponseEntity<>("글 수정 성공", HttpStatus.OK);
     }

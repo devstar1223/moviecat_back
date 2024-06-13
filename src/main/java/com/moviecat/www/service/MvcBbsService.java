@@ -40,10 +40,10 @@ public class MvcBbsService {
         MvcBbs post = bbsOptional.get();
         post.setTtl(newPostDto.getTtl());
         post.setCn(newPostDto.getCn());
-//        post.setAtchFileUrl(newPostDto.getAtchFileUrl());
         post.setSpoYn(newPostDto.getSpoYn());
-        post.setMdfcnUserId(newPostDto.getMdfcnUserId()); // 들어온 데이터의 id로 수정 id 등록(admin 일부 고려)
-        post.setMdfcnUserNm(newPostDto.getMdfcnUserNm()); // 들어온 데이터의 이름으로 수정자 등록(admin 일부 고려)
+        post.setAtchFileid(newPostDto.getAtchFileId());
+        post.setMdfcnUserId(newPostDto.getRgstUserId()); // 들어온 데이터의 id로 수정 id 등록
+        post.setMdfcnUserNm(newPostDto.getRgstUserNm()); // 들어온 데이터의 이름으로 수정자 등록
         post.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now())); // 현재 시간
         mvcBbsRepository.save(post);
     }
