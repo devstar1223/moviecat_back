@@ -8,6 +8,7 @@ import com.moviecat.www.repository.MvcAtchFileRepository;
 import com.moviecat.www.util.FileUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.spring6.expression.Mvc;
 
@@ -21,7 +22,7 @@ public class MvcAtchFileService {
 
     private final MvcAtchFileRepository mvcAtchFileRepository;
     private final MvcFileUploadService mvcFileUploadService;
-
+    @Transactional
     public MvcAtchFileDto writeSetDto(MultipartFile multipartFile, MvcBbsDto mvcBbsDto, int i){
         Optional<MvcAtchFile> fileIdOptional = mvcAtchFileRepository.findTopByOrderByAtchFileIdCkAtchFileIdDesc(); // 복합키 id에서 가장 큰 값을 가져온다
         long fileId; // 먼저 fileId 선언
@@ -53,6 +54,7 @@ public class MvcAtchFileService {
         return newFileDto;
     }
 
+    @Transactional
     public void uploadAtchFile(MvcAtchFileDto mvcAtchFileDto){
         System.out.println(mvcAtchFileDto.toString());
         MvcAtchFile newFile = new MvcAtchFile();
@@ -77,6 +79,7 @@ public class MvcAtchFileService {
         mvcAtchFileRepository.save(newFile);
     }
 
+    @Transactional
     public MvcAtchFileDto editSetDto(MultipartFile multipartFile, MvcBbsDto mvcBbsDto, Long atchFileId){
         MvcAtchFileDto newFileDto = new MvcAtchFileDto(); // dto를 만들어서 값을 넣자
         long recentSeq;

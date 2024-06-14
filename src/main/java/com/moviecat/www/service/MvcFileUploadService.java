@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -20,6 +21,7 @@ public class MvcFileUploadService {
         this.bucketName = bucketName;
     }
 
+    @Transactional
     public String uploadFile(MultipartFile file/*, String folderName*/) {
         String fileName = /*folderName + "/" + */UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
         try {

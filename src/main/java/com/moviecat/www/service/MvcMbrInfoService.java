@@ -15,6 +15,7 @@ import org.springframework.http.*;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -41,6 +42,7 @@ public class MvcMbrInfoService {
     @Value("${kakao.redirect-uri}")
     private String redirectUri;
 
+    @Transactional
     public void joinMember(MvcMbrInfoDto mvcMbrInfoDto) {
         MvcMbrInfo mvcMbrInfo = new MvcMbrInfo();
         mvcMbrInfo.setMbrId(mvcMbrInfoDto.getMbrId());
@@ -67,6 +69,7 @@ public class MvcMbrInfoService {
         mvcMbrInfoRepository.save(mvcMbrInfo);
     }
 
+    @Transactional
     public void editMember(MvcMbrInfoDto newMbrInfoDto) {
         Optional<MvcMbrInfo> mbrInfoOptional = mvcMbrInfoRepository.findById(newMbrInfoDto.getMvcId()); // 받아온 정보로 회원 찾기
         MvcMbrInfo mbrInfo = mbrInfoOptional.get();
@@ -82,16 +85,19 @@ public class MvcMbrInfoService {
         mvcMbrInfoRepository.save(mbrInfo);
     }
 
+    @Transactional
     public boolean idDupCheck(String mbrId){
         Optional<MvcMbrInfo> mbrIdOptional = mvcMbrInfoRepository.findByMbrId(mbrId); // 받아온 정보로 mbrId 찾기
         return mbrIdOptional.isPresent();
     }
 
+    @Transactional
     public boolean nickNmDupCheck(String nickNm){
         Optional<MvcMbrInfo> nickNmOptional = mvcMbrInfoRepository.findByNickNm(nickNm); // 받아온 정보로 nickNm 찾기
         return nickNmOptional.isPresent();
     }
 
+    @Transactional
     public String findId(String mbrNm, String email) {
         Optional<MvcMbrInfo> idOptional = mvcMbrInfoRepository.findByMbrNmAndEmail(mbrNm, email); // ID 있는지 확인
         if (idOptional.isPresent()) {
@@ -102,6 +108,7 @@ public class MvcMbrInfoService {
         }
     }
 
+    @Transactional
     public boolean findPswd(String mbrId, String mbrNm, String email) {
         Optional<MvcMbrInfo> pswdOptional = mvcMbrInfoRepository.findByMbrIdAndMbrNmAndEmail(mbrId, mbrNm, email);; // ID 있는지 확인
         if (pswdOptional.isPresent()) {
@@ -126,6 +133,7 @@ public class MvcMbrInfoService {
     }
 
     //snsLogin 처리
+    @Transactional
     public MvcLoginDto snsLogin(String code) {
         //1.인가 코드로 토큰 요청
         String accessToken = getAccessToken(code);
@@ -140,6 +148,7 @@ public class MvcMbrInfoService {
     }
 
     //토큰 요청
+    @Transactional
     private String getAccessToken(String code) {
 
         HttpHeaders headers = new HttpHeaders();
@@ -172,6 +181,7 @@ public class MvcMbrInfoService {
     }
 
     //회원 정보 요청
+    @Transactional
     private HashMap<String, Object> getKakaoUserInfo(String accessToken) {
 
         HashMap<String, Object> userInfo= new HashMap<String,Object>();
@@ -224,6 +234,7 @@ public class MvcMbrInfoService {
     }
 
     //카카오 로그인 및 회원가입
+    @Transactional
     private MvcLoginDto kakaoUserLogin(HashMap<String, Object> userInfo){
 
         Long mvcId= Long.valueOf(userInfo.get("mvcId").toString());

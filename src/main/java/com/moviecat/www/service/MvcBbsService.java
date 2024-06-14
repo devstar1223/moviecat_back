@@ -7,6 +7,7 @@ import com.moviecat.www.entity.MvcBbs;
 import com.moviecat.www.repository.MvcBbsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -18,6 +19,7 @@ import java.util.Optional;
 public class MvcBbsService {
     private final MvcBbsRepository mvcBbsRepository;
 
+    @Transactional
     public void bbsWritePost(MvcBbsDto mvcBbsDto) {
         MvcBbs newPost = new MvcBbs();
         newPost.setMenuId(mvcBbsDto.getMenuId());
@@ -35,6 +37,7 @@ public class MvcBbsService {
         mvcBbsRepository.save(newPost);
     }
 
+    @Transactional
     public void bbsEditPost(MvcBbsDto newPostDto) {
         Optional<MvcBbs> bbsOptional = mvcBbsRepository.findById(newPostDto.getPstId()); // 받아온 정보로 글 찾기
         MvcBbs post = bbsOptional.get();
@@ -48,6 +51,7 @@ public class MvcBbsService {
         mvcBbsRepository.save(post);
     }
 
+    @Transactional
     public void bbsDeletePost(MvcBbsDto newPostDto) {
         Optional<MvcBbs> bbsOptional = mvcBbsRepository.findById(newPostDto.getPstId()); // 받아온 정보로 글 찾기
         MvcBbs post = bbsOptional.get();
@@ -58,6 +62,7 @@ public class MvcBbsService {
         mvcBbsRepository.save(post);
     }
 
+    @Transactional
     public String bbsReadBoard(long boardId) throws JsonProcessingException {
         List<MvcBbs> postList = mvcBbsRepository.findByMenuIdAndDeltYnOrderByPstIdAsc(boardId, "N");
 

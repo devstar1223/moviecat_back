@@ -4,6 +4,7 @@ import com.moviecat.www.entity.MvcMenu;
 import com.moviecat.www.repository.MvcMenuRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +16,7 @@ import java.util.Map;
 public class MvcMenuService {
 
     private final MvcMenuRepository mvcMenuRepository;
+    @Transactional
     public List<Map<String, Object>> getActiveMenus() { // 메뉴 정보만을 주는 service모듈
         List<MvcMenu> activeMenus = mvcMenuRepository.findByUseYnOrderBySeqAsc("Y"); // 활성화된 메뉴를 리스트로 담아와서
         List<Map<String, Object>> menuList = new ArrayList<>(); // menuList라는 새로운 List의 원소를 만든다
