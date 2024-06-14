@@ -234,29 +234,27 @@ public class MvcMbrInfoService {
         String atchFileUrl = userInfo.get("atchFileUrl").toString();
 
         //TODO.강산님 회원가입 처리할 곳(아이디가 db에 존재하지 않을때만 회원가입)
-        //TODO.에러나서 우선 주석처리했습니다.
-        //아직 테스트 해보지 못했습니다.
+
         String kakaoIdPlusK = "K"+mvcId;
         Optional<MvcMbrInfo> kakaoIdOptional = mvcMbrInfoRepository.findByMbrId(kakaoIdPlusK);
         if(!kakaoIdOptional.isPresent()){
-            MvcMbrInfo kakaoJoinInfo = kakaoIdOptional.get();
             MvcMbrInfo kakaoMbr = new MvcMbrInfo();
-            kakaoMbr.setMbrId("K" + kakaoJoinInfo.getMvcId());
-            kakaoMbr.setEmail(kakaoJoinInfo.getEmail());
-            kakaoMbr.setNickNm(kakaoJoinInfo.getNickNm());
-            kakaoMbr.setAtchFileUrl(kakaoJoinInfo.getAtchFileUrl());
-            kakaoMbr.setPhoneNo(kakaoJoinInfo.getPhoneNo()); // 안들어오거나, 혹시 -가 붙여서 들어오진 않을까..
+            kakaoMbr.setMbrId(kakaoIdPlusK);
+            kakaoMbr.setEmail(email);
+            kakaoMbr.setNickNm(nickNm);
+            kakaoMbr.setAtchFileUrl(atchFileUrl);
+            kakaoMbr.setPhoneNo(phoneNo); // 안들어오거나, 혹시 -가 붙여서 들어오진 않을까..
             kakaoMbr.setMbrSe(1); // 카카오는 1
-            kakaoMbr.setMbrNm(kakaoJoinInfo.getMbrNm());
+            kakaoMbr.setMbrNm(mbrNm);
             kakaoMbr.setPswd(""); // 카카오 로그인 비밀번호 X
             kakaoMbr.setTrmsAgre('N');
             kakaoMbr.setInfoAgre('N');
             kakaoMbr.setMarkAgre('N');
-            kakaoMbr.setRgstUserId("K" + kakaoJoinInfo.getMvcId());
-            kakaoMbr.setRgstUserNm(kakaoJoinInfo.getMbrNm());
+            kakaoMbr.setRgstUserId(kakaoIdPlusK);
+            kakaoMbr.setRgstUserNm(mbrNm);
             kakaoMbr.setRgstDay(Timestamp.valueOf(LocalDateTime.now()));
-            kakaoMbr.setMdfcnUserId("K" + kakaoJoinInfo.getMvcId());
-            kakaoMbr.setMdfcnUserNm(kakaoJoinInfo.getMbrNm());
+            kakaoMbr.setMdfcnUserId(kakaoIdPlusK);
+            kakaoMbr.setMdfcnUserNm(mbrNm);
             kakaoMbr.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
             mvcMbrInfoRepository.save(kakaoMbr);
         }

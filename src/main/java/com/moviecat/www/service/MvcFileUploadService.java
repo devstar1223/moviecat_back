@@ -20,8 +20,8 @@ public class MvcFileUploadService {
         this.bucketName = bucketName;
     }
 
-    public String uploadFile(MultipartFile file) {
-        String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
+    public String uploadFile(MultipartFile file/*, String folderName*/) {
+        String fileName = /*folderName + "/" + */UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
         try {
             amazonS3.putObject(new PutObjectRequest(bucketName, fileName, file.getInputStream(), null));
             return amazonS3.getUrl(bucketName, fileName).toString();
