@@ -18,8 +18,10 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class MvcAtchFileService {
+
     private final MvcAtchFileRepository mvcAtchFileRepository;
     private final MvcFileUploadService mvcFileUploadService;
+
     public MvcAtchFileDto writeSetDto(MultipartFile multipartFile, MvcBbsDto mvcBbsDto, int i){
         Optional<MvcAtchFile> fileIdOptional = mvcAtchFileRepository.findTopByOrderByAtchFileIdCkAtchFileIdDesc(); // 복합키 id에서 가장 큰 값을 가져온다
         long fileId; // 먼저 fileId 선언
@@ -41,11 +43,11 @@ public class MvcAtchFileService {
         newFileDto.setStrgFilePath(mvcFileUploadService.uploadFile(multipartFile)); // 파일업로드 서비스에서 등록하고 주소명 반환
         newFileDto.setStrgFileSize((int) multipartFile.getSize());
         newFileDto.setStrgFileExtn(FileUtils.getFileExtension(multipartFile.getOriginalFilename())); // 파일 확장자 추출은 util에서
-        newFileDto.setRgstUserId(mvcBbsDto.getRgstUserId()); // 글 등록자 ID와 같음
-        newFileDto.setRgstUserNm(mvcBbsDto.getRgstUserNm()); // 글 등록자 이름과 같음
+        newFileDto.setRgstUserId(mvcBbsDto.getMbrId()); // 글 등록자 ID와 같음
+        newFileDto.setRgstUserNm(mvcBbsDto.getMbrNm()); // 글 등록자 이름과 같음
         newFileDto.setRgstDay(Timestamp.valueOf(LocalDateTime.now())); // 현재시간
-        newFileDto.setMdfcnUserId(mvcBbsDto.getRgstUserId()); // 글 등록자 ID와 같음
-        newFileDto.setMdfcnUserNm(mvcBbsDto.getRgstUserNm()); // 글 등록자 이름과 같음
+        newFileDto.setMdfcnUserId(mvcBbsDto.getMbrId()); // 글 등록자 ID와 같음
+        newFileDto.setMdfcnUserNm(mvcBbsDto.getMbrNm()); // 글 등록자 이름과 같음
         newFileDto.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now())); // 현재시간
         newFileDto.setDeltYn("N"); // 등록시엔 삭제유무 기본 N
         return newFileDto;

@@ -1,10 +1,12 @@
 package com.moviecat.www.dto;
 
+import jakarta.mail.Multipart;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,6 +18,8 @@ public class MvcBbsDto {
     private String cn; // 내용
     private Long atchFileId; // 첨부파일 id
     private String spoYn; // 스포일러 유무
+    private String mbrId;
+    private String mbrNm;
     private String rgstUserId; // 등록 ID
     private String rgstUserNm; // 등록자
     private Timestamp rgstDay; // 등록일

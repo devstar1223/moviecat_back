@@ -25,11 +25,11 @@ public class MvcBbsService {
         newPost.setCn(mvcBbsDto.getCn());
         newPost.setAtchFileid(mvcBbsDto.getAtchFileId());
         newPost.setSpoYn(mvcBbsDto.getSpoYn());
-        newPost.setRgstUserId(mvcBbsDto.getRgstUserId());
-        newPost.setRgstUserNm(mvcBbsDto.getRgstUserNm());
+        newPost.setRgstUserId(mvcBbsDto.getMbrId());
+        newPost.setRgstUserNm(mvcBbsDto.getMbrNm());
         newPost.setRgstDay(Timestamp.valueOf(LocalDateTime.now())); // 현재시간
-        newPost.setMdfcnUserId(mvcBbsDto.getRgstUserId());
-        newPost.setMdfcnUserNm(mvcBbsDto.getRgstUserNm());
+        newPost.setMdfcnUserId(mvcBbsDto.getMbrId());
+        newPost.setMdfcnUserNm(mvcBbsDto.getMbrNm());
         newPost.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now())); // 현재시간 (수정 api 따로)
         newPost.setDeltYn("N"); // 글 쓰기 이므로, 기본적으로 "N"으로 설정
         mvcBbsRepository.save(newPost);
