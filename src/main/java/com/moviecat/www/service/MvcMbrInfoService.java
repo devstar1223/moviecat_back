@@ -243,7 +243,7 @@ public class MvcMbrInfoService {
             kakaoMbr.setEmail(email);
             kakaoMbr.setNickNm(nickNm);
             kakaoMbr.setAtchFileUrl(atchFileUrl);
-            kakaoMbr.setPhoneNo(phoneNo); // 안들어오거나, 혹시 -가 붙여서 들어오진 않을까..
+            kakaoMbr.setPhoneNo(formatPhoneNumber(phoneNo)); // 안들어오거나, 혹시 -가 붙여서 들어오진 않을까..
             kakaoMbr.setMbrSe(1); // 카카오는 1
             kakaoMbr.setMbrNm(mbrNm);
             kakaoMbr.setPswd(""); // 카카오 로그인 비밀번호 X
@@ -259,5 +259,20 @@ public class MvcMbrInfoService {
             mvcMbrInfoRepository.save(kakaoMbr);
         }
         return new MvcLoginDto(mvcId, nickNm, mbrNm, email, atchFileUrl, jwtTokenProvider.generateToken(mvcId.toString()));
+    }
+
+    //+82 01 형식을 010으로 수정
+    public static String formatPhoneNumber(String input) {
+
+        if (input.startsWith("+82 10")) {
+            input = input.substring(6).trim();
+        }
+        input = input.replaceAll("[^\\d]", "");
+
+        if (!input.startsWith("010")) {
+            input = "010" + input;
+        }
+
+        return input;
     }
 }
