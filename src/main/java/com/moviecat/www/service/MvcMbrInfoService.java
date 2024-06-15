@@ -149,7 +149,7 @@ public class MvcMbrInfoService {
 
     //토큰 요청
     @Transactional
-    private String getAccessToken(String code) {
+    String getAccessToken(String code) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -182,7 +182,7 @@ public class MvcMbrInfoService {
 
     //회원 정보 요청
     @Transactional
-    private HashMap<String, Object> getKakaoUserInfo(String accessToken) {
+    HashMap<String, Object> getKakaoUserInfo(String accessToken) {
 
         HashMap<String, Object> userInfo= new HashMap<String,Object>();
 
@@ -235,7 +235,7 @@ public class MvcMbrInfoService {
 
     //카카오 로그인 및 회원가입
     @Transactional
-    private MvcLoginDto kakaoUserLogin(HashMap<String, Object> userInfo){
+    MvcLoginDto kakaoUserLogin(HashMap<String, Object> userInfo){
 
         Long mvcId= Long.valueOf(userInfo.get("mvcId").toString());
         String email = userInfo.get("email").toString();
@@ -244,10 +244,10 @@ public class MvcMbrInfoService {
         String phoneNo = userInfo.get("phoneNo").toString();
         String atchFileUrl = userInfo.get("atchFileUrl").toString();
 
-        //TODO.강산님 회원가입 처리할 곳(아이디가 db에 존재하지 않을때만 회원가입)
-
         String kakaoIdPlusK = "K"+mvcId;
+
         Optional<MvcMbrInfo> kakaoIdOptional = mvcMbrInfoRepository.findByMbrId(kakaoIdPlusK);
+
         if(!kakaoIdOptional.isPresent()){
             MvcMbrInfo kakaoMbr = new MvcMbrInfo();
             kakaoMbr.setMbrId(kakaoIdPlusK);

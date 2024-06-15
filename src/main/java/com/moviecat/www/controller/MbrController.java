@@ -15,6 +15,7 @@ import java.util.NoSuchElementException;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class MbrController {
 
     private final MvcMbrInfoService mvcMbrInfoService;

@@ -20,6 +20,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class MvcBbsController {
     private final MvcBbsService mvcBbsService;
     private final MvcAtchFileService mvcAtchFileService;

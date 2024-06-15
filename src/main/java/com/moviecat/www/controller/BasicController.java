@@ -24,6 +24,7 @@ import java.sql.ClientInfoStatus;
 import java.util.*;
 
 @RestController
+@RequestMapping("/api")
 public class BasicController {
 
     @Autowired
