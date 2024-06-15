@@ -39,6 +39,7 @@ public class MvcFileUploadService {
         String fileExtension = fileUtils.getFileExtension(file.getOriginalFilename()); // 확장자 추출 util
         String strgFileName = shortUuid + "_" + nowTime; // 경로와 확장자 없는, s3에 저장되는 파일 이름
         String uploadFileName = folderName + "/" + strgFileName + "." + fileExtension; // 경로와 확장자를 포함한 s3 저장 이름
+        System.out.println(uploadFileName);
         try {
             amazonS3.putObject(new PutObjectRequest(bucketName, uploadFileName, file.getInputStream(), null));
             return new String[] {strgFileName,fileExtension,amazonS3.getUrl(bucketName, uploadFileName).toString()}; //{파일 이름, 파일 확장자, 파일 주소} 반환
