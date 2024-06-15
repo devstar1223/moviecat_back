@@ -17,16 +17,16 @@ public class MvcAtchFile {
     private MvcAtchFilePK atchFileIdCk; // ID와 순서를 PK로 묶어서 받아온다.
 
     @Column(name = "actl_file_nm", nullable = false, length = 1036)
-    private String actlFileNm; // 실제파일명
+    private String actlFileNm; // 실제파일명(확장자 제외)
 
     @Column(name = "strg_file_nm", nullable = false, length = 1036)
     private String strgFileNm; // 저장파일명
 
     @Column(name = "strg_file_path", nullable = false, length = 1000)
-    private String strgFilePath; // 저장파일경로
+    private String strgFilePath; // 저장파일경로(폴더명 까지만)
 
     @Column(name = "strg_file_size", nullable = false)
-    private int strgFileSize; // 저장파일사이즈
+    private int strgFileSize; // 저장파일사이즈(바이트)
 
     @Column(name = "strg_file_extn", nullable = false, length = 30)
     private String strgFileExtn; // 저장파일확장자

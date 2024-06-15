@@ -63,8 +63,8 @@ public class MvcMbrInfoService {
         mvcMbrInfo.setMdfcnUserNm(mvcMbrInfoDto.getMbrNm());
         mvcMbrInfo.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
         if(mvcMbrInfoDto.getProfileImage() != null){
-            String path = mvcFileUploadService.uploadFile(mvcMbrInfoDto.getProfileImage());
-            mvcMbrInfo.setAtchFileUrl(path);
+            String[] fileInfo = mvcFileUploadService.uploadFile(mvcMbrInfoDto.getProfileImage(),"profile");
+            mvcMbrInfo.setAtchFileUrl(fileInfo[2]);
         }
         mvcMbrInfoRepository.save(mvcMbrInfo);
     }
@@ -79,8 +79,8 @@ public class MvcMbrInfoService {
         mbrInfo.setPhoneNo(newMbrInfoDto.getPhoneNo());
         mbrInfo.setIntrIntrcn(newMbrInfoDto.getIntrIntrcn());
         mbrInfo.setAtchFileUrl(newMbrInfoDto.getAtchFileUrl());
-        mbrInfo.setMdfcnUserId(mbrInfo.getMbrId()); // 수정 id는 현재 id를 등록 (id는 변경 불가) (admin이 재설정은 다른 api)
-        mbrInfo.setMdfcnUserNm(newMbrInfoDto.getNickNm()); // 수정 닉네임은 바꾼 닉네임을 등록 (admin이 재설정은 다른 api)
+        mbrInfo.setMdfcnUserId(mbrInfo.getMbrId()); // 수정 id는 현재 id를 등록 (id는 변경 불가)
+        mbrInfo.setMdfcnUserNm(newMbrInfoDto.getNickNm()); // 수정 닉네임은 바꾼 닉네임을 등록
         mbrInfo.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now())); // 수정 날짜 현재로 등록
         mvcMbrInfoRepository.save(mbrInfo);
     }

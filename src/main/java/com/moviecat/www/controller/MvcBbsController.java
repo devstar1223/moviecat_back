@@ -26,33 +26,35 @@ public class MvcBbsController {
 
     @PostMapping("/bbsWritePost")
     @Operation(summary = "글 작성", description = "글 작성 api")
-    public ResponseEntity<String> bbsWritePost(@ModelAttribute MvcBbsDto mvcBbsDto, @RequestPart(value = "files", required = false) List<MultipartFile> files) {
-
+    public ResponseEntity<String> bbsWritePost(@RequestPart MvcBbsDto mvcBbsDto, @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         MvcAtchFileDto mvcAtchFileDto = null;
-
-        if (files != null && !files.isEmpty()) {
-            for (int i = 1; i < files.size() + 1; i++) {
-                MultipartFile file = files.get(i - 1);
-                mvcAtchFileDto = mvcAtchFileService.writeSetDto(file, mvcBbsDto, i);  // dto를 서비스에서 설정
-                mvcAtchFileService.uploadAtchFile(mvcAtchFileDto); // 받은 dto 기반으로 파일 업로드
+        try {
+            if (files != null && !files.isEmpty()) {
+                for (int i = 1; i < files.size() + 1; i++) {
+                    MultipartFile file = files.get(i - 1);
+                    mvcAtchFileDto = mvcAtchFileService.writeSetDtoAndUploadFile(file, mvcBbsDto, i);  // dto를 서비스에서 설정하고, dto를 참고하여 파일 업로드
+                    mvcAtchFileService.insertAtchFileTable(mvcAtchFileDto); // 받은 dto 기반으로 DB에 저장
+                }
             }
+            if (mvcAtchFileDto != null) {
+                mvcBbsDto.setAtchFileId(mvcAtchFileDto.getAtchFileId());
+            }
+            mvcBbsService.bbsWritePost(mvcBbsDto);
+            return new ResponseEntity<>("글 작성 성공", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("오류 발생", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        if (mvcAtchFileDto != null) {
-            mvcBbsDto.setAtchFileId(mvcAtchFileDto.getAtchFileId());
-        }
-        mvcBbsService.bbsWritePost(mvcBbsDto);
-        return new ResponseEntity<>("글 작성 성공", HttpStatus.OK);
     }
 
     @PatchMapping("/bbsEditPost")
-    @Operation(summary = "글 수정", description = "글 수정 api")
+    @Operation(summary = "글 수정", description = "글 수정 api, 파일 id 무조건 들어와야, 새 파일 id 만들어지지 않습니다.")
     public ResponseEntity<String> bbsEditPost(@RequestPart MvcBbsDto mvcBbsDto, @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         if (files != null && !files.isEmpty()) {
             for (int i = 1; i < files.size() + 1; i++) {
                 MultipartFile file = files.get(i - 1);
-                MvcAtchFileDto mvcAtchFileDto = mvcAtchFileService.editSetDto(file, mvcBbsDto, mvcBbsDto.getAtchFileId());  // dto를 서비스에서 설정
+                MvcAtchFileDto mvcAtchFileDto = mvcAtchFileService.editSetDtoAndUploadFile(file, mvcBbsDto, mvcBbsDto.getAtchFileId());  // // dto를 서비스에서 설정하고, dto를 참고하여 파일 업로드
                 mvcBbsDto.setAtchFileId(mvcAtchFileDto.getAtchFileId()); // 파일이 있으므로, 파일id가 없었다면 넣어줘야함(반복 되도, 여기 넣어줘야 새로 번호 부여 X)
-                mvcAtchFileService.uploadAtchFile(mvcAtchFileDto); // 받은 dto 기반으로 파일 업로드
+                mvcAtchFileService.insertAtchFileTable(mvcAtchFileDto); // 받은 dto 기반으로 DB에 저장
             }
         }
         mvcBbsService.bbsEditPost(mvcBbsDto);

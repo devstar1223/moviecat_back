@@ -23,7 +23,7 @@ public class MvcAtchFileService {
     private final MvcAtchFileRepository mvcAtchFileRepository;
     private final MvcFileUploadService mvcFileUploadService;
     @Transactional
-    public MvcAtchFileDto writeSetDto(MultipartFile multipartFile, MvcBbsDto mvcBbsDto, int i){
+    public MvcAtchFileDto writeSetDtoAndUploadFile(MultipartFile multipartFile, MvcBbsDto mvcBbsDto, int i){
         Optional<MvcAtchFile> fileIdOptional = mvcAtchFileRepository.findTopByOrderByAtchFileIdCkAtchFileIdDesc(); // 복합키 id에서 가장 큰 값을 가져온다
         long fileId; // 먼저 fileId 선언
         if(fileIdOptional.isPresent() && i == 1){
@@ -40,10 +40,13 @@ public class MvcAtchFileService {
         newFileDto.setSeq(i);
         newFileDto.setMultipartFile(multipartFile);
         newFileDto.setActlFileNm(multipartFile.getOriginalFilename());
-        newFileDto.setStrgFileNm("임시 이름"); //TODO. S3 저장 파일명 규칙 생성 예정
-        newFileDto.setStrgFilePath(mvcFileUploadService.uploadFile(multipartFile)); // 파일업로드 서비스에서 등록하고 주소명 반환
+
+        String folderName = "board/"+String.valueOf(mvcBbsDto.getMenuId());
+        String[] fileInfo = mvcFileUploadService.uploadFile(multipartFile,folderName);  // 파일업로드 서비스에서 등록하고, 파일명, 확장자, 주소 반환
+        newFileDto.setStrgFilePath(folderName);
+        newFileDto.setStrgFileNm(fileInfo[0]);
         newFileDto.setStrgFileSize((int) multipartFile.getSize());
-        newFileDto.setStrgFileExtn(FileUtils.getFileExtension(multipartFile.getOriginalFilename())); // 파일 확장자 추출은 util에서
+        newFileDto.setStrgFileExtn(fileInfo[1]);
         newFileDto.setRgstUserId(mvcBbsDto.getMbrId()); // 글 등록자 ID와 같음
         newFileDto.setRgstUserNm(mvcBbsDto.getMbrNm()); // 글 등록자 이름과 같음
         newFileDto.setRgstDay(Timestamp.valueOf(LocalDateTime.now())); // 현재시간
@@ -55,8 +58,7 @@ public class MvcAtchFileService {
     }
 
     @Transactional
-    public void uploadAtchFile(MvcAtchFileDto mvcAtchFileDto){
-        System.out.println(mvcAtchFileDto.toString());
+    public void insertAtchFileTable(MvcAtchFileDto mvcAtchFileDto){
         MvcAtchFile newFile = new MvcAtchFile();
 
         MvcAtchFilePK atchFileIdCk = new MvcAtchFilePK(); // 복합키에 값 set 하기위해 클래스 만들기
@@ -80,7 +82,7 @@ public class MvcAtchFileService {
     }
 
     @Transactional
-    public MvcAtchFileDto editSetDto(MultipartFile multipartFile, MvcBbsDto mvcBbsDto, Long atchFileId){
+    public MvcAtchFileDto editSetDtoAndUploadFile(MultipartFile multipartFile, MvcBbsDto mvcBbsDto, Long atchFileId){
         MvcAtchFileDto newFileDto = new MvcAtchFileDto(); // dto를 만들어서 값을 넣자
         long recentSeq;
         if(atchFileId == null){
@@ -101,15 +103,17 @@ public class MvcAtchFileService {
         newFileDto.setSeq(recentSeq+1); // 순서는 +1 해줌
         newFileDto.setMultipartFile(multipartFile);
         newFileDto.setActlFileNm(multipartFile.getOriginalFilename());
-        newFileDto.setStrgFileNm("임시 이름"); //TODO. S3 저장 파일명 규칙 생성 예정
-        newFileDto.setStrgFilePath(mvcFileUploadService.uploadFile(multipartFile)); // 파일업로드 서비스에서 등록하고 주소명 반환
+        String folderName = "board/"+String.valueOf(mvcBbsDto.getMenuId());
+        String[] fileInfo = mvcFileUploadService.uploadFile(multipartFile,folderName);  // 파일업로드 서비스에서 등록하고, 파일명, 확장자, 주소 반환
+        newFileDto.setStrgFilePath(folderName);
+        newFileDto.setStrgFileNm(fileInfo[0]);
         newFileDto.setStrgFileSize((int) multipartFile.getSize());
-        newFileDto.setStrgFileExtn(FileUtils.getFileExtension(multipartFile.getOriginalFilename())); // 파일 확장자 추출은 util에서
-        newFileDto.setRgstUserId(mvcBbsDto.getRgstUserId()); // 글 등록자 ID와 같음
-        newFileDto.setRgstUserNm(mvcBbsDto.getRgstUserNm()); // 글 등록자 이름과 같음
+        newFileDto.setStrgFileExtn(fileInfo[1]);
+        newFileDto.setRgstUserId(mvcBbsDto.getMbrId()); // 글 등록자 ID와 같음
+        newFileDto.setRgstUserNm(mvcBbsDto.getMbrNm()); // 글 등록자 이름과 같음
         newFileDto.setRgstDay(Timestamp.valueOf(LocalDateTime.now())); // 현재시간
-        newFileDto.setMdfcnUserId(mvcBbsDto.getRgstUserId()); // 글 등록자 ID와 같음
-        newFileDto.setMdfcnUserNm(mvcBbsDto.getRgstUserNm()); // 글 등록자 이름과 같음
+        newFileDto.setMdfcnUserId(mvcBbsDto.getMbrId()); // 글 등록자 ID와 같음
+        newFileDto.setMdfcnUserNm(mvcBbsDto.getMbrNm()); // 글 등록자 이름과 같음
         newFileDto.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now())); // 현재시간
         newFileDto.setDeltYn("N"); // 등록시엔 삭제유무 기본 N
         return newFileDto;

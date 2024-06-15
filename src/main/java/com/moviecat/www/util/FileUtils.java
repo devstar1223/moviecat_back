@@ -1,5 +1,10 @@
 package com.moviecat.www.util;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
 public class FileUtils {
 
     public static String getFileExtension(String fileName) {
@@ -10,4 +15,5 @@ public class FileUtils {
             return ""; // 확장자가 없는 경우
         }
     }
+
 }
