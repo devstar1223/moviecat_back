@@ -15,13 +15,36 @@ public class MvcSearchController {
 
     private final MvcSearchService mvcSearchService;
 
-    @GetMapping("/searchAll") // 우선 모든 데이터 반환하는 api 부터 만들고.
-    @Operation(summary = "검색(임시)", description = "게시판 구분(게시판 번호, 전체 검색은 0), 검색 조건 구분 (제목 0, 제목+내용 1, 작성자 2)")
-    public ResponseEntity<String> searchAll(@RequestBody MvcSearchDto mvcSearchDto){
-        String jsonSearchResult = mvcSearchService.searchAll(mvcSearchDto.getMenuId(),mvcSearchDto.getSrchCrtr(),mvcSearchDto.getSrchWord());
-        if (jsonSearchResult == null) {
-            return new ResponseEntity<>("검색결과가 없습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+    @GetMapping("/searchTtl")
+    @Operation(summary = "제목 검색", description = "게시판 번호별 결과 출력. 0번 들어올경우 통합 검색")
+    public ResponseEntity<String> searchTtl(@RequestBody MvcSearchDto mvcSearchDto) {
+        try {
+            String jsonSearchResult = mvcSearchService.searchTtl(mvcSearchDto.getMenuId(), mvcSearchDto.getSrchWord(), mvcSearchDto.getPage());
+            return new ResponseEntity<>(jsonSearchResult, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(jsonSearchResult, HttpStatus.OK);
+    }
+
+    @GetMapping("/searchTtlCn")
+    @Operation(summary = "제목+내용 검색", description = "게시판 번호별 결과 출력. 0번 들어올경우 통합 검색")
+    public ResponseEntity<String> searchTtlCn(@RequestBody MvcSearchDto mvcSearchDto) {
+        try {
+            String jsonSearchResult = mvcSearchService.searchTtlCn(mvcSearchDto.getMenuId(), mvcSearchDto.getSrchWord(), mvcSearchDto.getPage());
+            return new ResponseEntity<>(jsonSearchResult, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/searchWriter")
+    @Operation(summary = "작성자 검색", description = "게시판 번호별 결과 출력. 0번 들어올경우 통합 검색")
+    public ResponseEntity<String> searchWriter(@RequestBody MvcSearchDto mvcSearchDto) {
+        try {
+            String jsonSearchResult = mvcSearchService.searchWriter(mvcSearchDto.getMenuId(), mvcSearchDto.getSrchWord(), mvcSearchDto.getPage());
+            return new ResponseEntity<>(jsonSearchResult, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

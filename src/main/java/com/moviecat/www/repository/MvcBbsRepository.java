@@ -13,12 +13,19 @@ public interface MvcBbsRepository extends JpaRepository<MvcBbs, Long> {
     Optional<MvcBbs> findByMenuIdAndPstIdAndDeltYn(long menuId, long pstId, String deltYn);
     Optional<MvcBbs> findByPstIdAndDeltYn(long pstId, String deltYn);
 
-    // 0. 제목(ttl) 기준
+    // 제목(ttl) 기준 - 게시판 검색
     List<MvcBbs> findByMenuIdAndDeltYnAndTtlContainingOrderByRgstDayDesc(Long menuId, String deltYn, String ttl);
+    // 제목(ttl) 기준 - 전체 검색
+    List<MvcBbs> findByDeltYnAndTtlContainingOrderByRgstDayDesc(String deltYn, String ttl);
 
-//    // 1. 제목(ttl) 또는 내용(cn) 기준
-//    List<MvcBbs> findByMenuIdAndDeltYnAndTtlContainingOrCnContainingOrderByRgstDayDesc(Long menuId,String deltYn,String srchWord);
-//
-//    // 2. 작성자(rgstUserId) 기준
-//    List<MvcBbs> findByMenuIdAndDeltYnAndRgstUserIdOrderByRgstDayDesc(Long menuId, String deltYn, String rgstUserId);
+    // 제목(ttl) 또는 내용(cn) 기준 - 게시판 검색
+    List<MvcBbs> findByMenuIdAndDeltYnAndTtlContainingOrMenuIdAndDeltYnAndCnContainingOrderByRgstDayDesc(Long menuId, String deltYn, String word, Long menuId2, String deltYn2, String word2);
+    // 제목(ttl) 또는 내용(cn) 기준 - 전체 검색
+    List<MvcBbs> findByDeltYnAndTtlContainingOrDeltYnAndCnContainingOrderByRgstDayDesc(String deltYn, String word, String deltYn2, String word2);
+
+
+    // 작성자(rgstUserId) 기준 - 게시판 검색
+    List<MvcBbs> findByMenuIdAndDeltYnAndRgstUserIdOrderByRgstDayDesc(Long menuId, String deltYn, String rgstUserId);
+    // 작성자(rgstUserId) 기준 - 전체 검색
+    List<MvcBbs> findByDeltYnAndRgstUserIdOrderByRgstDayDesc(String deltYn, String rgstUserId);
 }

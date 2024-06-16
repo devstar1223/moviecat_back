@@ -2,6 +2,9 @@ package com.moviecat.www.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moviecat.www.entity.MvcBbs;
+import com.moviecat.www.entity.MvcMbrInfo;
+import com.moviecat.www.repository.MvcMbrInfoRepository;
+import com.moviecat.www.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.moviecat.www.repository.MvcBbsRepository;
@@ -14,39 +17,60 @@ import java.util.*;
 public class MvcSearchService {
 
     private final MvcBbsRepository mvcBbsRepository;
+    private final MvcPageReturnService mvcPageReturnService;
+    private final MvcMbrInfoRepository mvcMbrInfoRepository;
 
-    public String searchAll(Long menuId, int srchCrtr, String srchWord) {
+    public String searchTtl(Long menuId, String srchWord, int page) { // 제목 검색으로, 요청 들어오면
         try {
-            if (srchCrtr == 0) {
-                List<MvcBbs> resultList = mvcBbsRepository.findByMenuIdAndDeltYnAndTtlContainingOrderByRgstDayDesc(menuId, "N", srchWord);
-                List<Map<String, Object>> searchResultList = new ArrayList<>();
-                for (MvcBbs searchResult : resultList) {
-                    Map<String, Object> searchResultMap = new LinkedHashMap<>(); // LinkedHashMap을 사용하여 순서를 보장
-                    searchResultMap.put("menuId", searchResult.getMenuId());
-                    searchResultMap.put("pstId", searchResult.getPstId());
-                    searchResultMap.put("ttl", searchResult.getTtl());
-                    //Optional<MvcMbrInfo> mbrInfoOptional = mvcMbrInfoRepository.findByRgstUserId(searchResult.getRgstUserId()); // 등록id로 유저 찾아오기
-                    //MvcMbrInfo mbrInfo = mbrInfoOptional.get();
-                    //searchResultMap.put("nickNm", mbrInfo.getNickNm()); // nickNm 찾아 넣기
-                    searchResultMap.put("nickNm", "가데이터 오류 임시 값"); // 예외 처리를 했을 때의 대안 값을 넣어줍니다.
-
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd/HH:mm");
-                    String rgstTime = sdf.format(searchResult.getRgstDay());
-                    searchResultMap.put("rgstDay", rgstTime);
-
-                    searchResultList.add(searchResultMap);
-                }
-
-                Map<String, Object> responseMap = new LinkedHashMap<>(); // LinkedHashMap을 사용하여 순서를 보장
-                responseMap.put("totalCount", searchResultList.size());
-                responseMap.put("data", searchResultList);
-
-                ObjectMapper objectMapper = new ObjectMapper();
-                return objectMapper.writeValueAsString(responseMap);
+            List<MvcBbs> resultList = new ArrayList<>();
+            if(menuId != 0) {
+                resultList = mvcBbsRepository.findByMenuIdAndDeltYnAndTtlContainingOrderByRgstDayDesc(menuId, "N", srchWord); //찾고
             }
+            else{
+                resultList = mvcBbsRepository.findByDeltYnAndTtlContainingOrderByRgstDayDesc("N", srchWord); //찾고
+            }
+            Map<String,Object> pagedSearchResultMap = mvcPageReturnService.boardPageReturn(resultList,page); //모든 행 넘겨주면, 페이징된 Map으로 받음
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.writeValueAsString(pagedSearchResultMap); // json으로 파싱해서 반환
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e.getMessage());
         }
-        return null;
+    }
+
+    public String searchTtlCn(Long menuId, String srchWord, int page) { // 제목+내용 검색으로, 요청 들어오면
+        try {
+            List<MvcBbs> resultList = new ArrayList<>();
+            if(menuId != 0) {
+                resultList = mvcBbsRepository.findByMenuIdAndDeltYnAndTtlContainingOrMenuIdAndDeltYnAndCnContainingOrderByRgstDayDesc(menuId, "N", srchWord,menuId, "N", srchWord); //찾고
+            }
+            else{
+                resultList = mvcBbsRepository.findByDeltYnAndTtlContainingOrDeltYnAndCnContainingOrderByRgstDayDesc("N", srchWord,"N", srchWord); //찾고
+            }
+            Map<String,Object> pagedSearchResultMap = mvcPageReturnService.boardPageReturn(resultList,page); //모든 행 넘겨주면, 페이징된 Map으로 받음
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.writeValueAsString(pagedSearchResultMap); // json으로 파싱해서 반환
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    //TODO.작성자검색 테스트 미완료(아마 될것)
+    public String searchWriter(Long menuId, String srchWord, int page) { // 글쓴이 검색으로, 요청 들어오면
+        try {
+            Optional<MvcMbrInfo> mbrInfoOptional = mvcMbrInfoRepository.findByNickNm(srchWord); // 닉네임으로 ID 찾아오기
+            String writerId = mbrInfoOptional.get().getMbrId();
+            List<MvcBbs> resultList = new ArrayList<>();
+            if(menuId != 0) {
+                resultList = mvcBbsRepository.findByMenuIdAndDeltYnAndRgstUserIdOrderByRgstDayDesc(menuId, "N", writerId); //찾고
+            }
+            else{
+                resultList = mvcBbsRepository.findByDeltYnAndRgstUserIdOrderByRgstDayDesc("N", writerId); //찾고
+            }
+            Map<String,Object> pagedSearchResultMap = mvcPageReturnService.boardPageReturn(resultList,page); //모든 행 넘겨주면, 페이징된 Map으로 받음
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.writeValueAsString(pagedSearchResultMap); // json으로 파싱해서 반환
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 }
