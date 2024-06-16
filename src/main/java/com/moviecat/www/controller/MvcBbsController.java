@@ -95,7 +95,7 @@ public class MvcBbsController {
 
     @GetMapping("/{menuId}/{pstId}/files")
     @Operation(summary = "글 읽기-첨부파일", description = "게시판 번호와 글 번호를 받아 첨부파일을 List로 반환합니다.")
-    public ResponseEntity<?> bbsReadPostFiles(@PathVariable("menuId") long menuId, @PathVariable("pstId") long pstId) {
+    public ResponseEntity<Object> bbsReadPostFiles(@PathVariable("menuId") long menuId, @PathVariable("pstId") long pstId) {
         try {
             List<String> atchFileList = mvcBbsService.bbsReadPostFiles(menuId, pstId);
             System.out.println(atchFileList);
