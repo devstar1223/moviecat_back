@@ -8,6 +8,8 @@ import java.util.Optional;
 
 public interface MvcMbrInfoRepository extends JpaRepository<MvcMbrInfo, Long> {
     Optional<MvcMbrInfo> findByMbrId(String mbrId);
+
+    Optional<MvcMbrInfo> findByRgstUserId(String rgstUserId);
     Optional<MvcMbrInfo> findByNickNm(String nickNm);
     Optional<MvcMbrInfo> findByMbrNmAndEmail(String mbrNm, String email);
     Optional<MvcMbrInfo> findByMbrIdAndMbrNmAndEmail(String mbrId, String mbrNm, String email);

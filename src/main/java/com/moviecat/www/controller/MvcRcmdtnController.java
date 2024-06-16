@@ -2,6 +2,7 @@ package com.moviecat.www.controller;
 
 import com.moviecat.www.dto.MvcRcmdtnInfoDto;
 import com.moviecat.www.service.MvcRcmdtnInfoService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ public class MvcRcmdtnController {
     private final MvcRcmdtnInfoService mvcRcmdtnInfoService;
 
     @PostMapping("/recommend")
+    @Operation(summary = "추천 기능", description ="json으로 오는 추천 정보 처리")
     public ResponseEntity<String> recommend(@RequestBody MvcRcmdtnInfoDto mvcRcmdtnInfoDto){
         mvcRcmdtnInfoService.recommend(mvcRcmdtnInfoDto);
         try {

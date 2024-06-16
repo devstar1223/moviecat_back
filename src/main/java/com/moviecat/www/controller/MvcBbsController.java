@@ -69,27 +69,39 @@ public class MvcBbsController {
         return new ResponseEntity<>("글 삭제 성공", HttpStatus.OK);
     }
 
-//    @GetMapping("/{boarId}/{pstId}")
-//    @Operation(summary = "글 읽기", description = "게시판 번호와 글 번호를 받아 글내용을 반환합니다.")
-//    public ResponseEntity<String> bbsReadPost(@PathVariable("pstId") Long pstId) {
+//    @GetMapping("/{boardId}")
+//    @Operation(summary = "게시판 글 목록", description = "/1 처럼 게시판 번호로 요청하면 글 목록 json으로 줍니다. Jackson ObjectMapper 라이브러리 사용했고 공부 필요.")
+//    public ResponseEntity<String> showBoard(@PathVariable("boardId") Long boardId) {
 //        try {
-//            String jsonPost = mvcBbsService.bbsReadPost(pstId);
-//            return new ResponseEntity<>(jsonPost, HttpStatus.OK);
+//            String jsonPostList = mvcBbsService.bbsReadBoard(boardId);
+//            return new ResponseEntity<>(jsonPostList, HttpStatus.OK);
 //        } catch (JsonProcessingException e) {
 //            e.printStackTrace();
 //            return new ResponseEntity<>("Error processing JSON", HttpStatus.INTERNAL_SERVER_ERROR);
 //        }
 //    }
 
-    @GetMapping("/{boardId}")
-    @Operation(summary = "게시판 글 목록", description = "/1 처럼 게시판 번호로 요청하면 글 목록 json으로 줍니다. Jackson ObjectMapper 라이브러리 사용했고 공부 필요.")
-    public ResponseEntity<String> showBoard(@PathVariable("boardId") Long boardId) {
+    @GetMapping("/{menuId}/{pstId}")
+    @Operation(summary = "글 읽기", description = "게시판 번호와 글 번호를 받아 글내용을 json으로 반환합니다.")
+    public ResponseEntity<String> bbsReadPost(@PathVariable("menuId") long menuId,@PathVariable("pstId") long pstId) {
         try {
-            String jsonPostList = mvcBbsService.bbsReadBoard(boardId);
-            return new ResponseEntity<>(jsonPostList, HttpStatus.OK);
+            String jsonPost = mvcBbsService.bbsReadPost(menuId,pstId);
+            return new ResponseEntity<>(jsonPost, HttpStatus.OK);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return new ResponseEntity<>("Error processing JSON", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{menuId}/{pstId}/files")
+    @Operation(summary = "글 읽기-첨부파일", description = "게시판 번호와 글 번호를 받아 첨부파일을 List로 반환합니다.")
+    public ResponseEntity<?> bbsReadPostFiles(@PathVariable("menuId") long menuId, @PathVariable("pstId") long pstId) {
+        try {
+            List<String> atchFileList = mvcBbsService.bbsReadPostFiles(menuId, pstId);
+            System.out.println(atchFileList);
+            return ResponseEntity.ok().body(atchFileList);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("에러");
         }
     }
 
