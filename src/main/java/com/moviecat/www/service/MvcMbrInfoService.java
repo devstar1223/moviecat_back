@@ -269,7 +269,7 @@ public class MvcMbrInfoService {
             kakaoMbr.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
             mvcMbrInfoRepository.save(kakaoMbr);
         }
-        return new MvcLoginDto(mvcId, nickNm, mbrNm, email, atchFileUrl, jwtTokenProvider.generateToken(mvcId.toString()));
+        return new MvcLoginDto(mvcId, kakaoIdPlusK, nickNm, mbrNm, email, atchFileUrl, jwtTokenProvider.generateToken(mvcId.toString()));
     }
 
     //+82 01 형식을 010으로 수정

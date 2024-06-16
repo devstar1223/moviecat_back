@@ -27,7 +27,7 @@ public class MvcBbsController {
 
     @PostMapping("/bbsWritePost")
     @Operation(summary = "글 작성", description = "글 작성 api")
-    public ResponseEntity<String> bbsWritePost(@RequestPart MvcBbsDto mvcBbsDto, @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+    public ResponseEntity<String> bbsWritePost(@ModelAttribute MvcBbsDto mvcBbsDto, @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         MvcAtchFileDto mvcAtchFileDto = null;
         try {
             if (files != null && !files.isEmpty()) {
@@ -81,7 +81,7 @@ public class MvcBbsController {
 //        }
 //    }
 
-    @GetMapping("/{menuId}/{pstId}")
+    @GetMapping("/movieboard/{menuId}/{pstId}")
     @Operation(summary = "글 읽기", description = "게시판 번호와 글 번호를 받아 글내용을 json으로 반환합니다.")
     public ResponseEntity<String> bbsReadPost(@PathVariable("menuId") long menuId,@PathVariable("pstId") long pstId) {
         try {
@@ -93,7 +93,7 @@ public class MvcBbsController {
         }
     }
 
-    @GetMapping("/{menuId}/{pstId}/files")
+    @GetMapping("/movieboard/{menuId}/{pstId}/files")
     @Operation(summary = "글 읽기-첨부파일", description = "게시판 번호와 글 번호를 받아 첨부파일을 List로 반환합니다.")
     public ResponseEntity<Object> bbsReadPostFiles(@PathVariable("menuId") long menuId, @PathVariable("pstId") long pstId) {
         try {
