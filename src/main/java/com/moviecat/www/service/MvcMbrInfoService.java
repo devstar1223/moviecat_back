@@ -110,7 +110,7 @@ public class MvcMbrInfoService {
 
     @Transactional
     public boolean findPswd(String mbrId, String mbrNm, String email) {
-        Optional<MvcMbrInfo> pswdOptional = mvcMbrInfoRepository.findByMbrIdAndMbrNmAndEmail(mbrId, mbrNm, email);; // ID 있는지 확인
+        Optional<MvcMbrInfo> pswdOptional = mvcMbrInfoRepository.findByMbrIdAndMbrNmAndEmail(mbrId, mbrNm, email); // ID 있는지 확인
         if (pswdOptional.isPresent()) {
             MvcMbrInfo foundPswdMbr = pswdOptional.get();
             String newPswd = PasswordGenerator.generatePassword(10);
