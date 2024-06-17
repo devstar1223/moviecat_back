@@ -10,7 +10,7 @@ import java.text.SimpleDateFormat;
 @RequiredArgsConstructor
 public class TimeFormat {
     public String formatDate(Timestamp timestamp) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd/HH:mm");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm");
         return sdf.format(timestamp);
     }
 }

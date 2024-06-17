@@ -106,7 +106,7 @@ public class MvcBbsService {
             postMap.put("spoYn", post.getSpoYn());
 
             String rgstTime = timeFormat.formatDate(post.getRgstDay());
-            postMap.put("rgstDay", rgstTime);
+            postMap.put("rgstDate", rgstTime);
 
             List<MvcRcmdtnInfo> rcmdList = mvcRcmdtnInfoRepository.findByRcmdtnSeIdAndRcmdtnSeAndDeltYn(post.getMenuId(), post.getPstId(), "N"); // 해당되는 추천 리스트로 받아와서
             postMap.put("rcmd", rcmdList.size()); // 사이즈 만큼 좋아요 수 할당
