@@ -3,16 +3,14 @@ package com.moviecat.www.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.moviecat.www.dto.MvcCmntDto;
 import com.moviecat.www.entity.MvcBbsCmnt;
-import com.moviecat.www.entity.MvcMbrInfo;
 import com.moviecat.www.repository.MvcBbsCmntRepository;
-import com.moviecat.www.repository.MvcMbrInfoRepository;
+import com.moviecat.www.util.ColumnValueMapper;
+import com.moviecat.www.util.TimeFormat;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import java.sql.Timestamp;
@@ -23,7 +21,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MvcBbsCmntService {
     private final MvcBbsCmntRepository mvcBbsCmntRepository;
-    private final MvcMbrInfoRepository mvcMbrInfoRepository;
+    private final ColumnValueMapper columnValueMapper;
+    private final TimeFormat timeFormat;
 
     @Transactional
     public void bbsWriteCmnt(MvcCmntDto mvcCmntDto){
@@ -33,9 +32,8 @@ public class MvcBbsCmntService {
         Optional<MvcBbsCmnt> cmntGroupOptional = mvcBbsCmntRepository.findTopByPstIdOrderByCmntGroupDesc(mvcCmntDto.getPstId());
         int group = cmntGroupOptional.map(cmnt -> cmnt.getCmntGroup() + 1).orElse(0);
 
-        Optional<MvcMbrInfo> mbrNmOptional = mvcMbrInfoRepository.findByMbrId(mvcCmntDto.getCmntMbrId());
-        String mbrNm = mbrNmOptional.map(MvcMbrInfo::getMbrNm)
-                .orElseThrow(() -> new RuntimeException("회원 정보가 유효하지 않습니다."));
+        String mbrNm = columnValueMapper.mbrIdToMbrNm(mvcCmntDto.getCmntMbrId()); // mbrId 넣고 mbrNm으로 받기
+
         MvcBbsCmnt newCmnt = new MvcBbsCmnt();
         newCmnt.setPstId(mvcCmntDto.getPstId());
         newCmnt.setUpCmntId(0);
@@ -57,20 +55,28 @@ public class MvcBbsCmntService {
 
     @Transactional
     public void bbsWriteReply(MvcCmntDto mvcCmntDto){
-        Optional<MvcBbsCmnt> upCmntOptional = mvcBbsCmntRepository.findById(mvcCmntDto.getUpCmntId()); // 상위댓글 id로, 상위댓글 정보 찾기
-        MvcBbsCmnt upCmnt = upCmntOptional.get(); // 받아오기
-        int group = upCmnt.getCmntGroup(); // 그룹지정
-        int lyr = upCmnt.getCmntLyr()+1; // 계층 지정
-        int seq = upCmnt.getSeq()+1; // 순서 지정
+        long upCmntId = mvcCmntDto.getUpCmntId(); // 상위댓글 id
+        Optional<MvcBbsCmnt> upCmntOptional = mvcBbsCmntRepository.findById(upCmntId); // 상위댓글 id로, 상위댓글 정보 찾기
+        int group;
+        int lyr;
+        int seq;
+        if (upCmntOptional.isPresent()) {
+            MvcBbsCmnt upCmnt = upCmntOptional.get();
+            group = upCmnt.getCmntGroup();
+            lyr = upCmnt.getCmntLyr() + 1;
+            Optional<MvcBbsCmnt> seqOptional = mvcBbsCmntRepository.findTopByUpCmntIdOrderBySeqDesc(upCmntId);
+            seq = seqOptional.map(cmnt -> cmnt.getSeq() + 1).orElse(upCmnt.getSeq() + 1);
+        } else {
+            throw new NoSuchElementException("답글을 작성할 상위 댓글을 찾을 수 없습니다.");
+        }
+
         List<MvcBbsCmnt> cmntsToUpdate = mvcBbsCmntRepository.findByPstIdAndSeqGreaterThanEqual(mvcCmntDto.getPstId(), seq); // 게시글에서, 이 답글보다 순서 같거나 큰거 검색
         for (MvcBbsCmnt cmnt : cmntsToUpdate) {
             cmnt.setSeq(cmnt.getSeq() + 1); // 전부 순서 +1씩 해주고
             mvcBbsCmntRepository.save(cmnt); // 저장
         }
 
-        Optional<MvcMbrInfo> mbrNmOptional = mvcMbrInfoRepository.findByMbrId(mvcCmntDto.getCmntMbrId());
-        String mbrNm = mbrNmOptional.map(MvcMbrInfo::getMbrNm)
-                .orElseThrow(() -> new RuntimeException("회원 정보가 유효하지 않습니다."));
+        String mbrNm = columnValueMapper.mbrIdToMbrNm(mvcCmntDto.getCmntMbrId()); // mbrId 넣고 mbrNm으로 받기
 
         MvcBbsCmnt newReply = new MvcBbsCmnt();
         newReply.setPstId(mvcCmntDto.getPstId());
@@ -92,23 +98,25 @@ public class MvcBbsCmntService {
     }
 
     @Transactional
-    public void bbsDeleteCmnt(long cmntId) {
-        Optional<MvcBbsCmnt> deleteCmntOptional = mvcBbsCmntRepository.findById(cmntId);
+    public void bbsDeleteCmnt(MvcCmntDto mvcCmntDto) {
+        Optional<MvcBbsCmnt> deleteCmntOptional = mvcBbsCmntRepository.findById(mvcCmntDto.getCmntId());
+        String mbrNm = columnValueMapper.mbrIdToMbrNm(mvcCmntDto.getCmntMbrId()); // mbrId 넣고 mbrNm으로 받기
         if (deleteCmntOptional.isPresent()) {
             MvcBbsCmnt deleteCmnt = deleteCmntOptional.get();
             deleteCmnt.setDeltYn('Y');
+            deleteCmnt.setMdfcnUserId(mvcCmntDto.getCmntMbrId());
+            deleteCmnt.setMdfcnUserNm(mbrNm);
+            deleteCmnt.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
             mvcBbsCmntRepository.save(deleteCmnt);
         } else {
-            throw new IllegalArgumentException("해당 댓글을 찾을 수 없습니다: " + cmntId);
+            throw new IllegalArgumentException("해당 댓글을 찾을 수 없습니다");
         }
     }
 
     @Transactional
     public void bbsEditCmnt(MvcCmntDto mvcCmntDto){
-        Optional<MvcBbsCmnt> editCmntOptional = mvcBbsCmntRepository.findByCmntIdAndDeltYn(mvcCmntDto.getCmtnId(),'N');
-        Optional<MvcMbrInfo> mbrNmOptional = mvcMbrInfoRepository.findByMbrId(mvcCmntDto.getCmntMbrId());
-        String mbrNm = mbrNmOptional.map(MvcMbrInfo::getMbrNm)
-                .orElseThrow(() -> new RuntimeException("회원 정보가 유효하지 않습니다."));
+        Optional<MvcBbsCmnt> editCmntOptional = mvcBbsCmntRepository.findByCmntIdAndDeltYn(mvcCmntDto.getCmntId(),'N');
+        String mbrNm = columnValueMapper.mbrIdToMbrNm(mvcCmntDto.getCmntMbrId()); // mbrId 넣고 mbrNm으로 받기
         if (editCmntOptional.isPresent()) {
             MvcBbsCmnt editCmnt = editCmntOptional.get();
             editCmnt.setCn(mvcCmntDto.getCn());
@@ -129,11 +137,14 @@ public class MvcBbsCmntService {
         int total = cmntList.size();
 
         for (MvcBbsCmnt cmnt : cmntList) {
-            Map<String, Object> cmntData = new HashMap<>();
+            Map<String, Object> cmntData = new LinkedHashMap<>();
+            cmntData.put("seq", cmnt.getSeq());
+            cmntData.put("cmntGroup", cmnt.getCmntGroup());
+            cmntData.put("cmntLyr", cmnt.getCmntLyr());
             cmntData.put("nickNm", cmnt.getCmntMbrNickNm());
             cmntData.put("cn", cmnt.getCn());
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd/HH:mm"); // 포맷
-            cmntData.put("rgstDay", sdf.format(cmnt.getRgstDay()));
+            String rgstTime = timeFormat.formatDate(cmnt.getRgstDay());
+            cmntData.put("rgstDay", rgstTime);
             dataList.add(cmntData);
         }
 
@@ -141,7 +152,7 @@ public class MvcBbsCmntService {
         result.put("total", total);
         result.put("data", dataList);
 
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.writeValueAsString(result);
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(result);
     }
 }

@@ -40,8 +40,8 @@ public class MvcBbsCmntController {
     }
 
     @PatchMapping("/bbsEditCmnt")
-    @Operation(summary = "댓글 수정", description ="ㅇㅇㅇㅇㅇㅇㅇ")
-    public ResponseEntity<String> bbsEditCmnt(@ModelAttribute MvcCmntDto mvcCmntDto){
+    @Operation(summary = "댓글 수정", description ="댓글 수정 기능")
+    public ResponseEntity<String> bbsEditCmnt(@RequestBody MvcCmntDto mvcCmntDto){
         try {
             mvcBbsCmntService.bbsEditCmnt(mvcCmntDto);
             return new ResponseEntity<>("댓글 수정 성공", HttpStatus.OK);
@@ -51,9 +51,9 @@ public class MvcBbsCmntController {
     }
     @DeleteMapping("/bbsDeleteCmnt")
     @Operation(summary = "댓글/답글 삭제", description ="댓글/답글 통합 삭제")
-    public ResponseEntity<String> bbsDeleteCmnt(@RequestParam long cmntId){
+    public ResponseEntity<String> bbsDeleteCmnt(@RequestBody MvcCmntDto mvcCmntDto){
         try {
-            mvcBbsCmntService.bbsDeleteCmnt(cmntId);
+            mvcBbsCmntService.bbsDeleteCmnt(mvcCmntDto);
             return new ResponseEntity<>("댓글 삭제 성공", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("댓글 삭제 실패: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

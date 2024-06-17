@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FileUtils {
 
-    public static String getFileExtension(String fileName) {
+    public String getFileExtension(String fileName) {
         int lastIndex = fileName.lastIndexOf('.');
         if (lastIndex > 0) {
             return fileName.substring(lastIndex + 1);

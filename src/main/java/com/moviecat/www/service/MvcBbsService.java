@@ -12,6 +12,7 @@ import com.moviecat.www.repository.MvcBbsRepository;
 import com.moviecat.www.repository.MvcMbrInfoRepository;
 import com.moviecat.www.repository.MvcRcmdtnInfoRepository;
 import com.moviecat.www.util.PaginationUtil;
+import com.moviecat.www.util.TimeFormat;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,8 @@ public class MvcBbsService {
     private final MvcRcmdtnInfoRepository mvcRcmdtnInfoRepository;
     private final MvcMbrInfoRepository mvcMbrInfoRepository;
     private final MvcAtchFileRepository mvcAtchFileRepository;
+    private final TimeFormat timeFormat;
+    private final PaginationUtil paginationUtil;
 
     @Transactional
     public void bbsWritePost(MvcBbsDto mvcBbsDto) {
@@ -77,7 +80,7 @@ public class MvcBbsService {
         List<MvcBbs> postList = mvcBbsRepository.findByMenuIdAndDeltYnOrderByPstIdAsc(boardId, "N");
         List<MvcBbs> pagedPostList;
         try {
-            pagedPostList = PaginationUtil.getPage(postList, page);
+            pagedPostList = paginationUtil.getPage(postList, page);
         } catch (Exception e) {
             throw e;
         }
@@ -102,8 +105,7 @@ public class MvcBbsService {
             postMap.put("cn", post.getCn());
             postMap.put("spoYn", post.getSpoYn());
 
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd/HH:mm"); // 포맷
-            String rgstTime = sdf.format(post.getRgstDay()); // 위 포맷 으로 바꿔서 String형으로
+            String rgstTime = timeFormat.formatDate(post.getRgstDay());
             postMap.put("rgstDay", rgstTime);
 
             List<MvcRcmdtnInfo> rcmdList = mvcRcmdtnInfoRepository.findByRcmdtnSeIdAndRcmdtnSeAndDeltYn(post.getMenuId(), post.getPstId(), "N"); // 해당되는 추천 리스트로 받아와서

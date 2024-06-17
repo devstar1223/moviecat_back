@@ -35,6 +35,7 @@ public class MvcMbrInfoService {
     private final JwtTokenProvider jwtTokenProvider = new JwtTokenProvider();
     private final MailSender mailSender;
     private final MvcFileUploadService mvcFileUploadService;
+    private final PasswordGenerator passwordGenerator;
 
     @Value("${kakao.key.client-id}")
     private String clientId;
@@ -113,7 +114,7 @@ public class MvcMbrInfoService {
         Optional<MvcMbrInfo> pswdOptional = mvcMbrInfoRepository.findByMbrIdAndMbrNmAndEmail(mbrId, mbrNm, email); // ID 있는지 확인
         if (pswdOptional.isPresent()) {
             MvcMbrInfo foundPswdMbr = pswdOptional.get();
-            String newPswd = PasswordGenerator.generatePassword(10);
+            String newPswd = passwordGenerator.generatePassword(10);
             foundPswdMbr.setPswd(passwordEncoder.encode(newPswd));
             foundPswdMbr.setMdfcnUserId("admin"); // admin으로 수정 ID 변경
             foundPswdMbr.setMdfcnUserNm("운영자"); // 운영자로 수정자 변경

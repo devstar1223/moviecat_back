@@ -7,7 +7,7 @@ import java.util.List;
 @Component
 public class PaginationUtil {
     public static final int PAGE_SIZE = 10; // 페이지 크기 고정값
-    public static <T> List<T> getPage(List<T> list, int page) {
+    public <T> List<T> getPage(List<T> list, int page) {
         int start = (page - 1) * PAGE_SIZE;
         int end = Math.min(start + PAGE_SIZE, list.size());
         if (start > list.size()) {

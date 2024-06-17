@@ -3,6 +3,7 @@ package com.moviecat.www.service;
 import com.moviecat.www.entity.MvcBbs;
 import com.moviecat.www.repository.MvcMbrInfoRepository;
 import com.moviecat.www.util.PaginationUtil;
+import com.moviecat.www.util.TimeFormat;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.moviecat.www.entity.MvcMbrInfo;
@@ -15,6 +16,8 @@ import java.util.*;
 public class MvcPageReturnService {
 
     private final MvcMbrInfoRepository mvcMbrInfoRepository;
+    private final TimeFormat timeFormat;
+    private final PaginationUtil paginationUtil;
     public Map<String, Object> boardPageReturn(List<MvcBbs> resultList, int page) {
         if (resultList == null || resultList.isEmpty()) {
             throw new NoSuchElementException("검색결과가 없습니다.");
@@ -36,9 +39,7 @@ public class MvcPageReturnService {
             Optional<MvcMbrInfo> mbrInfoOptional = mvcMbrInfoRepository.findByRgstUserId(searchResult.getRgstUserId()); // 등록id로 유저 찾아오기
             MvcMbrInfo mbrInfo = mbrInfoOptional.get();
             searchResultMap.put("nickNm", mbrInfo.getNickNm()); // nickNm 찾아 넣기
-
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd/HH:mm");
-            String rgstTime = sdf.format(searchResult.getRgstDay());
+            String rgstTime = timeFormat.formatDate(mbrInfo.getRgstDay());
             searchResultMap.put("rgstDay", rgstTime);
 
             searchResultList.add(searchResultMap);
@@ -51,7 +52,7 @@ public class MvcPageReturnService {
             throw new RuntimeException("페이지를 초과합니다.");
         }
 
-        List<Map<String, Object>> pagedResultList = PaginationUtil.getPage(searchResultList, page); // 여러 글 담은 리스트 페이징 해주기
+        List<Map<String, Object>> pagedResultList = paginationUtil.getPage(searchResultList, page); // 여러 글 담은 리스트 페이징 해주기
 
         Map<String, Object> responseMap = new LinkedHashMap<>();
         responseMap.put("total", totalSize);
