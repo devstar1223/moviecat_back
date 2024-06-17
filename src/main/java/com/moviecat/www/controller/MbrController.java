@@ -22,7 +22,7 @@ public class MbrController {
 
     @PostMapping("/join")
     @Operation(summary = "회원 가입", description = "회원가입 api, 프로필 사진도 함께 받음.")
-    public ResponseEntity<String> joinMember(@ModelAttribute MvcMbrInfoDto mvcMbrInfoDto, @RequestPart(required = false) MultipartFile profileImage) {
+    public ResponseEntity<String> joinMember(@RequestPart MvcMbrInfoDto mvcMbrInfoDto, @RequestPart(required = false) MultipartFile profileImage) {
         mvcMbrInfoDto.setProfileImage(profileImage);
         mvcMbrInfoService.joinMember(mvcMbrInfoDto);
         return new ResponseEntity<>("회원 가입 성공", HttpStatus.OK);

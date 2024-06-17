@@ -21,7 +21,7 @@ public class MvcSearchController {
         try {
             String jsonSearchResult = mvcSearchService.searchTtl(mvcSearchDto.getMenuId(), mvcSearchDto.getSrchWord(), mvcSearchDto.getPage());
             return new ResponseEntity<>(jsonSearchResult, HttpStatus.OK);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -32,7 +32,7 @@ public class MvcSearchController {
         try {
             String jsonSearchResult = mvcSearchService.searchTtlCn(mvcSearchDto.getMenuId(), mvcSearchDto.getSrchWord(), mvcSearchDto.getPage());
             return new ResponseEntity<>(jsonSearchResult, HttpStatus.OK);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -43,7 +43,7 @@ public class MvcSearchController {
         try {
             String jsonSearchResult = mvcSearchService.searchWriter(mvcSearchDto.getMenuId(), mvcSearchDto.getSrchWord(), mvcSearchDto.getPage());
             return new ResponseEntity<>(jsonSearchResult, HttpStatus.OK);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

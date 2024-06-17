@@ -13,7 +13,7 @@ import java.sql.Timestamp;
 public class MvcMbrInfoDto {
     private long mvcId; // 무비캣 ID
     private String mbrId; // 회원 ID (SNS 로그인의 경우 SNS에서 보내주는)
-    private int mbrSe; // 회원 구분 (0 또는 1)
+    private int mbrSe; // 회원 구분 (일반 0 카카오1)
     private String mbrNm; // 회원이름
     private String nickNm; // 닉네임
     private String pswd; // 비밀번호

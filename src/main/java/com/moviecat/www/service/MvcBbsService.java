@@ -11,6 +11,7 @@ import com.moviecat.www.repository.MvcAtchFileRepository;
 import com.moviecat.www.repository.MvcBbsRepository;
 import com.moviecat.www.repository.MvcMbrInfoRepository;
 import com.moviecat.www.repository.MvcRcmdtnInfoRepository;
+import com.moviecat.www.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,17 +72,26 @@ public class MvcBbsService {
         mvcBbsRepository.save(post);
     }
 
-//    @Transactional
-//    public String bbsReadBoard(long boardId) throws JsonProcessingException {
-//        List<MvcBbs> postList = mvcBbsRepository.findByMenuIdAndDeltYnOrderByPstIdAsc(boardId, "N");
-//
-//        // Jackson ObjectMapper를 사용하여 List<MvcBbs>를 JSON 형식의 문자열로 변환
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        String jsonPostList = objectMapper.writeValueAsString(postList);
-//
-//        return jsonPostList;
-//    }
-//
+    @Transactional
+    public String bbsReadBoard(long boardId, int page) throws JsonProcessingException {
+        List<MvcBbs> postList = mvcBbsRepository.findByMenuIdAndDeltYnOrderByPstIdAsc(boardId, "N");
+        List<MvcBbs> pagedPostList;
+        try {
+            pagedPostList = PaginationUtil.getPage(postList, page);
+        } catch (Exception e) {
+            throw e;
+        }
+        long total = postList.size();
+        Map<String, Object> result = new HashMap<>();
+        result.put("total", total);
+        result.put("data", pagedPostList);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonPostList = objectMapper.writeValueAsString(result);
+
+        return jsonPostList;
+    }
+
     public String bbsReadPost(long menuId,long pstId) throws JsonProcessingException {
         Optional<MvcBbs> postOptional = mvcBbsRepository.findByMenuIdAndPstIdAndDeltYn(menuId,pstId,"N");
 

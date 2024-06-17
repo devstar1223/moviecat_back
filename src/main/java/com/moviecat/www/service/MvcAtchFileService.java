@@ -40,7 +40,6 @@ public class MvcAtchFileService {
         newFileDto.setSeq(i);
         newFileDto.setMultipartFile(multipartFile);
         newFileDto.setActlFileNm(multipartFile.getOriginalFilename());
-
         String folderName = "board/"+String.valueOf(mvcBbsDto.getMenuId());
         String[] fileInfo = mvcFileUploadService.uploadFile(multipartFile,folderName);  // 파일업로드 서비스에서 등록하고, 파일명, 확장자, 주소 반환
         newFileDto.setStrgFilePath(folderName);

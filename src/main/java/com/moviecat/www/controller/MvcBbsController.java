@@ -27,7 +27,7 @@ public class MvcBbsController {
 
     @PostMapping("/bbsWritePost")
     @Operation(summary = "글 작성", description = "글 작성 api")
-    public ResponseEntity<String> bbsWritePost(@ModelAttribute MvcBbsDto mvcBbsDto, @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+    public ResponseEntity<String> bbsWritePost(@RequestPart MvcBbsDto mvcBbsDto, @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         MvcAtchFileDto mvcAtchFileDto = null;
         try {
             if (files != null && !files.isEmpty()) {
@@ -69,17 +69,16 @@ public class MvcBbsController {
         return new ResponseEntity<>("글 삭제 성공", HttpStatus.OK);
     }
 
-//    @GetMapping("/{boardId}")
-//    @Operation(summary = "게시판 글 목록", description = "/1 처럼 게시판 번호로 요청하면 글 목록 json으로 줍니다. Jackson ObjectMapper 라이브러리 사용했고 공부 필요.")
-//    public ResponseEntity<String> showBoard(@PathVariable("boardId") Long boardId) {
-//        try {
-//            String jsonPostList = mvcBbsService.bbsReadBoard(boardId);
-//            return new ResponseEntity<>(jsonPostList, HttpStatus.OK);
-//        } catch (JsonProcessingException e) {
-//            e.printStackTrace();
-//            return new ResponseEntity<>("Error processing JSON", HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
+    @GetMapping("movieboard/{menuId}")
+    @Operation(summary = "게시판 글 목록", description = "/1 처럼 게시판 번호로 요청하면 글 목록 json으로 줍니다. 페이지도 줘야합니다 (기본 1)")
+    public ResponseEntity<String> showBoard(@PathVariable("menuId") Long menuId,int page) {
+        try {
+            String jsonPostList = mvcBbsService.bbsReadBoard(menuId, page);
+            return new ResponseEntity<>(jsonPostList, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @GetMapping("/movieboard/{menuId}/{pstId}")
     @Operation(summary = "글 읽기", description = "게시판 번호와 글 번호를 받아 글내용을 json으로 반환합니다.")
