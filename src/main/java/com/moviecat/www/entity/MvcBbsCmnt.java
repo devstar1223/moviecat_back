@@ -19,7 +19,7 @@ public class MvcBbsCmnt {
     private long pstId; // 게시글 ID
 
     @Column(name = "up_cmnt_id", nullable = false)
-    private int upCmntId; // 상위 댓글 ID , 대댓글은 상위 댓글 ID
+    private long upCmntId; // 상위 댓글 ID , 대댓글은 상위 댓글 ID
 
     @Column(name = "cmnt_lyr", nullable = false)
     private int cmntLyr; // 댓글 계층, 댓글은 0, 대댓글은 1, 대댓글에 대한 댓글은 2
