@@ -18,8 +18,8 @@ public class MvcRcmdtnInfo {
     @Column(name = "rcmdtn_se_id", nullable = false)
     private long rcmdtnSeId; // 추천구분ID, 게시글인 경우 게시글ID,, 평점인 경우 평점ID
 
-    @Column(name = "rcmdtn_se", nullable = false)
-    private int rcmdtnSe; // 게시판, 평점 구분(게시판 각각 1 2 3 평점 4)
+    @Column(name = "menuId", nullable = false)
+    private int menuId; // 게시판, 평점 구분(게시판 각각 1 2 3 평점 4)
 
     @Column(name = "rgst_user_id", nullable = false, length = 20)
     private String rgstUserId; // 등록 ID

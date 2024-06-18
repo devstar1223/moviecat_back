@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MvcRcmdtnInfoRepository extends JpaRepository<MvcRcmdtnInfo, Long> {
-    Optional<MvcRcmdtnInfo> findByRcmdtnSeAndRcmdtnSeIdAndRgstUserId(int rcmdtnSe, long rcmdtnSeId, String rgstUserId);
+    Optional<MvcRcmdtnInfo> findByMenuIdAndRcmdtnSeIdAndRgstUserId(int menuId, long rcmdtnSeId, String rgstUserId);
 
-    List<MvcRcmdtnInfo> findByRcmdtnSeIdAndRcmdtnSeAndDeltYn(long rcmdtnSeId, long rcmdtnSe, String Yn);
+    List<MvcRcmdtnInfo> findByRcmdtnSeIdAndMenuIdAndDeltYn(long rcmdtnSeId, long menuId, String Yn); // 게시글 id, 메뉴 id, yn
+
+    List<MvcRcmdtnInfo> findByDeltYnAndMenuIdAndRcmdtnSeId(String deltYn, long menuId, long rcmdtnSeId);
 }

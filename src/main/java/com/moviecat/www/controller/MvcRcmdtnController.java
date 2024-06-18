@@ -1,5 +1,6 @@
 package com.moviecat.www.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.moviecat.www.dto.MvcRcmdtnInfoDto;
 import com.moviecat.www.service.MvcRcmdtnInfoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,10 +17,10 @@ public class MvcRcmdtnController {
 
     @PostMapping("/recommend")
     @Operation(summary = "추천 기능", description ="추천, 한번 더누르면 추천 취소")
-    public ResponseEntity<String> recommend(@ModelAttribute MvcRcmdtnInfoDto mvcRcmdtnInfoDto){
-        mvcRcmdtnInfoService.recommend(mvcRcmdtnInfoDto);
+    public ResponseEntity<String> recommend(@ModelAttribute MvcRcmdtnInfoDto mvcRcmdtnInfoDto) throws JsonProcessingException {
+        String jsonRcmd = mvcRcmdtnInfoService.recommend(mvcRcmdtnInfoDto);
         try {
-            return new ResponseEntity<>("추천/추천 취소 성공", HttpStatus.OK);
+            return new ResponseEntity<>(jsonRcmd, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("오류 발생", HttpStatus.INTERNAL_SERVER_ERROR);
         }

@@ -110,7 +110,7 @@ public class MvcBbsService {
             String rgstTime = timeFormat.formatDate(post.getRgstDay());
             postMap.put("rgstDate", rgstTime);
 
-            List<MvcRcmdtnInfo> rcmdList = mvcRcmdtnInfoRepository.findByRcmdtnSeIdAndRcmdtnSeAndDeltYn(post.getMenuId(), post.getPstId(), "N"); // 해당되는 추천 리스트로 받아와서
+            List<MvcRcmdtnInfo> rcmdList = mvcRcmdtnInfoRepository.findByRcmdtnSeIdAndMenuIdAndDeltYn(post.getPstId(), post.getMenuId(), "N"); // 해당되는 추천 리스트로 받아와서
             postMap.put("rcmd", rcmdList.size()); // 사이즈 만큼 좋아요 수 할당
 
             Optional<MvcMbrInfo> mbrInfoOptional = mvcMbrInfoRepository.findByRgstUserId(post.getRgstUserId()); // 등록id로 유저 찾아오기
