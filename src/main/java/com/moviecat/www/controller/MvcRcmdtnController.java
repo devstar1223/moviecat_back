@@ -17,7 +17,7 @@ public class MvcRcmdtnController {
 
     @PostMapping("/recommend")
     @Operation(summary = "추천 기능", description ="추천, 한번 더누르면 추천 취소")
-    public ResponseEntity<String> recommend(@ModelAttribute MvcRcmdtnInfoDto mvcRcmdtnInfoDto) throws JsonProcessingException {
+    public ResponseEntity<String> recommend(@RequestBody MvcRcmdtnInfoDto mvcRcmdtnInfoDto) throws JsonProcessingException {
         String jsonRcmd = mvcRcmdtnInfoService.recommend(mvcRcmdtnInfoDto);
         try {
             return new ResponseEntity<>(jsonRcmd, HttpStatus.OK);
