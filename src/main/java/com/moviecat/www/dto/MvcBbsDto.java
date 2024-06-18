@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.persistence.*;
+import java.sql.Blob;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -15,6 +17,7 @@ public class MvcBbsDto {
     private long pstId; // 게시글 id
     private long menuId; // 메뉴 id
     private String ttl; // 제목
+    @Lob
     private String cn; // 내용
     private Long atchFileId; // 첨부파일 id
     private String spoYn; // 스포일러 유무
