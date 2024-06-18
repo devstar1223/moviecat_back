@@ -40,7 +40,7 @@ public class MvcAtchFileService {
         newFileDto.setAtchFileId(fileId);
         newFileDto.setSeq(i);
         newFileDto.setMultipartFile(multipartFile);
-        newFileDto.setActlFileNm(multipartFile.getOriginalFilename());
+        newFileDto.setActlFileNm(fileUtils.removeFileExtension(multipartFile.getOriginalFilename()));
         String folderName = "board/"+String.valueOf(mvcBbsDto.getMenuId());
         String[] fileInfo = mvcFileUploadService.uploadFile(multipartFile,folderName);  // 파일업로드 서비스에서 등록하고, 파일명, 확장자, 주소 반환
         newFileDto.setStrgFilePath(folderName);
@@ -102,7 +102,6 @@ public class MvcAtchFileService {
         newFileDto.setAtchFileId(atchFileId);
         newFileDto.setSeq(recentSeq+1); // 순서는 +1 해줌
         newFileDto.setMultipartFile(multipartFile);
-        System.out.println(multipartFile.getOriginalFilename());
         newFileDto.setActlFileNm(fileUtils.removeFileExtension(multipartFile.getOriginalFilename()));
         String folderName = "board/"+mvcBbsDto.getMenuId();
         String[] fileInfo = mvcFileUploadService.uploadFile(multipartFile,folderName);  // 파일업로드 서비스에서 등록하고, 파일명, 확장자, 주소 반환

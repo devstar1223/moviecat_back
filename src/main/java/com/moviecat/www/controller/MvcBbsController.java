@@ -28,7 +28,7 @@ public class MvcBbsController {
 
     @PostMapping("/bbsWritePost")
     @Operation(summary = "글 작성", description = "글 작성 api")
-    public ResponseEntity<String> bbsWritePost(@RequestPart MvcBbsDto mvcBbsDto, @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+    public ResponseEntity<String> bbsWritePost(@ModelAttribute MvcBbsDto mvcBbsDto, @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         MvcAtchFileDto mvcAtchFileDto = null;
         try {
             if (files != null && !files.isEmpty()) {
@@ -50,7 +50,7 @@ public class MvcBbsController {
 
     @PatchMapping("/bbsEditPost")
     @Operation(summary = "글 수정", description = "글 수정 api, 파일 id 무조건 들어와야, 새 파일 id 만들어지지 않습니다.")
-    public ResponseEntity<String> bbsEditPost(@RequestPart MvcBbsDto mvcBbsDto, @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+    public ResponseEntity<String> bbsEditPost(@ModelAttribute MvcBbsDto mvcBbsDto, @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         if (files != null && !files.isEmpty()) {
             for (int i = 1; i < files.size() + 1; i++) {
                 MultipartFile file = files.get(i - 1);
