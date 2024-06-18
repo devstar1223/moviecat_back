@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Blob;
 import java.sql.Timestamp;
 
 @Entity
@@ -21,7 +22,8 @@ public class MvcBbs {
     @Column(name = "ttl", nullable = false, length = 240)
     private String ttl; // 제목
 
-    @Column(name = "cn", nullable = false, length = 5000)
+    @Lob
+    @Column(name = "cn", nullable = false, columnDefinition = "TEXT")
     private String cn; // 내용
 
     @Column(name = "atch_file_id", nullable = true)

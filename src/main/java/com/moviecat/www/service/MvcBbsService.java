@@ -11,6 +11,7 @@ import com.moviecat.www.repository.MvcAtchFileRepository;
 import com.moviecat.www.repository.MvcBbsRepository;
 import com.moviecat.www.repository.MvcMbrInfoRepository;
 import com.moviecat.www.repository.MvcRcmdtnInfoRepository;
+import com.moviecat.www.util.FileUtils;
 import com.moviecat.www.util.PaginationUtil;
 import com.moviecat.www.util.TimeFormat;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class MvcBbsService {
     private final MvcAtchFileRepository mvcAtchFileRepository;
     private final TimeFormat timeFormat;
     private final PaginationUtil paginationUtil;
+    private final FileUtils fileUtils;
 
     @Transactional
     public void bbsWritePost(MvcBbsDto mvcBbsDto) {
@@ -127,22 +129,36 @@ public class MvcBbsService {
 
     }
 
-    public List<String> bbsReadPostFiles(long menuId, long pstId) {
-        Optional<MvcBbs> fileIdOptional = mvcBbsRepository.findByPstIdAndDeltYn(pstId, "N");
+    public Map<String,Object> bbsReadPostFiles(long pstId) {
+        Optional<MvcBbs> postInfoOptional = mvcBbsRepository.findByPstIdAndDeltYn(pstId, "N");
 
-        if (fileIdOptional.isPresent()) {
-            Long fileId = fileIdOptional.get().getAtchFileid();
-            List<MvcAtchFile> filesList = mvcAtchFileRepository.findAllByAtchFileIdCkAtchFileIdOrderByAtchFileIdCkSeqAsc(fileId);
-            List<String> atchFileList = new ArrayList<>();
+        if (postInfoOptional.isPresent()) {
+            MvcBbs postInfo = postInfoOptional.get(); // 글 정보 가져오기
+            long fileId = postInfo.getAtchFileid();
+            List<MvcAtchFile> filesList = mvcAtchFileRepository.findAllByAtchFileIdCkAtchFileIdOrderByAtchFileIdCkSeqAsc(fileId); // 파일 id로 파일 리스트 검색
+            int seq = 0;
+            List<Map<String, Object>> atchFileList = new ArrayList<>(); // 파일 정보 넣을 리스트 만들기
+            Map<String, Object> atchFileMap = new HashMap<>();
+            String s3Link = "https://mvc0605bucket.s3.ap-northeast-2.amazonaws.com/";
 
             for (MvcAtchFile file : filesList) {
-                String s3Link = "https://mvc0605bucket.s3.ap-northeast-2.amazonaws.com/";
-                atchFileList.add(s3Link+file.getStrgFilePath()+"/"+file.getStrgFileNm()+"."+file.getStrgFileExtn());
+                Map<String, Object> atchFileInfo = new HashMap<>(); // 파일 정보 넣을 맵 만들기
+                atchFileInfo.put("fileId", fileId);
+                atchFileInfo.put("seq", seq++);
+                atchFileInfo.put("fileName", fileUtils.removeFileExtension(file.getActlFileNm())); // 확장자 떼서 파일이름으로 추가
+                atchFileInfo.put("fileExtn", "." + file.getStrgFileExtn());
+                atchFileInfo.put("fileUrl", s3Link + file.getStrgFilePath() + "/" + file.getStrgFileNm() + "." + file.getStrgFileExtn());
+                atchFileList.add(atchFileInfo);
             }
-            return atchFileList;
+            atchFileMap.put("total", atchFileList.size());
+            atchFileMap.put("data", atchFileList);
+            return atchFileMap;
         } else {
-            // fileIdOptional이 비어 있는 경우, 즉 검색 결과가 없는 경우
-            return new ArrayList<>();
+            // postInfoOptional이 비어 있는 경우, 즉 검색 결과가 없는 경우
+            Map<String, Object> emptyMap = new HashMap<>();
+            emptyMap.put("total", 0);
+            emptyMap.put("data", new ArrayList<>());
+            return emptyMap;
         }
     }
 }

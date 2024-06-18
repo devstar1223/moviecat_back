@@ -15,5 +15,12 @@ public class FileUtils {
             return ""; // 확장자가 없는 경우
         }
     }
-
+    public String removeFileExtension(String fileName) {
+        int lastIndex = fileName.lastIndexOf('.');
+        if (lastIndex > 0) {
+            return fileName.substring(0, lastIndex);
+        } else {
+            return fileName; // 확장자가 없는 경우 원본 파일명 반환
+        }
+    }
 }

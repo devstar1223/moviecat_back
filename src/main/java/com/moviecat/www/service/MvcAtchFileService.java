@@ -22,6 +22,7 @@ public class MvcAtchFileService {
 
     private final MvcAtchFileRepository mvcAtchFileRepository;
     private final MvcFileUploadService mvcFileUploadService;
+    private final FileUtils fileUtils;
     @Transactional
     public MvcAtchFileDto writeSetDtoAndUploadFile(MultipartFile multipartFile, MvcBbsDto mvcBbsDto, int i){
         Optional<MvcAtchFile> fileIdOptional = mvcAtchFileRepository.findTopByOrderByAtchFileIdCkAtchFileIdDesc(); // 복합키 id에서 가장 큰 값을 가져온다
@@ -101,8 +102,9 @@ public class MvcAtchFileService {
         newFileDto.setAtchFileId(atchFileId);
         newFileDto.setSeq(recentSeq+1); // 순서는 +1 해줌
         newFileDto.setMultipartFile(multipartFile);
-        newFileDto.setActlFileNm(multipartFile.getOriginalFilename());
-        String folderName = "board/"+String.valueOf(mvcBbsDto.getMenuId());
+        System.out.println(multipartFile.getOriginalFilename());
+        newFileDto.setActlFileNm(fileUtils.removeFileExtension(multipartFile.getOriginalFilename()));
+        String folderName = "board/"+mvcBbsDto.getMenuId();
         String[] fileInfo = mvcFileUploadService.uploadFile(multipartFile,folderName);  // 파일업로드 서비스에서 등록하고, 파일명, 확장자, 주소 반환
         newFileDto.setStrgFilePath(folderName);
         newFileDto.setStrgFileNm(fileInfo[0]);
