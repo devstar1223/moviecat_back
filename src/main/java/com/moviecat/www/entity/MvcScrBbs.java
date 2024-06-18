@@ -13,7 +13,10 @@ public class MvcScrBbs {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "scr_id", nullable = false)
-    private long scrId; // 평점 ID
+    private long scrId; // 평점 ID.
+
+    @Column(name = "menu_id", nullable = false)
+    private long menuId; // 메뉴 ID (4번 고정이나, 확장성을 고려)
 
     @Column(name = "vdo_nm", nullable = false, length = 200)
     private String vdoNm; // 영화명
@@ -47,7 +50,4 @@ public class MvcScrBbs {
 
     @Column(name = "delt_yn", nullable = false, length = 1)
     private String deltYn = "N"; // 삭제유무, 기본 "N"
-
-    @Column(name = "menu_id", nullable = false)
-    private int menuId; // 메뉴 ID
 }

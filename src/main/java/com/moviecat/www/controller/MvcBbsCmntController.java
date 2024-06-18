@@ -18,7 +18,7 @@ public class MvcBbsCmntController {
 
     private final MvcBbsCmntService mvcBbsCmntService;
     @PostMapping("/bbsWriteCmnt")
-    @Operation(summary = "댓글 작성", description ="답글 X")
+    @Operation(summary = "댓글 작성", description ="댓글 작성. 답글 X")
     public ResponseEntity<String> bbsWriteCmnt(@ModelAttribute MvcCmntDto mvcCmntDto){
         try {
             mvcBbsCmntService.bbsWriteCmnt(mvcCmntDto);
@@ -29,7 +29,7 @@ public class MvcBbsCmntController {
     }
 
     @PostMapping("/bbsWriteReply")
-    @Operation(summary = "답글 작성", description ="ㅇㅇㅇㅇㅇㅇㅇ")
+    @Operation(summary = "답글 작성", description ="답글 작성")
     public ResponseEntity<String> bbsWriteReply(@ModelAttribute MvcCmntDto mvcCmntDto){
         try {
             mvcBbsCmntService.bbsWriteReply(mvcCmntDto);
