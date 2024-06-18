@@ -27,7 +27,7 @@ public class MvcBbsController {
 
     @PostMapping("/bbsWritePost")
     @Operation(summary = "글 작성", description = "글 작성 api")
-    public ResponseEntity<String> bbsWritePost(@RequestPart MvcBbsDto mvcBbsDto, @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+    public ResponseEntity<String> bbsWritePost(@ModelAttribute MvcBbsDto mvcBbsDto, @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         MvcAtchFileDto mvcAtchFileDto = null;
         try {
             if (files != null && !files.isEmpty()) {
