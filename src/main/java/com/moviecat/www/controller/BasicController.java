@@ -1,34 +1,25 @@
 package com.moviecat.www.controller;
 
-import com.moviecat.www.entity.MvcMenu;
-import com.moviecat.www.repository.MvcMenuRepository;
+import com.moviecat.www.service.MvcMainBoardService;
 import com.moviecat.www.service.MvcMenuService;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.info.Info;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-
-import java.sql.ClientInfoStatus;
 import java.util.*;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api")
 public class BasicController {
 
-    @Autowired
-    private MvcMenuService menuService;
+    private final MvcMenuService menuService;
+    private final MvcMainBoardService mainBoardService;
 
     @GetMapping("/menuList")
     @Operation(summary = "메뉴명 리스트", description = "메뉴에 들어갈 게시판명을 보내주는 api")
@@ -43,6 +34,17 @@ public class BasicController {
         response.put("data", data);
 
         return response;
+    }
+
+    @GetMapping("/mainBoard")
+    @Operation(summary = "메인 화면", description = "영화리뷰(1) 인기글3 일반7, 영화토크(2) 인기글3 일반7, 영화평점(4) 일반8")
+    public ResponseEntity<String> mainBoard() {
+        try {
+            String jsonMainBoard = mainBoardService.mainBoard();
+            return new ResponseEntity<>(jsonMainBoard, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("메인화면 출력 실패", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }
