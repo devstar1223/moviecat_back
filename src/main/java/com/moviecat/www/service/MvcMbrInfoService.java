@@ -259,7 +259,6 @@ public class MvcMbrInfoService {
             mvcMbrInfoRepository.save(kakaoMbr);
         }
 
-        //TODO.save 후 받아온 MVCID를 전달하기
         return new MvcLoginDto(mvcId, kakaoIdPlusK, nickNm, mbrNm, email, atchFileUrl, jwtTokenProvider.generateToken(mvcId.toString()));
     }
 
