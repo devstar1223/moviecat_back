@@ -116,7 +116,7 @@ public class MvcBbsService {
         return jsonPostList;
     }
 
-    public String bbsReadPost(long menuId,long pstId, String mbrId) throws JsonProcessingException {
+    public String bbsReadPost(long menuId,long pstId) throws JsonProcessingException {
         Optional<MvcBbs> postOptional = mvcBbsRepository.findByMenuIdAndPstIdAndDeltYn(menuId,pstId,"N");
 
         if(postOptional.isPresent()){
@@ -128,9 +128,9 @@ public class MvcBbsService {
             String rgstTime = timeFormat.formatDate(post.getRgstDay());
             postMap.put("rgstDate", rgstTime);
             postMap.put("rcmd", columnValueMapper.pstIdAndMenuIdToRcmdTotal(post.getPstId(), post.getMenuId())); // 좋아요 수 구해오기
-            postMap.put("rcmdDeltYn", columnValueMapper.mbrIdToRcmdDeltYn(mbrId)); // 글 조회시, 해당 유저가 이 글을 좋아요 눌렀는지.
             postMap.put("profileUrl", columnValueMapper.mbrIdToAtchFileUrl(post.getRgstUserId())); // 등록 id로 프로필 url 찾아 넣기
             postMap.put("nickNm", columnValueMapper.mbrIdToNickNm(post.getRgstUserId())); // 등록 id로 nickNm 찾아 넣기(없으면 null)
+            postMap.put("mvcId", columnValueMapper.mbrIdToMvcId(post.getRgstUserId())); // 등록 id로 mvcId 찾아 넣기
             // ObjectMapper를 사용하여 맵을 JSON으로 변환
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.writeValueAsString(postMap);

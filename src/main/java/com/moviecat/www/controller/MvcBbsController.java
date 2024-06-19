@@ -83,9 +83,9 @@ public class MvcBbsController {
 
     @GetMapping("/movieboard/{menuId}/{pstId}")
     @Operation(summary = "글 읽기", description = "게시판 번호와 글 번호를 받아 글내용을 json으로 반환합니다.")
-    public ResponseEntity<String> bbsReadPost(@PathVariable("menuId") long menuId,@PathVariable("pstId") long pstId, @RequestParam String mbrId) {
+    public ResponseEntity<String> bbsReadPost(@PathVariable("menuId") long menuId,@PathVariable("pstId") long pstId) {
         try {
-            String jsonPost = mvcBbsService.bbsReadPost(menuId,pstId,mbrId);
+            String jsonPost = mvcBbsService.bbsReadPost(menuId,pstId);
             return new ResponseEntity<>(jsonPost, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("오류 발생", HttpStatus.INTERNAL_SERVER_ERROR);

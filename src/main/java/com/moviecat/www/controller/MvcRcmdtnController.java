@@ -25,4 +25,16 @@ public class MvcRcmdtnController {
             return new ResponseEntity<>("오류 발생", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/rcmdYn")
+    @Operation(summary = "추천 확인 기능", description ="해당 회원이 추천을 눌렀는지 확인")
+    public ResponseEntity<Object> rcmdCheck(@RequestParam long menuId, @RequestParam long rcmdtnSeId, @RequestParam String mbrId){
+        try {
+            boolean rcmdYn = mvcRcmdtnInfoService.rcmdCheck(menuId,rcmdtnSeId,mbrId);
+            return new ResponseEntity<>(rcmdYn, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("오류 발생", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

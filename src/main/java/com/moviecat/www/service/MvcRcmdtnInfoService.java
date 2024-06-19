@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moviecat.www.dto.MvcRcmdtnInfoDto;
 import com.moviecat.www.entity.MvcRcmdtnInfo;
 import com.moviecat.www.repository.MvcRcmdtnInfoRepository;
+import com.moviecat.www.util.ColumnValueMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,7 @@ import java.util.Optional;
 public class MvcRcmdtnInfoService {
     private final MvcRcmdtnInfoRepository mvcRcmdtnInfoRepository;
     private final ObjectMapper objectMapper;
+
     public String recommend(MvcRcmdtnInfoDto mvcRcmdtnInfoDto) throws JsonProcessingException {
         Map<String, Object> recommendMap = new LinkedHashMap<>();
         Optional<MvcRcmdtnInfo> rcmdOptional = mvcRcmdtnInfoRepository.findByMenuIdAndRcmdtnSeIdAndRgstUserId(mvcRcmdtnInfoDto.getMenuId(), mvcRcmdtnInfoDto.getRcmdtnSeId(), mvcRcmdtnInfoDto.getMbrId());
@@ -51,5 +53,15 @@ public class MvcRcmdtnInfoService {
         recommendMap.put("total", totalRcmdList.size());
 
         return objectMapper.writeValueAsString(recommendMap);
+    }
+
+    public boolean rcmdCheck(long menuId, long rcmdtnSeId, String mbrId) {
+        Optional<MvcRcmdtnInfo> rcmdOptional = mvcRcmdtnInfoRepository.findByMenuIdAndRcmdtnSeIdAndRgstUserIdAndDeltYn(menuId,rcmdtnSeId,mbrId,"N");
+        if(rcmdOptional.isPresent()){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 }

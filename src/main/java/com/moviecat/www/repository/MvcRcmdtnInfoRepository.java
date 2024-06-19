@@ -13,5 +13,5 @@ public interface MvcRcmdtnInfoRepository extends JpaRepository<MvcRcmdtnInfo, Lo
 
     List<MvcRcmdtnInfo> findByDeltYnAndMenuIdAndRcmdtnSeId(String deltYn, long menuId, long rcmdtnSeId);
 
-    Optional<MvcRcmdtnInfo> findByRgstUserIdAndDeltYn(String rgstUserId, String deltYn);
+    Optional<MvcRcmdtnInfo> findByMenuIdAndRcmdtnSeIdAndRgstUserIdAndDeltYn(long menuId,long rcmdtnSeId,String rgstUserId, String deltYn);
 }

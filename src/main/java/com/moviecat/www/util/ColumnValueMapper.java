@@ -56,19 +56,19 @@ public class ColumnValueMapper {
         return rcmdList.size(); // 사이즈 만큼 좋아요 수 반환
     }
 
-    public String mbrIdToRcmdDeltYn(String mbrId){ // mbrId를 받으면, 해당 유저가 상세글 보기에서 좋아요를 눌렀는지 안눌렀는지
-        Optional<MvcRcmdtnInfo> rcmdOptional = mvcRcmdtnInfoRepository.findByRgstUserIdAndDeltYn(mbrId, "N");
-        if(rcmdOptional.isPresent()){
-            return "N";
-        }
-        else{
-            return "Y";
-        }
-    }
-
     public int pstIdToCmntTotal(long pstId) { // 게시글 id주면, 댓글 갯수 반환
         List<MvcBbsCmnt> rcmdList = mvcBbsCmntRepository.findByPstIdAndDeltYn(pstId,'N'); // 해당되는 추천 리스트로 받아와서
         return rcmdList.size(); // 사이즈 만큼 좋아요 수 반환
+    }
+
+    public long mbrIdToMvcId(String mbrId) { // mbrId 주면, mvcId 반환
+        Optional<MvcMbrInfo> mvcIdOptional = mvcMbrInfoRepository.findByMbrId(mbrId); // 해당되는 추천 리스트로 받아와서
+        if(mvcIdOptional.isPresent()){
+            return mvcIdOptional.get().getMvcId();
+        }
+        else {
+            throw new NoSuchElementException("회원 정보가 유효하지 않습니다.");
+        }
     }
 
 }

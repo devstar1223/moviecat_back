@@ -20,4 +20,5 @@ public interface MvcBbsCmntRepository extends JpaRepository<MvcBbsCmnt,Long> {
     Optional<MvcBbsCmnt> findTopByUpCmntIdOrderBySeqDesc(long upCmntId);
 
     List<MvcBbsCmnt> findByPstIdAndDeltYn(long pstId, char deltYn);
+
 }

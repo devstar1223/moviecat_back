@@ -46,7 +46,7 @@ public class MvcScrBbsService {
     }
 
     @Transactional
-    public String scrBbsRead(long scrId, String mbrId) throws JsonProcessingException {
+    public String scrBbsRead(long scrId) throws JsonProcessingException {
         Optional<MvcScrBbs> scrOptional = mvcScrBbsRepository.findByScrIdAndDeltYn(scrId,"N");
 
         if(scrOptional.isPresent()){
@@ -61,14 +61,6 @@ public class MvcScrBbsService {
 
             List<MvcRcmdtnInfo> rcmdList = mvcRcmdtnInfoRepository.findByRcmdtnSeIdAndMenuIdAndDeltYn(scr.getScrId(), scr.getMenuId(), "N"); // 해당되는 추천 리스트로 받아와서
             scrMap.put("rcmd", rcmdList.size()); // 사이즈 만큼 좋아요 수 할당
-
-            Optional<MvcRcmdtnInfo> rcmdOptional = mvcRcmdtnInfoRepository.findByRgstUserIdAndDeltYn(mbrId, "N");
-            if(rcmdOptional.isPresent()){
-                scrMap.put("rcmdDeltYn","N");
-            }
-            else{
-                scrMap.put("rcmdDeltYn","Y");
-            }
 
             Optional<MvcMbrInfo> mbrInfoOptional = mvcMbrInfoRepository.findByRgstUserId(scr.getRgstUserId()); // 등록id로 유저 찾아오기
             MvcMbrInfo mbrInfo = mbrInfoOptional.get();

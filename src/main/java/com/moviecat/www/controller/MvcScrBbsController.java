@@ -29,9 +29,9 @@ public class MvcScrBbsController {
 
     @GetMapping("/scrboard/{menuId}/{scrId}")
     @Operation(summary = "평점 글 조회", description ="평점 글 조회")
-    public ResponseEntity<String> scrBbsRead(@PathVariable("scrId") long scrId, @RequestParam String mbrId) {
+    public ResponseEntity<String> scrBbsRead(@PathVariable("scrId") long scrId) {
         try {
-            String jsonScr = mvcScrBbsService.scrBbsRead(scrId,mbrId);
+            String jsonScr = mvcScrBbsService.scrBbsRead(scrId);
             return new ResponseEntity<>(jsonScr, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("오류 발생", HttpStatus.INTERNAL_SERVER_ERROR);
