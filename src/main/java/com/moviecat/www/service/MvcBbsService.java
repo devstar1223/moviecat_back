@@ -97,12 +97,12 @@ public class MvcBbsService {
         return jsonPostList;
     }
 
-    public String bbsReadPost(long menuId,long pstId) throws JsonProcessingException {
+    public String bbsReadPost(long menuId,long pstId, String mbrId) throws JsonProcessingException {
         Optional<MvcBbs> postOptional = mvcBbsRepository.findByMenuIdAndPstIdAndDeltYn(menuId,pstId,"N");
 
         if(postOptional.isPresent()){
             MvcBbs post = postOptional.get();
-            Map<String, Object> postMap = new HashMap<>();
+            Map<String, Object> postMap = new LinkedHashMap<>();
             postMap.put("ttl", post.getTtl());
             postMap.put("cn", post.getCn());
             postMap.put("spoYn", post.getSpoYn());
@@ -112,6 +112,14 @@ public class MvcBbsService {
 
             List<MvcRcmdtnInfo> rcmdList = mvcRcmdtnInfoRepository.findByRcmdtnSeIdAndMenuIdAndDeltYn(post.getPstId(), post.getMenuId(), "N"); // 해당되는 추천 리스트로 받아와서
             postMap.put("rcmd", rcmdList.size()); // 사이즈 만큼 좋아요 수 할당
+
+            Optional<MvcRcmdtnInfo> rcmdOptional = mvcRcmdtnInfoRepository.findByRgstUserIdAndDeltYn(mbrId, "N");
+            if(rcmdOptional.isPresent()){
+                postMap.put("rcmdDeltYn","N");
+            }
+            else{
+                postMap.put("rcmdDeltYn","Y");
+            }
 
             Optional<MvcMbrInfo> mbrInfoOptional = mvcMbrInfoRepository.findByRgstUserId(post.getRgstUserId()); // 등록id로 유저 찾아오기
             MvcMbrInfo mbrInfo = mbrInfoOptional.get();

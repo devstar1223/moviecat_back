@@ -12,4 +12,6 @@ public interface MvcRcmdtnInfoRepository extends JpaRepository<MvcRcmdtnInfo, Lo
     List<MvcRcmdtnInfo> findByRcmdtnSeIdAndMenuIdAndDeltYn(long rcmdtnSeId, long menuId, String Yn); // 게시글 id, 메뉴 id, yn
 
     List<MvcRcmdtnInfo> findByDeltYnAndMenuIdAndRcmdtnSeId(String deltYn, long menuId, long rcmdtnSeId);
+
+    Optional<MvcRcmdtnInfo> findByRgstUserIdAndDeltYn(String rgstUserId, String deltYn);
 }
