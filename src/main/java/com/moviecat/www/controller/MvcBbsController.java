@@ -70,9 +70,9 @@ public class MvcBbsController {
         return new ResponseEntity<>("글 삭제 성공", HttpStatus.OK);
     }
 
-    @GetMapping("movieboard/{menuId}")
+    @GetMapping("/movieboard/{menuId}")
     @Operation(summary = "게시판 글 목록", description = "/1 처럼 게시판 번호로 요청하면 글 목록 json으로 줍니다. 페이지도 줘야합니다 (기본 1)")
-    public ResponseEntity<String> showBoard(@PathVariable("menuId") Long menuId,@RequestParam int page) {
+    public ResponseEntity<String> bbsList(@PathVariable("menuId") Long menuId,@RequestParam(value = "page", defaultValue = "1") int page) {
         try {
             String jsonPostList = mvcBbsService.bbsReadBoard(menuId, page);
             return new ResponseEntity<>(jsonPostList, HttpStatus.OK);
