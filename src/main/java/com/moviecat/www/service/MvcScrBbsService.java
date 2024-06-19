@@ -3,12 +3,15 @@ package com.moviecat.www.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moviecat.www.dto.MvcScrBbsDto;
+import com.moviecat.www.entity.MvcBbs;
 import com.moviecat.www.entity.MvcMbrInfo;
 import com.moviecat.www.entity.MvcRcmdtnInfo;
 import com.moviecat.www.entity.MvcScrBbs;
 import com.moviecat.www.repository.MvcMbrInfoRepository;
 import com.moviecat.www.repository.MvcRcmdtnInfoRepository;
 import com.moviecat.www.repository.MvcScrBbsRepository;
+import com.moviecat.www.util.ColumnValueMapper;
+import com.moviecat.www.util.PaginationUtil;
 import com.moviecat.www.util.TimeFormat;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,8 @@ public class MvcScrBbsService {
     private final MvcRcmdtnInfoRepository mvcRcmdtnInfoRepository;
     private final MvcMbrInfoRepository mvcMbrInfoRepository;
     private final TimeFormat timeFormat;
+    private final ColumnValueMapper columnValueMapper;
+    private final PaginationUtil paginationUtil;
 
     @Transactional
     public void scrBbsWrite(MvcScrBbsDto mvcScrBbsDto){
@@ -105,5 +110,42 @@ public class MvcScrBbsService {
         else {
             throw new NoSuchElementException("해당 평점이 존재하지 않습니다.");
         }
+    }
+
+    @Transactional
+    public String scrList(long menuId, int page) throws JsonProcessingException {
+        List<MvcScrBbs> scrListOrigin = mvcScrBbsRepository.findByMenuIdAndDeltYnOrderByScrIdDesc(menuId, "N");
+        List<Map<String,Object>> scrList = new ArrayList<>();
+        int scrNumber = scrListOrigin.size();
+        for(MvcScrBbs scr : scrListOrigin){
+            Map<String,Object> map = new LinkedHashMap<>();
+            map.put("scrNumber", scrNumber--);
+            map.put("scrId",scr.getScrId());
+            map.put("vdoNm",scr.getVdoNm());
+            map.put("OpngDay",scr.getOpngDay());
+            String[] rgstTime = timeFormat.formatDateToday(scr.getRgstDay());
+            map.put("new",rgstTime[1]);
+            map.put("rgstDate", rgstTime[0]);
+            map.put("vdoEvl",scr.getVdoEvl());
+            int rcmdTotal = columnValueMapper.pstIdAndMenuIdToRcmdTotal(scr.getScrId(), scr.getMenuId());
+            map.put("rmcdTotal", (rcmdTotal > 5)? "5+" : String.valueOf(rcmdTotal));
+            map.put("nickNm", columnValueMapper.mbrIdToNickNm(scr.getRgstUserId()));
+            scrList.add(map);
+        }
+        List<Map<String, Object>> pagedPostList;
+        try {
+            pagedPostList = paginationUtil.getPage(scrList, page);
+        } catch (Exception e) {
+            throw e;
+        }
+        long total = scrList.size();
+        Map<String, Object> result = new HashMap<>();
+        result.put("total", total);
+        result.put("data", pagedPostList);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonScrList = objectMapper.writeValueAsString(result);
+
+        return jsonScrList;
     }
 }

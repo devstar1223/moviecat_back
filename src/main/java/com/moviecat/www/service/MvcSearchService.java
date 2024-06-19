@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moviecat.www.entity.MvcBbs;
 import com.moviecat.www.entity.MvcMbrInfo;
+import com.moviecat.www.entity.MvcScrBbs;
 import com.moviecat.www.repository.MvcMbrInfoRepository;
+import com.moviecat.www.repository.MvcScrBbsRepository;
 import com.moviecat.www.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ public class MvcSearchService {
     private final MvcBbsRepository mvcBbsRepository;
     private final MvcPageReturnService mvcPageReturnService;
     private final MvcMbrInfoRepository mvcMbrInfoRepository;
+    private final MvcScrBbsRepository mvcScrBbsRepository;
 
     @Transactional
     public String searchTtl(Long menuId, String srchWord, int page) { // 제목 검색으로, 요청 들어오면
@@ -83,5 +86,20 @@ public class MvcSearchService {
         } else {
             throw new RuntimeException("검색결과가 없습니다.");
         }
+    }
+
+    public String searchScr(Long menuId, String srchWord, int page) {
+        try {
+            List<MvcScrBbs> scrList = mvcScrBbsRepository.findByVdoNmOrderByRgstDayDesc(srchWord); // 부분일치로 하려면 VdoNm 뒤에 Containing
+            if(scrList.isEmpty()) {
+                throw new RuntimeException("검색 결과가 없습니다.");
+            }
+            Map<String, Object> pagedSearchResultMap = mvcPageReturnService.scrPageReturn(scrList, page); //모든 행 넘겨주면, 페이징된 Map으로 받음
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.writeValueAsString(pagedSearchResultMap); // json으로 파싱해서 반환
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("JSON 처리 중 오류가 발생했습니다.", e);
+        }
+
     }
 }

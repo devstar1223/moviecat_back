@@ -61,4 +61,15 @@ public class MvcScrBbsController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
         }
     }
+
+    @GetMapping("/scrboard/{menuId}")
+    @Operation(summary = "평점 목록 조회", description ="평점 목록 조회")
+    public ResponseEntity<String> scrList(@PathVariable("menuId") long menuId, @RequestParam(value = "page", defaultValue = "1") int page) {
+        try {
+            String jsonScrList = mvcScrBbsService.scrList(menuId, page);
+            return new ResponseEntity<>(jsonScrList, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("오류 발생", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

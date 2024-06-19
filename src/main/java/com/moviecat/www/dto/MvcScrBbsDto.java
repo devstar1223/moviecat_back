@@ -15,8 +15,8 @@ import java.sql.Timestamp;
 @ToString
 public class MvcScrBbsDto {
     private long scrId; // 평점 id U D
-    private long menuId; // 메뉴 id C
-    private String vdoNm; // 영화명 C
+    private long menuId; // 메뉴 id C + 검색시 사용
+    private String vdoNm; // 영화명 C + 검색시 사용
     private String opngDay; // 개봉일 C
     private int scr; // 평점 C U
     private String vdoEvl; // 영화평 C U
