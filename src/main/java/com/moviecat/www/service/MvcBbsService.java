@@ -83,8 +83,10 @@ public class MvcBbsService {
     public String bbsReadBoard(long menuId, int page) throws JsonProcessingException {
         List<MvcBbs> postListOrigin = mvcBbsRepository.findByMenuIdAndDeltYnOrderByPstIdDesc(menuId, "N");
         List<Map<String,Object>> postList = new ArrayList<>();
+        int postNumber = postListOrigin.size();
         for(MvcBbs post : postListOrigin){
             Map<String,Object> map = new LinkedHashMap<>();
+            map.put("postNumber", postNumber--);
             map.put("pstId",post.getPstId());
             String[] rgstTime = timeFormat.formatDateToday(post.getRgstDay());
             map.put("new",rgstTime[1]);
@@ -92,9 +94,6 @@ public class MvcBbsService {
             map.put("spoYn",post.getSpoYn());
             map.put("ttl",post.getTtl());
             map.put("cmntTotal", columnValueMapper.pstIdToCmntTotal(post.getPstId()));
-            if(post.getPstId() == 7 && post.getMenuId() == 2){
-                System.out.println("레전드 상황 발생");
-            }
             map.put("rcmdTotal", columnValueMapper.pstIdAndMenuIdToRcmdTotal(post.getPstId(), post.getMenuId()));
             map.put("nickNm", columnValueMapper.mbrIdToMbrNm(post.getRgstUserId()));
             postList.add(map);
