@@ -72,7 +72,7 @@ public class MvcBbsController {
 
     @GetMapping("movieboard/{menuId}")
     @Operation(summary = "게시판 글 목록", description = "/1 처럼 게시판 번호로 요청하면 글 목록 json으로 줍니다. 페이지도 줘야합니다 (기본 1)")
-    public ResponseEntity<String> showBoard(@PathVariable("menuId") Long menuId,int page) {
+    public ResponseEntity<String> showBoard(@PathVariable("menuId") Long menuId,@RequestParam int page) {
         try {
             String jsonPostList = mvcBbsService.bbsReadBoard(menuId, page);
             return new ResponseEntity<>(jsonPostList, HttpStatus.OK);
@@ -87,9 +87,8 @@ public class MvcBbsController {
         try {
             String jsonPost = mvcBbsService.bbsReadPost(menuId,pstId,mbrId);
             return new ResponseEntity<>(jsonPost, HttpStatus.OK);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("Error processing JSON", HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>("오류 발생", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

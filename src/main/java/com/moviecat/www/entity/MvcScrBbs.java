@@ -13,7 +13,7 @@ public class MvcScrBbs {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "scr_id", nullable = false)
-    private long scrId; // 평점 ID.
+    private long scrId; // 평점 ID
 
     @Column(name = "menu_id", nullable = false)
     private long menuId; // 메뉴 ID (4번 고정이나, 확장성을 고려)
@@ -22,7 +22,7 @@ public class MvcScrBbs {
     private String vdoNm; // 영화명
 
     @Column(name = "opng_day", nullable = false)
-    private Timestamp opngDay; // 개봉일
+    private String opngDay; // 개봉일
 
     @Column(name = "scr", nullable = false)
     private int scr; // 평점

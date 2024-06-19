@@ -11,6 +11,7 @@ import com.moviecat.www.repository.MvcAtchFileRepository;
 import com.moviecat.www.repository.MvcBbsRepository;
 import com.moviecat.www.repository.MvcMbrInfoRepository;
 import com.moviecat.www.repository.MvcRcmdtnInfoRepository;
+import com.moviecat.www.util.ColumnValueMapper;
 import com.moviecat.www.util.FileUtils;
 import com.moviecat.www.util.PaginationUtil;
 import com.moviecat.www.util.TimeFormat;
@@ -33,6 +34,7 @@ public class MvcBbsService {
     private final TimeFormat timeFormat;
     private final PaginationUtil paginationUtil;
     private final FileUtils fileUtils;
+    private final ColumnValueMapper columnValueMapper;
 
     @Transactional
     public void bbsWritePost(MvcBbsDto mvcBbsDto) {
@@ -78,9 +80,26 @@ public class MvcBbsService {
     }
 
     @Transactional
-    public String bbsReadBoard(long boardId, int page) throws JsonProcessingException {
-        List<MvcBbs> postList = mvcBbsRepository.findByMenuIdAndDeltYnOrderByPstIdAsc(boardId, "N");
-        List<MvcBbs> pagedPostList;
+    public String bbsReadBoard(long menuId, int page) throws JsonProcessingException {
+        List<MvcBbs> postListOrigin = mvcBbsRepository.findByMenuIdAndDeltYnOrderByPstIdDesc(menuId, "N");
+        List<Map<String,Object>> postList = new ArrayList<>();
+        for(MvcBbs post : postListOrigin){
+            Map<String,Object> map = new LinkedHashMap<>();
+            map.put("pstId",post.getPstId());
+            String[] rgstTime = timeFormat.formatDateToday(post.getRgstDay());
+            map.put("new",rgstTime[1]);
+            map.put("rgstDate", rgstTime[0]);
+            map.put("spoYn",post.getSpoYn());
+            map.put("ttl",post.getTtl());
+            map.put("cmntTotal", columnValueMapper.pstIdToCmntTotal(post.getPstId()));
+            if(post.getPstId() == 7 && post.getMenuId() == 2){
+                System.out.println("레전드 상황 발생");
+            }
+            map.put("rcmdTotal", columnValueMapper.pstIdAndMenuIdToRcmdTotal(post.getPstId(), post.getMenuId()));
+            map.put("nickNm", columnValueMapper.mbrIdToMbrNm(post.getRgstUserId()));
+            postList.add(map);
+        }
+        List<Map<String, Object>> pagedPostList;
         try {
             pagedPostList = paginationUtil.getPage(postList, page);
         } catch (Exception e) {
@@ -106,26 +125,12 @@ public class MvcBbsService {
             postMap.put("ttl", post.getTtl());
             postMap.put("cn", post.getCn());
             postMap.put("spoYn", post.getSpoYn());
-
             String rgstTime = timeFormat.formatDate(post.getRgstDay());
             postMap.put("rgstDate", rgstTime);
-
-            List<MvcRcmdtnInfo> rcmdList = mvcRcmdtnInfoRepository.findByRcmdtnSeIdAndMenuIdAndDeltYn(post.getPstId(), post.getMenuId(), "N"); // 해당되는 추천 리스트로 받아와서
-            postMap.put("rcmd", rcmdList.size()); // 사이즈 만큼 좋아요 수 할당
-
-            Optional<MvcRcmdtnInfo> rcmdOptional = mvcRcmdtnInfoRepository.findByRgstUserIdAndDeltYn(mbrId, "N");
-            if(rcmdOptional.isPresent()){
-                postMap.put("rcmdDeltYn","N");
-            }
-            else{
-                postMap.put("rcmdDeltYn","Y");
-            }
-
-            Optional<MvcMbrInfo> mbrInfoOptional = mvcMbrInfoRepository.findByRgstUserId(post.getRgstUserId()); // 등록id로 유저 찾아오기
-            MvcMbrInfo mbrInfo = mbrInfoOptional.get();
-            postMap.put("profileUrl", mbrInfo.getAtchFileUrl()); // url 찾아 넣기 (없으면 null 넣음)
-            postMap.put("nickNm", mbrInfo.getNickNm()); // nickNm 찾아 넣기
-
+            postMap.put("rcmd", columnValueMapper.pstIdAndMenuIdToRcmdTotal(post.getPstId(), post.getMenuId())); // 좋아요 수 구해오기
+            postMap.put("rcmdDeltYn", columnValueMapper.mbrIdToRcmdDeltYn(mbrId)); // 글 조회시, 해당 유저가 이 글을 좋아요 눌렀는지.
+            postMap.put("profileUrl", columnValueMapper.mbrIdToAtchFileUrl(post.getRgstUserId())); // 등록 id로 프로필 url 찾아 넣기
+            postMap.put("nickNm", columnValueMapper.mbrIdToNickNm(post.getRgstUserId())); // 등록 id로 nickNm 찾아 넣기(없으면 null)
             // ObjectMapper를 사용하여 맵을 JSON으로 변환
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.writeValueAsString(postMap);
