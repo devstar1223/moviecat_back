@@ -193,7 +193,7 @@ public class MvcMbrInfoService {
             e.printStackTrace();
         }
 
-        Long mvcId = jsonNode.get("id").asLong();
+        Long mbrId = jsonNode.get("id").asLong();
         String email = jsonNode.get("kakao_account").get("email").asText();
         String phoneNo = Optional.ofNullable(jsonNode)
                 .map(node -> node.get("kakao_account"))
@@ -208,12 +208,12 @@ public class MvcMbrInfoService {
                 .map(node -> node.get("properties").get("profile_image_url").asText())
                 .orElse("");
 
-        userInfo.put("mvcId",mvcId);
-        userInfo.put("mbrNm",mbrNm);
-        userInfo.put("phoneNo",phoneNo);
-        userInfo.put("email",email);
-        userInfo.put("nickNm",nickNm);
-        userInfo.put("atchFileUrl",atchFileUrl);
+        userInfo.put("mbrId", mbrId);
+        userInfo.put("mbrNm", mbrNm);
+        userInfo.put("phoneNo", phoneNo);
+        userInfo.put("email", email);
+        userInfo.put("nickNm", nickNm);
+        userInfo.put("atchFileUrl", atchFileUrl);
 
         return userInfo;
     }
@@ -222,19 +222,23 @@ public class MvcMbrInfoService {
     @Transactional
     MvcLoginDto kakaoUserLogin(HashMap<String, Object> userInfo){
 
-        Long mvcId= Long.valueOf(userInfo.get("mvcId").toString());
+        Long mbrId= Long.valueOf(userInfo.get("mbrId").toString());
         String email = userInfo.get("email").toString();
         String nickNm = userInfo.get("nickNm").toString();
         String mbrNm = userInfo.get("mbrNm").toString();
         String phoneNo = userInfo.get("phoneNo").toString();
         String atchFileUrl = userInfo.get("atchFileUrl").toString();
 
-        String kakaoIdPlusK = "K"+mvcId;
+        String kakaoIdPlusK = "K" + mbrId;
 
         Optional<MvcMbrInfo> kakaoIdOptional = mvcMbrInfoRepository.findByMbrId(kakaoIdPlusK);
 
+        Long mvcId = kakaoIdOptional.get().getMvcId();
+
         if(!kakaoIdOptional.isPresent()){
+
             MvcMbrInfo kakaoMbr = new MvcMbrInfo();
+
             kakaoMbr.setMbrId(kakaoIdPlusK);
             kakaoMbr.setEmail(email);
             kakaoMbr.setNickNm(nickNm);
@@ -254,6 +258,8 @@ public class MvcMbrInfoService {
             kakaoMbr.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
             mvcMbrInfoRepository.save(kakaoMbr);
         }
+
+        //TODO.save 후 받아온 MVCID를 전달하기
         return new MvcLoginDto(mvcId, kakaoIdPlusK, nickNm, mbrNm, email, atchFileUrl, jwtTokenProvider.generateToken(mvcId.toString()));
     }
 

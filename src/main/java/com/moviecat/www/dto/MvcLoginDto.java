@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class MvcLoginDto {
-    private long mvcId;
+    private Long mvcId;
     private String mbrId;
     private String nickNm;
     private String mbrNm;
