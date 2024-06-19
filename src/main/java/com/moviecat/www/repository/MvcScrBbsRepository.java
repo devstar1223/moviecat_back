@@ -10,6 +10,6 @@ import java.util.Optional;
 public interface MvcScrBbsRepository extends JpaRepository<MvcScrBbs, Long> {
     Optional<MvcScrBbs> findByScrIdAndDeltYn(long scrId,String deltYn);
     List<MvcScrBbs> findByMenuIdAndDeltYnOrderByScrIdDesc(long menuId, String deltYn);
-
     List<MvcScrBbs> findByVdoNmOrderByRgstDayDesc(String vdoNm);
+    List<MvcScrBbs> findByRgstUserIdAndDeltYnOrderByRgstDayDesc(String rgstUserId, String deltYn);
 }

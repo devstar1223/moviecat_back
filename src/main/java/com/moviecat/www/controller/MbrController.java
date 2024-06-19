@@ -39,13 +39,6 @@ public class MbrController {
         }
     }
 
-    @PatchMapping("/editInfo")
-    @Operation(summary = "회원 정보 수정", description = "mvcId로 식별, json으로 mvcId,nickNm,pswd,email,phoneNo,intrlntrcn,atchField 보내주면 됩니다.")
-    public ResponseEntity<String> editMember(@RequestBody MvcMbrInfoDto mvcMbrInfoDto) {
-        mvcMbrInfoService.editMember(mvcMbrInfoDto);
-        return new ResponseEntity<>("정보 수정 성공", HttpStatus.OK);
-    }
-
     @GetMapping("/mbrIdDupCheck")
     @Operation(summary = "ID 중복 체크", description = "중복시 409 CONFLICT 반환. 없을시 200 OK")
     public ResponseEntity<String> idDupCheck(@RequestParam String mbrId) {

@@ -69,4 +69,7 @@ public class MvcMbrInfo {
 
     @Column(name = "mdfcn_day", nullable = false)
     private Timestamp mdfcnDay; // 수정일
+
+    @Column(name = "delt_yn", nullable = false, length = 1)
+    private String deltYn = "N"; // 삭제유무, 기본 "N"
     }

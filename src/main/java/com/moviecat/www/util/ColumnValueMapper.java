@@ -1,9 +1,11 @@
 package com.moviecat.www.util;
 
+import com.moviecat.www.entity.MvcBbs;
 import com.moviecat.www.entity.MvcBbsCmnt;
 import com.moviecat.www.entity.MvcMbrInfo;
 import com.moviecat.www.entity.MvcRcmdtnInfo;
 import com.moviecat.www.repository.MvcBbsCmntRepository;
+import com.moviecat.www.repository.MvcBbsRepository;
 import com.moviecat.www.repository.MvcMbrInfoRepository;
 import com.moviecat.www.repository.MvcRcmdtnInfoRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ public class ColumnValueMapper {
     private final MvcMbrInfoRepository mvcMbrInfoRepository;
     private final MvcRcmdtnInfoRepository mvcRcmdtnInfoRepository;
     private final MvcBbsCmntRepository mvcBbsCmntRepository;
+    private final MvcBbsRepository mvcBbsRepository;
     // 회원 ID -> 회원 이름
     public String mbrIdToMbrNm(String mbrId) { // mbrId 주면, 실명 반환
         Optional<MvcMbrInfo> mbrNmOptional = mvcMbrInfoRepository.findByMbrId(mbrId);
@@ -65,6 +68,16 @@ public class ColumnValueMapper {
         Optional<MvcMbrInfo> mvcIdOptional = mvcMbrInfoRepository.findByMbrId(mbrId); // 해당되는 추천 리스트로 받아와서
         if(mvcIdOptional.isPresent()){
             return mvcIdOptional.get().getMvcId();
+        }
+        else {
+            throw new NoSuchElementException("회원 정보가 유효하지 않습니다.");
+        }
+    }
+
+    public long pstIdToMenuId(long pstId){
+        Optional<MvcBbs> menuIdOptional = mvcBbsRepository.findById(pstId);
+        if(menuIdOptional.isPresent()){
+            return menuIdOptional.get().getMenuId();
         }
         else {
             throw new NoSuchElementException("회원 정보가 유효하지 않습니다.");

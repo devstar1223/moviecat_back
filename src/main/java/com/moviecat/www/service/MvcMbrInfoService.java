@@ -71,22 +71,6 @@ public class MvcMbrInfoService {
     }
 
     @Transactional
-    public void editMember(MvcMbrInfoDto newMbrInfoDto) {
-        Optional<MvcMbrInfo> mbrInfoOptional = mvcMbrInfoRepository.findById(newMbrInfoDto.getMvcId()); // 받아온 정보로 회원 찾기
-        MvcMbrInfo mbrInfo = mbrInfoOptional.get();
-        mbrInfo.setNickNm(newMbrInfoDto.getNickNm());
-        mbrInfo.setPswd(passwordEncoder.encode(newMbrInfoDto.getPswd()));
-        mbrInfo.setEmail(newMbrInfoDto.getEmail());
-        mbrInfo.setPhoneNo(newMbrInfoDto.getPhoneNo());
-        mbrInfo.setIntrIntrcn(newMbrInfoDto.getIntrIntrcn());
-        mbrInfo.setAtchFileUrl(newMbrInfoDto.getAtchFileUrl());
-        mbrInfo.setMdfcnUserId(mbrInfo.getMbrId()); // 수정 id는 현재 id를 등록 (id는 변경 불가)
-        mbrInfo.setMdfcnUserNm(newMbrInfoDto.getNickNm()); // 수정 닉네임은 바꾼 닉네임을 등록
-        mbrInfo.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now())); // 수정 날짜 현재로 등록
-        mvcMbrInfoRepository.save(mbrInfo);
-    }
-
-    @Transactional
     public boolean idDupCheck(String mbrId){
         Optional<MvcMbrInfo> mbrIdOptional = mvcMbrInfoRepository.findByMbrId(mbrId); // 받아온 정보로 mbrId 찾기
         return mbrIdOptional.isPresent();
@@ -255,10 +239,10 @@ public class MvcMbrInfoService {
             kakaoMbr.setEmail(email);
             kakaoMbr.setNickNm(nickNm);
             kakaoMbr.setAtchFileUrl(atchFileUrl);
-            kakaoMbr.setPhoneNo(formatPhoneNumber(phoneNo)); // 안들어오거나, 혹시 -가 붙여서 들어오진 않을까..
+            kakaoMbr.setPhoneNo(formatPhoneNumber(phoneNo));
             kakaoMbr.setMbrSe(1); // 카카오는 1
             kakaoMbr.setMbrNm(mbrNm);
-            kakaoMbr.setPswd(""); // 카카오 로그인 비밀번호 X
+            kakaoMbr.setPswd(passwordEncoder.encode("")); // 카카오 로그인 비밀번호 X
             kakaoMbr.setTrmsAgre('N');
             kakaoMbr.setInfoAgre('N');
             kakaoMbr.setMarkAgre('N');

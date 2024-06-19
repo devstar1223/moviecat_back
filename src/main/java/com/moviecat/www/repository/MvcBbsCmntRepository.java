@@ -17,8 +17,11 @@ public interface MvcBbsCmntRepository extends JpaRepository<MvcBbsCmnt,Long> {
 
     List<MvcBbsCmnt> findByPstIdAndDeltYnOrderByCmntGroupAscSeqAsc(long pstId, char deltYn);
 
+    List<MvcBbsCmnt> findByRgstUserIdAndDeltYnOrderByRgstDayDesc(String rgstUserId, char deltYn);
     Optional<MvcBbsCmnt> findTopByUpCmntIdOrderBySeqDesc(long upCmntId);
 
     List<MvcBbsCmnt> findByPstIdAndDeltYn(long pstId, char deltYn);
+
+    Optional<MvcBbsCmnt> findByPstId(long pstId);
 
 }

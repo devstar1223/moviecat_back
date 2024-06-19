@@ -13,6 +13,8 @@ public interface MvcBbsRepository extends JpaRepository<MvcBbs, Long> {
     Optional<MvcBbs> findByMenuIdAndPstIdAndDeltYn(long menuId, long pstId, String deltYn);
     Optional<MvcBbs> findByPstIdAndDeltYn(long pstId, String deltYn);
 
+    List<MvcBbs> findByRgstUserIdAndDeltYnOrderByRgstDayDesc(String rgstUserId, String deltYn);
+
     // 제목(ttl) 기준 - 게시판 검색
     List<MvcBbs> findByMenuIdAndDeltYnAndTtlContainingOrderByRgstDayDesc(Long menuId, String deltYn, String ttl);
     // 제목(ttl) 기준 - 전체 검색
