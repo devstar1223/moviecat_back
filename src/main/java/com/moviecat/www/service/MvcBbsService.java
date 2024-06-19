@@ -131,6 +131,7 @@ public class MvcBbsService {
             postMap.put("profileUrl", columnValueMapper.mbrIdToAtchFileUrl(post.getRgstUserId())); // 등록 id로 프로필 url 찾아 넣기
             postMap.put("nickNm", columnValueMapper.mbrIdToNickNm(post.getRgstUserId())); // 등록 id로 nickNm 찾아 넣기(없으면 null)
             postMap.put("mvcId", columnValueMapper.mbrIdToMvcId(post.getRgstUserId())); // 등록 id로 mvcId 찾아 넣기
+            postMap.put("atchFileId", post.getAtchFileid());
             // ObjectMapper를 사용하여 맵을 JSON으로 변환
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.writeValueAsString(postMap);

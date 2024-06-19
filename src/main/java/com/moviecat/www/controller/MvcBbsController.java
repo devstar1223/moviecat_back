@@ -82,7 +82,7 @@ public class MvcBbsController {
     }
 
     @GetMapping("/movieboard/{menuId}/{pstId}")
-    @Operation(summary = "글 읽기", description = "게시판 번호와 글 번호를 받아 글내용을 json으로 반환합니다.")
+    @Operation(summary = "글 상세 페이지", description = "게시판 번호와 글 번호를 받아 글내용을 json으로 반환합니다.")
     public ResponseEntity<String> bbsReadPost(@PathVariable("menuId") long menuId,@PathVariable("pstId") long pstId) {
         try {
             String jsonPost = mvcBbsService.bbsReadPost(menuId,pstId);
@@ -93,7 +93,7 @@ public class MvcBbsController {
     }
 
     @GetMapping("/movieboard/{menuId}/{pstId}/files")
-    @Operation(summary = "글 읽기-첨부파일", description = "게시판 번호와 글 번호를 받아 첨부파일을 List로 반환합니다.")
+    @Operation(summary = "글 상세 페이지-첨부파일", description = "게시판 번호와 글 번호를 받아 첨부파일을 List로 반환합니다.")
     public ResponseEntity<Object> bbsReadPostFiles(@PathVariable("menuId") long menuId, @PathVariable("pstId") long pstId) {
         try {
             Map<String,Object> atchFileList = mvcBbsService.bbsReadPostFiles(pstId);
