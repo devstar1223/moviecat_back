@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MvcBbsCmntRepository extends JpaRepository<MvcBbsCmnt,Long> {
-    Optional<MvcBbsCmnt> findTopByPstIdOrderBySeqDesc(long pstId);
+    Optional<MvcBbsCmnt> findTopByPstIdAndCmntGroupOrderBySeqDesc(long pstId, int cmntGroup);
     Optional<MvcBbsCmnt> findTopByPstIdOrderByCmntGroupDesc(long pstId);
 
     Optional<MvcBbsCmnt> findByCmntIdAndDeltYn(long cmntId, char deltYn);
     List<MvcBbsCmnt> findByPstIdAndSeqGreaterThanEqual(long pstId, int seq);
 
-    List<MvcBbsCmnt> findByPstIdAndDeltYnOrderBySeqAsc(long pstId, char deltYn);
+    List<MvcBbsCmnt> findByPstIdAndDeltYnOrderByCmntGroupAscSeqAsc(long pstId, char deltYn);
 
     Optional<MvcBbsCmnt> findTopByUpCmntIdOrderBySeqDesc(long upCmntId);
 

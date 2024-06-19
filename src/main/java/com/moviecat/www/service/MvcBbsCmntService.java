@@ -26,11 +26,11 @@ public class MvcBbsCmntService {
 
     @Transactional
     public void bbsWriteCmnt(MvcCmntDto mvcCmntDto){
-        Optional<MvcBbsCmnt> cmntSeqOptional = mvcBbsCmntRepository.findTopByPstIdOrderBySeqDesc(mvcCmntDto.getPstId());
-        int seq = cmntSeqOptional.map(cmnt -> cmnt.getSeq() + 1).orElse(0);
-
         Optional<MvcBbsCmnt> cmntGroupOptional = mvcBbsCmntRepository.findTopByPstIdOrderByCmntGroupDesc(mvcCmntDto.getPstId());
         int group = cmntGroupOptional.map(cmnt -> cmnt.getCmntGroup() + 1).orElse(0);
+
+        Optional<MvcBbsCmnt> cmntSeqOptional = mvcBbsCmntRepository.findTopByPstIdAndCmntGroupOrderBySeqDesc(mvcCmntDto.getPstId(),group);
+        int seq = cmntSeqOptional.map(cmnt -> cmnt.getSeq() + 1).orElse(0);
 
         String mbrNm = columnValueMapper.mbrIdToMbrNm(mvcCmntDto.getCmntMbrId()); // mbrId 넣고 mbrNm으로 받기
 
@@ -131,7 +131,7 @@ public class MvcBbsCmntService {
 
     @Transactional
     public String bbsReadCmnt(long pstId) throws JsonProcessingException {
-        List<MvcBbsCmnt> cmntList = mvcBbsCmntRepository.findByPstIdAndDeltYnOrderBySeqAsc(pstId, 'N');
+        List<MvcBbsCmnt> cmntList = mvcBbsCmntRepository.findByPstIdAndDeltYnOrderByCmntGroupAscSeqAsc(pstId, 'N');
         List<Map<String, Object>> dataList = new ArrayList<>();
 
         int total = cmntList.size();
