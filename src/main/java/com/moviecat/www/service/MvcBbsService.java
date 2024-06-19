@@ -94,8 +94,9 @@ public class MvcBbsService {
             map.put("spoYn",post.getSpoYn());
             map.put("ttl",post.getTtl());
             map.put("cmntTotal", columnValueMapper.pstIdToCmntTotal(post.getPstId()));
-            map.put("rcmdTotal", columnValueMapper.pstIdAndMenuIdToRcmdTotal(post.getPstId(), post.getMenuId()));
-            map.put("nickNm", columnValueMapper.mbrIdToMbrNm(post.getRgstUserId()));
+            int rcmdTotal = columnValueMapper.pstIdAndMenuIdToRcmdTotal(post.getPstId(), post.getMenuId());
+            map.put("rmcdTotal", (rcmdTotal > 5)? "5+" : String.valueOf(rcmdTotal));
+            map.put("nickNm", columnValueMapper.mbrIdToNickNm(post.getRgstUserId()));
             postList.add(map);
         }
         List<Map<String, Object>> pagedPostList;
