@@ -19,7 +19,7 @@ public class MvcBbsCmntController {
     private final MvcBbsCmntService mvcBbsCmntService;
     @PostMapping("/bbsWriteCmnt")
     @Operation(summary = "댓글 작성", description ="댓글 작성. 답글 X")
-    public ResponseEntity<String> bbsWriteCmnt(@ModelAttribute MvcCmntDto mvcCmntDto){
+    public ResponseEntity<String> bbsWriteCmnt(@RequestBody MvcCmntDto mvcCmntDto){
         try {
             mvcBbsCmntService.bbsWriteCmnt(mvcCmntDto);
             return new ResponseEntity<>("댓글 작성 성공", HttpStatus.OK);
@@ -61,7 +61,7 @@ public class MvcBbsCmntController {
     }
 
     @GetMapping("/movieboard/{menuId}/{pstId}/cmnt")
-    @Operation(summary = "글 읽기-댓글", description = "댓글의 수와 댓글내용을 json으로 반환합니다.")
+    @Operation(summary = "상세 글 -> 댓글", description = "댓글의 수와 댓글내용을 json으로 반환")
     public ResponseEntity<String> bbsReadCmnt(@PathVariable("pstId") long pstId) {
         try {
             String jsonCmnt = mvcBbsCmntService.bbsReadCmnt(pstId);
