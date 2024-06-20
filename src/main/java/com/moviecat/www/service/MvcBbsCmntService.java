@@ -150,6 +150,7 @@ public class MvcBbsCmntService {
             cmntData.put("rgstDay", rgstTime);
             //TODO.프로필 사진 추가 필요
             dataList.add(cmntData);
+            //TODO.mvcId 추가 필요(댓글 작성자가 게시글 작성자인 경우 표시하기 위해 필요)
         }
 
         Map<String, Object> result = new HashMap<>();
