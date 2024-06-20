@@ -46,10 +46,10 @@ public class MvcBbsCmntService {
         newCmnt.setSeq(seq);
         newCmnt.setCn(mvcCmntDto.getCn());
         newCmnt.setRgstUserId(mvcCmntDto.getMbrId());
-        newCmnt.setRgstUserNm(mvcCmntDto.getMbrNm());
+        newCmnt.setRgstUserNm(mbrNm);
         newCmnt.setRgstDay(Timestamp.valueOf(LocalDateTime.now()));
         newCmnt.setMdfcnUserId(mvcCmntDto.getMbrId());
-        newCmnt.setMdfcnUserNm(mvcCmntDto.getMbrNm());
+        newCmnt.setMdfcnUserNm(mbrNm);
         newCmnt.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
         newCmnt.setDeltYn('N');
         mvcBbsCmntRepository.save(newCmnt);
