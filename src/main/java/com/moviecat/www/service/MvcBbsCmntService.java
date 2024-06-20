@@ -93,14 +93,15 @@ public class MvcBbsCmntService {
     }
 
     @Transactional
-    public void bbsEditCmnt(MvcCmntDto mvcCmntDto){
+    public void bbsEditCmnt(MvcCmntDto mvcCmntDto) {
+
         Optional<MvcBbsCmnt> editCmntOptional = mvcBbsCmntRepository.findByCmntIdAndDeltYn(mvcCmntDto.getCmntId(),'N');
-        String mbrNm = columnValueMapper.mbrIdToMbrNm(mvcCmntDto.getCmntMbrId()); // mbrId 넣고 mbrNm으로 받기
+
         if (editCmntOptional.isPresent()) {
             MvcBbsCmnt editCmnt = editCmntOptional.get();
             editCmnt.setCn(mvcCmntDto.getCn());
-            editCmnt.setMdfcnUserId(mvcCmntDto.getCmntMbrId());
-            editCmnt.setMdfcnUserNm(mbrNm);
+            editCmnt.setMdfcnUserId(mvcCmntDto.getMbrId());
+            editCmnt.setMdfcnUserNm(mvcCmntDto.getMbrNm());
             editCmnt.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
             mvcBbsCmntRepository.save(editCmnt);
         } else {
