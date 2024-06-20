@@ -36,7 +36,6 @@ public class MvcBbsCmntService {
         String mbrNm = columnValueMapper.mbrIdToMbrNm(mvcCmntDto.getCmntMbrId()); // mbrId 넣고 mbrNm으로 받기
 
         MvcBbsCmnt newCmnt = new MvcBbsCmnt();
-        newCmnt.setCmntId(cmntGroupOptional.get().getCmntId());
         newCmnt.setPstId(mvcCmntDto.getPstId());
         newCmnt.setUpCmntId(0);
         newCmnt.setCmntLyr(0);
@@ -46,10 +45,10 @@ public class MvcBbsCmntService {
         newCmnt.setSeq(seq);
         newCmnt.setCn(mvcCmntDto.getCn());
         newCmnt.setRgstUserId(mvcCmntDto.getMbrId());
-        newCmnt.setRgstUserNm(mvcCmntDto.getMbrNm());
+        newCmnt.setRgstUserNm(mbrNm);
         newCmnt.setRgstDay(Timestamp.valueOf(LocalDateTime.now()));
         newCmnt.setMdfcnUserId(mvcCmntDto.getMbrId());
-        newCmnt.setMdfcnUserNm(mvcCmntDto.getMbrNm());
+        newCmnt.setMdfcnUserNm(mbrNm);
         newCmnt.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
         newCmnt.setDeltYn('N');
         mvcBbsCmntRepository.save(newCmnt);
@@ -143,14 +142,23 @@ public class MvcBbsCmntService {
             cmntData.put("seq", cmnt.getSeq());
             cmntData.put("cmntGroup", cmnt.getCmntGroup());
             cmntData.put("cmntLyr", cmnt.getCmntLyr());
-            //TODO.cmntLyr가 2인 경우 어떤 댓글에 댓글을 달았는지 알아야 되기 때문에 cmntLyr 1의 닉네임이 필요함
+            System.out.println(cmnt.getUpCmntId());
+            Optional<MvcBbsCmnt> upCmntNickNmOptional = mvcBbsCmntRepository.findById(cmnt.getUpCmntId());
+            String upCmntNickNmValue = null;
+            if (upCmntNickNmOptional.isPresent()) {
+                MvcBbsCmnt upCmntNickNm = upCmntNickNmOptional.get();
+                if (upCmntNickNm.getUpCmntId() != 0) {
+                    upCmntNickNmValue = upCmntNickNm.getCmntMbrNickNm();
+                }
+            }
+            cmntData.put("upCmntNickNm", upCmntNickNmValue);
+            cmntData.put("mvcId",columnValueMapper.mbrIdToMvcId(cmnt.getRgstUserId()));
+            cmntData.put("profileUrl",columnValueMapper.mbrIdToAtchFileUrl(cmnt.getRgstUserId()));
             cmntData.put("nickNm", cmnt.getCmntMbrNickNm());
             cmntData.put("cn", cmnt.getCn());
             String rgstTime = timeFormat.formatDate(cmnt.getRgstDay());
             cmntData.put("rgstDay", rgstTime);
-            //TODO.프로필 사진 추가 필요
             dataList.add(cmntData);
-            //TODO.mvcId 추가 필요(댓글 작성자가 게시글 작성자인 경우 표시하기 위해 필요)
         }
 
         Map<String, Object> result = new HashMap<>();
