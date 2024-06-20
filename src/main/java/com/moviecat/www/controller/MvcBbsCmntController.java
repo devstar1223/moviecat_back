@@ -30,7 +30,7 @@ public class MvcBbsCmntController {
 
     @PostMapping("/bbsWriteReply")
     @Operation(summary = "답글 작성", description ="답글 작성")
-    public ResponseEntity<String> bbsWriteReply(@ModelAttribute MvcCmntDto mvcCmntDto){
+    public ResponseEntity<String> bbsWriteReply(@RequestBody MvcCmntDto mvcCmntDto){
         try {
             mvcBbsCmntService.bbsWriteReply(mvcCmntDto);
             return new ResponseEntity<>("답글 작성 성공", HttpStatus.OK);

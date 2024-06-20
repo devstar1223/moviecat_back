@@ -16,4 +16,7 @@ public class MvcCmntDto {
     private Long upCmntId; // 댓글 쓰기, 수정, 삭제에는 필요없음.
     private String mbrId;
     private String mbrNm;
+    private int cmntLyr;
+    private int cmntGroup;
+    private int seq;
 }

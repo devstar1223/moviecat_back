@@ -55,44 +55,21 @@ public class MvcBbsCmntService {
     }
 
     @Transactional
-    public void bbsWriteReply(MvcCmntDto mvcCmntDto){
-        long upCmntId = mvcCmntDto.getUpCmntId(); // 상위댓글 id
-        Optional<MvcBbsCmnt> upCmntOptional = mvcBbsCmntRepository.findById(upCmntId); // 상위댓글 id로, 상위댓글 정보 찾기
-        int group;
-        int lyr;
-        int seq;
-        if (upCmntOptional.isPresent()) {
-            MvcBbsCmnt upCmnt = upCmntOptional.get();
-            group = upCmnt.getCmntGroup();
-            lyr = upCmnt.getCmntLyr() + 1;
-            Optional<MvcBbsCmnt> seqOptional = mvcBbsCmntRepository.findTopByUpCmntIdOrderBySeqDesc(upCmntId);
-            seq = seqOptional.map(cmnt -> cmnt.getSeq() + 1).orElse(upCmnt.getSeq() + 1);
-        } else {
-            throw new NoSuchElementException("답글을 작성할 상위 댓글을 찾을 수 없습니다.");
-        }
-
-        List<MvcBbsCmnt> cmntsToUpdate = mvcBbsCmntRepository.findByPstIdAndSeqGreaterThanEqual(mvcCmntDto.getPstId(), seq); // 게시글에서, 이 답글보다 순서 같거나 큰거 검색
-        for (MvcBbsCmnt cmnt : cmntsToUpdate) {
-            cmnt.setSeq(cmnt.getSeq() + 1); // 전부 순서 +1씩 해주고
-            mvcBbsCmntRepository.save(cmnt); // 저장
-        }
-
-        String mbrNm = columnValueMapper.mbrIdToMbrNm(mvcCmntDto.getCmntMbrId()); // mbrId 넣고 mbrNm으로 받기
-
+    public void bbsWriteReply(MvcCmntDto mvcCmntDto) {
         MvcBbsCmnt newReply = new MvcBbsCmnt();
         newReply.setPstId(mvcCmntDto.getPstId());
         newReply.setUpCmntId(mvcCmntDto.getUpCmntId());
-        newReply.setCmntLyr(lyr);
-        newReply.setCmntGroup(group);
+        newReply.setCmntLyr(mvcCmntDto.getCmntLyr());
+        newReply.setCmntGroup(mvcCmntDto.getCmntGroup());
         newReply.setCmntMbrId(mvcCmntDto.getCmntMbrId());
         newReply.setCmntMbrNickNm(mvcCmntDto.getCmntMbrNickNm());
-        newReply.setSeq(seq);
+        newReply.setSeq(mvcCmntDto.getSeq());
         newReply.setCn(mvcCmntDto.getCn());
         newReply.setRgstUserId(mvcCmntDto.getCmntMbrId());
-        newReply.setRgstUserNm(mbrNm);
+        newReply.setRgstUserNm(mvcCmntDto.getMbrNm());
         newReply.setRgstDay(Timestamp.valueOf(LocalDateTime.now()));
         newReply.setMdfcnUserId(mvcCmntDto.getCmntMbrId());
-        newReply.setMdfcnUserNm(mbrNm);
+        newReply.setMdfcnUserNm(mvcCmntDto.getMbrNm());
         newReply.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
         newReply.setDeltYn('N');
         mvcBbsCmntRepository.save(newReply);
@@ -139,6 +116,7 @@ public class MvcBbsCmntService {
 
         for (MvcBbsCmnt cmnt : cmntList) {
             Map<String, Object> cmntData = new LinkedHashMap<>();
+            cmntData.put("cmntId",cmnt.getCmntId());
             cmntData.put("seq", cmnt.getSeq());
             cmntData.put("cmntGroup", cmnt.getCmntGroup());
             cmntData.put("cmntLyr", cmnt.getCmntLyr());
