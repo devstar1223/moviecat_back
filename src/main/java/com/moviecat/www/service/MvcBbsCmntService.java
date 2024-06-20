@@ -77,13 +77,14 @@ public class MvcBbsCmntService {
 
     @Transactional
     public void bbsDeleteCmnt(MvcCmntDto mvcCmntDto) {
+
         Optional<MvcBbsCmnt> deleteCmntOptional = mvcBbsCmntRepository.findById(mvcCmntDto.getCmntId());
-        String mbrNm = columnValueMapper.mbrIdToMbrNm(mvcCmntDto.getCmntMbrId()); // mbrId 넣고 mbrNm으로 받기
+
         if (deleteCmntOptional.isPresent()) {
             MvcBbsCmnt deleteCmnt = deleteCmntOptional.get();
             deleteCmnt.setDeltYn('Y');
-            deleteCmnt.setMdfcnUserId(mvcCmntDto.getCmntMbrId());
-            deleteCmnt.setMdfcnUserNm(mbrNm);
+            deleteCmnt.setMdfcnUserId(mvcCmntDto.getMbrId());
+            deleteCmnt.setMdfcnUserNm(mvcCmntDto.getMbrNm());
             deleteCmnt.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
             mvcBbsCmntRepository.save(deleteCmnt);
         } else {
@@ -120,7 +121,7 @@ public class MvcBbsCmntService {
             cmntData.put("seq", cmnt.getSeq());
             cmntData.put("cmntGroup", cmnt.getCmntGroup());
             cmntData.put("cmntLyr", cmnt.getCmntLyr());
-            System.out.println(cmnt.getUpCmntId());
+
             Optional<MvcBbsCmnt> upCmntNickNmOptional = mvcBbsCmntRepository.findById(cmnt.getUpCmntId());
             String upCmntNickNmValue = null;
             if (upCmntNickNmOptional.isPresent()) {

@@ -39,7 +39,7 @@ public class MvcBbsCmntController {
         }
     }
 
-    @PatchMapping("/bbsEditCmnt")
+    @PostMapping("/bbsEditCmnt")
     @Operation(summary = "댓글 수정", description ="댓글 수정 기능")
     public ResponseEntity<String> bbsEditCmnt(@RequestBody MvcCmntDto mvcCmntDto){
         try {
@@ -49,13 +49,14 @@ public class MvcBbsCmntController {
             return new ResponseEntity<>("댓글 수정 실패: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @DeleteMapping("/bbsDeleteCmnt")
+    @PostMapping("/bbsDeleteCmnt")
     @Operation(summary = "댓글/답글 삭제", description ="댓글/답글 통합 삭제")
     public ResponseEntity<String> bbsDeleteCmnt(@RequestBody MvcCmntDto mvcCmntDto){
         try {
             mvcBbsCmntService.bbsDeleteCmnt(mvcCmntDto);
             return new ResponseEntity<>("댓글 삭제 성공", HttpStatus.OK);
         } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>("댓글 삭제 실패: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -67,6 +68,7 @@ public class MvcBbsCmntController {
             String jsonCmnt = mvcBbsCmntService.bbsReadCmnt(pstId);
             return new ResponseEntity<>(jsonCmnt, HttpStatus.OK);
         } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>("에러", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
