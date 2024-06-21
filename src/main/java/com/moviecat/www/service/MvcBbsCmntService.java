@@ -123,6 +123,7 @@ public class MvcBbsCmntService {
 
             if(cmnt.getDeltYn() == 'Y' && cmnt.getCmntLyr() == 0 && mvcBbsCmntRepository.findByUpCmntIdAndDeltYn(cmnt.getCmntId(), 'N').isPresent()){
                 cn = ""; // 지워진 댓글이, lyr 0인 답글 아닌 댓글이고, 이 댓글id를 상위 댓글 id로 가진 삭제되지 않은 답글이 존재할경우
+                // TODO. 나머지 값은 null로 보내는게 좋음.
             } else if(cmnt.getDeltYn() == 'N'){ // 삭제되지 않은 글 / 댓글이면, 그냥 내용 넣기
                 total++;
                 cn = cmnt.getCn();

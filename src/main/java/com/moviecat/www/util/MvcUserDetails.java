@@ -14,9 +14,11 @@ public class MvcUserDetails extends User {
     private final String mbrNm;
     private final String atchFileUrl;
     private final String token;
+    private final long mvcId;
 
-    public MvcUserDetails(String mbrId, String pswd, Collection<? extends GrantedAuthority> auth, String nickNm, String mbrNm, String atchFileUrl, String token) {
+    public MvcUserDetails(long mvcId,String mbrId, String pswd, Collection<? extends GrantedAuthority> auth, String nickNm, String mbrNm, String atchFileUrl, String token) {
         super(mbrId, pswd, auth);
+        this.mvcId = mvcId;
         this.mbrId = mbrId;
         this.nickNm = nickNm;
         this.mbrNm = mbrNm;

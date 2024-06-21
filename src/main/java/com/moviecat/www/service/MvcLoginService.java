@@ -32,7 +32,7 @@ public class MvcLoginService implements UserDetailsService {
         List<GrantedAuthority> auth = new ArrayList<>();
         auth.add(new SimpleGrantedAuthority("일반유저")); // 우선, 모든 유저에게 일반유저 부여
         String token = JwtTokenProvider.generateToken(user.getMbrId());
-        MvcUserDetails userDetails = new MvcUserDetails(user.getMbrId(), user.getPswd(), auth, user.getNickNm(), user.getMbrNm(), user.getAtchFileUrl(), token);
+        MvcUserDetails userDetails = new MvcUserDetails(user.getMvcId(),user.getMbrId(), user.getPswd(), auth, user.getNickNm(), user.getMbrNm(), user.getAtchFileUrl(), token);
         return userDetails;
     }
 
