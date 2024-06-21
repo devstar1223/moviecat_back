@@ -34,7 +34,7 @@ public class MvcBbsCmntService {
 //        Optional<MvcBbsCmnt> cmntSeqOptional = mvcBbsCmntRepository.findTopByPstIdAndCmntGroupOrderBySeqDesc(mvcCmntDto.getPstId(),group);
 //        int seq = cmntSeqOptional.map(cmnt -> cmnt.getSeq() + 1).orElse(0);
 
-        String mbrNm = columnValueMapper.mbrIdToMbrNm(mvcCmntDto.getCmntMbrId()); // mbrId 넣고 mbrNm으로 받기
+        //String mbrNm = columnValueMapper.mbrIdToMbrNm(mvcCmntDto.getCmntMbrId()); // mbrId 넣고 mbrNm으로 받기
 
         MvcBbsCmnt newCmnt = new MvcBbsCmnt();
         newCmnt.setPstId(mvcCmntDto.getPstId());
@@ -46,10 +46,10 @@ public class MvcBbsCmntService {
         newCmnt.setSeq(0); // 답글이 아닌 댓글은 기본적으로 seq값 0
         newCmnt.setCn(mvcCmntDto.getCn());
         newCmnt.setRgstUserId(mvcCmntDto.getMbrId());
-        newCmnt.setRgstUserNm(mbrNm);
+        newCmnt.setRgstUserNm(mvcCmntDto.getMbrNm());
         newCmnt.setRgstDay(Timestamp.valueOf(LocalDateTime.now()));
         newCmnt.setMdfcnUserId(mvcCmntDto.getMbrId());
-        newCmnt.setMdfcnUserNm(mbrNm);
+        newCmnt.setMdfcnUserNm(mvcCmntDto.getMbrNm());
         newCmnt.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
         newCmnt.setDeltYn('N');
         mvcBbsCmntRepository.save(newCmnt);
@@ -114,26 +114,31 @@ public class MvcBbsCmntService {
     public String bbsReadCmnt(long pstId) throws JsonProcessingException {
         List<Map<String, Object>> dataList = new ArrayList<>();
         List<MvcBbsCmnt> cmntList = mvcBbsCmntRepository.findByPstIdOrderByCmntGroupAscSeqAsc(pstId);
+
         int total = 0;
+
         for (MvcBbsCmnt cmnt : cmntList) {
-            String cn;
+
+            String cn = "";
+
             if(cmnt.getDeltYn() == 'Y' && cmnt.getCmntLyr() == 0 && mvcBbsCmntRepository.findByUpCmntIdAndDeltYn(cmnt.getCmntId(), 'N').isPresent()){
-                cn = "삭제된 댓글입니다."; // 지워진 댓글이, lyr 0인 답글 아닌 댓글이고, 이 댓글id를 상위 댓글 id로 가진 삭제되지 않은 답글이 존재할경우
-            }
-            else if(cmnt.getDeltYn() == 'N'){ // 삭제되지 않은 글 / 댓글이면, 그냥 내용 넣기
+                cn = ""; // 지워진 댓글이, lyr 0인 답글 아닌 댓글이고, 이 댓글id를 상위 댓글 id로 가진 삭제되지 않은 답글이 존재할경우
+            } else if(cmnt.getDeltYn() == 'N'){ // 삭제되지 않은 글 / 댓글이면, 그냥 내용 넣기
                 total++;
                 cn = cmnt.getCn();
-            }
-            else{
+            } else{
                 continue;
             }
+
             Map<String, Object> cmntData = new LinkedHashMap<>();
             cmntData.put("cmntId",cmnt.getCmntId());
             cmntData.put("seq", cmnt.getSeq());
             cmntData.put("cmntGroup", cmnt.getCmntGroup());
             cmntData.put("cmntLyr", cmnt.getCmntLyr());
+            cmntData.put("deltYn", cmnt.getDeltYn());
 
             Optional<MvcBbsCmnt> upCmntNickNmOptional = mvcBbsCmntRepository.findById(cmnt.getUpCmntId());
+
             String upCmntNickNmValue = null;
             if (upCmntNickNmOptional.isPresent()) {
                 MvcBbsCmnt upCmntNickNm = upCmntNickNmOptional.get();
