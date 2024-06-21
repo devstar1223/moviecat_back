@@ -3,6 +3,8 @@ package com.moviecat.www.repository;
 import com.moviecat.www.entity.MvcBbsCmnt;
 import jakarta.validation.constraints.Future;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.thymeleaf.spring6.expression.Mvc;
 
 import java.util.List;
@@ -15,7 +17,10 @@ public interface MvcBbsCmntRepository extends JpaRepository<MvcBbsCmnt,Long> {
     Optional<MvcBbsCmnt> findByCmntIdAndDeltYn(long cmntId, char deltYn);
     List<MvcBbsCmnt> findByPstIdAndSeqGreaterThanEqual(long pstId, int seq);
 
-    List<MvcBbsCmnt> findByPstIdAndDeltYnOrderByCmntGroupAscSeqAsc(long pstId, char deltYn);
+    List<MvcBbsCmnt> findByPstIdOrderByCmntGroupAscSeqAsc(long pstId);
+    List<MvcBbsCmnt> findByPstIdAndDeltYnAndCmntLyrOrderByCmntGroupAscSeqAsc(long pstId, char deltYn, int lyr);
+
+    Optional<MvcBbsCmnt> findByUpCmntIdAndDeltYn(long upCmntId, char deltYn);
 
     List<MvcBbsCmnt> findByRgstUserIdAndDeltYnOrderByRgstDayDesc(String rgstUserId, char deltYn);
     Optional<MvcBbsCmnt> findTopByUpCmntIdOrderBySeqDesc(long upCmntId);
@@ -23,5 +28,8 @@ public interface MvcBbsCmntRepository extends JpaRepository<MvcBbsCmnt,Long> {
     List<MvcBbsCmnt> findByPstIdAndDeltYn(long pstId, char deltYn);
 
     Optional<MvcBbsCmnt> findByPstId(long pstId);
+
+    @Query("SELECT COUNT(c) FROM MvcBbsCmnt c WHERE c.pstId = :pstId AND c.deltYn = 'N'")
+    int countByPstIdAndDeltYn(@Param("pstId") long pstId);
 
 }

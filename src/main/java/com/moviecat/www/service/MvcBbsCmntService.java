@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.thymeleaf.spring6.expression.Mvc;
 
 import java.util.*;
 
@@ -28,10 +29,10 @@ public class MvcBbsCmntService {
     @Transactional
     public void bbsWriteCmnt(MvcCmntDto mvcCmntDto){
         Optional<MvcBbsCmnt> cmntGroupOptional = mvcBbsCmntRepository.findTopByPstIdOrderByCmntGroupDesc(mvcCmntDto.getPstId());
-        int group = cmntGroupOptional.map(cmnt -> cmnt.getCmntGroup() + 1).orElse(0);
+        int group = cmntGroupOptional.map(cmnt -> cmnt.getCmntGroup() + 1).orElse(0); // 그룹은 댓글 작성시 만들어서 프론트에 전달.
 
-        Optional<MvcBbsCmnt> cmntSeqOptional = mvcBbsCmntRepository.findTopByPstIdAndCmntGroupOrderBySeqDesc(mvcCmntDto.getPstId(),group);
-        int seq = cmntSeqOptional.map(cmnt -> cmnt.getSeq() + 1).orElse(0);
+//        Optional<MvcBbsCmnt> cmntSeqOptional = mvcBbsCmntRepository.findTopByPstIdAndCmntGroupOrderBySeqDesc(mvcCmntDto.getPstId(),group);
+//        int seq = cmntSeqOptional.map(cmnt -> cmnt.getSeq() + 1).orElse(0);
 
         String mbrNm = columnValueMapper.mbrIdToMbrNm(mvcCmntDto.getCmntMbrId()); // mbrId 넣고 mbrNm으로 받기
 
@@ -42,7 +43,7 @@ public class MvcBbsCmntService {
         newCmnt.setCmntGroup(group);
         newCmnt.setCmntMbrId(mvcCmntDto.getCmntMbrId());
         newCmnt.setCmntMbrNickNm(mvcCmntDto.getCmntMbrNickNm());
-        newCmnt.setSeq(seq);
+        newCmnt.setSeq(0); // 답글이 아닌 댓글은 기본적으로 seq값 0
         newCmnt.setCn(mvcCmntDto.getCn());
         newCmnt.setRgstUserId(mvcCmntDto.getMbrId());
         newCmnt.setRgstUserNm(mbrNm);
@@ -111,12 +112,21 @@ public class MvcBbsCmntService {
 
     @Transactional
     public String bbsReadCmnt(long pstId) throws JsonProcessingException {
-        List<MvcBbsCmnt> cmntList = mvcBbsCmntRepository.findByPstIdAndDeltYnOrderByCmntGroupAscSeqAsc(pstId, 'N');
         List<Map<String, Object>> dataList = new ArrayList<>();
-
-        int total = cmntList.size();
-
+        List<MvcBbsCmnt> cmntList = mvcBbsCmntRepository.findByPstIdOrderByCmntGroupAscSeqAsc(pstId);
+        int total = 0;
         for (MvcBbsCmnt cmnt : cmntList) {
+            String cn;
+            if(cmnt.getDeltYn() == 'Y' && cmnt.getCmntLyr() == 0 && mvcBbsCmntRepository.findByUpCmntIdAndDeltYn(cmnt.getCmntId(), 'N').isPresent()){
+                cn = "삭제된 댓글입니다."; // 지워진 댓글이, lyr 0인 답글 아닌 댓글이고, 이 댓글id를 상위 댓글 id로 가진 삭제되지 않은 답글이 존재할경우
+            }
+            else if(cmnt.getDeltYn() == 'N'){ // 삭제되지 않은 글 / 댓글이면, 그냥 내용 넣기
+                total++;
+                cn = cmnt.getCn();
+            }
+            else{
+                continue;
+            }
             Map<String, Object> cmntData = new LinkedHashMap<>();
             cmntData.put("cmntId",cmnt.getCmntId());
             cmntData.put("seq", cmnt.getSeq());
@@ -128,14 +138,14 @@ public class MvcBbsCmntService {
             if (upCmntNickNmOptional.isPresent()) {
                 MvcBbsCmnt upCmntNickNm = upCmntNickNmOptional.get();
                 if (upCmntNickNm.getUpCmntId() != 0) {
-                    upCmntNickNmValue = upCmntNickNm.getCmntMbrNickNm();
+                    upCmntNickNmValue = upCmntNickNm.getCmntMbrNickNm(); // 답댓글일 경우, 어떤 글에 달았는지 작성자의 닉네임을 표시
                 }
             }
             cmntData.put("upCmntNickNm", upCmntNickNmValue);
             cmntData.put("mvcId",columnValueMapper.mbrIdToMvcId(cmnt.getRgstUserId()));
             cmntData.put("profileUrl",columnValueMapper.mbrIdToAtchFileUrl(cmnt.getRgstUserId()));
             cmntData.put("nickNm", cmnt.getCmntMbrNickNm());
-            cmntData.put("cn", cmnt.getCn());
+            cmntData.put("cn", cn);
             String rgstTime = timeFormat.formatDate(cmnt.getRgstDay());
             cmntData.put("rgstDay", rgstTime);
             dataList.add(cmntData);
