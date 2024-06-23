@@ -9,6 +9,7 @@ import javax.persistence.*;
 import java.sql.Blob;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -30,4 +31,6 @@ public class MvcBbsDto {
     private String mdfcnUserNm; // 수정자
     private Timestamp mdfcnDay; // 수정일
     private String deltYn; // 삭제유무
+
+    private List<Map<String, Integer>> delFileList; //삭제파일 fileId, seq
 }

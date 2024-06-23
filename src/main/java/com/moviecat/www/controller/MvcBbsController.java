@@ -1,21 +1,22 @@
 package com.moviecat.www.controller;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moviecat.www.dto.MvcAtchFileDto;
 import com.moviecat.www.dto.MvcBbsDto;
 import com.moviecat.www.service.MvcAtchFileService;
 import com.moviecat.www.service.MvcBbsService;
-import com.moviecat.www.service.MvcFileUploadService;
-import com.moviecat.www.util.FileUtils;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -48,22 +49,47 @@ public class MvcBbsController {
         }
     }
 
-    @PatchMapping("/bbsEditPost")
+    @PostMapping("/bbsEditPost")
     @Operation(summary = "글 수정", description = "글 수정 api, 파일 id 무조건 들어와야, 새 파일 id 만들어지지 않습니다.")
-    public ResponseEntity<String> bbsEditPost(@ModelAttribute MvcBbsDto mvcBbsDto, @RequestPart(value = "files", required = false) List<MultipartFile> files) {
-        if (files != null && !files.isEmpty()) {
-            for (int i = 1; i < files.size() + 1; i++) {
-                MultipartFile file = files.get(i - 1);
-                MvcAtchFileDto mvcAtchFileDto = mvcAtchFileService.editSetDtoAndUploadFile(file, mvcBbsDto, mvcBbsDto.getAtchFileId());  // // dto를 서비스에서 설정하고, dto를 참고하여 파일 업로드
-                mvcBbsDto.setAtchFileId(mvcAtchFileDto.getAtchFileId()); // 파일이 있으므로, 파일id가 없었다면 넣어줘야함(반복 되도, 여기 넣어줘야 새로 번호 부여 X)
-                mvcAtchFileService.insertAtchFileTable(mvcAtchFileDto); // 받은 dto 기반으로 DB에 저장
+    public ResponseEntity<String> bbsEditPost(@ModelAttribute MvcBbsDto mvcBbsDto
+            , @RequestPart(value = "files", required = false) List<MultipartFile> files
+            , @RequestParam Map<String, String> allRequestParams) {
+
+        //TODO. 삭제할 파일 정보들입니다. start
+        List<Map<String, Integer>> delFileList = new ArrayList<>();
+
+        // delFileList 파싱
+        for (int i = 0; ; i++) {
+            String fileIdKey = "delFileList[" + i + "][fileId]";
+            String seqKey = "delFileList[" + i + "][seq]";
+            if (!allRequestParams.containsKey(fileIdKey) || !allRequestParams.containsKey(seqKey)) {
+                break;
             }
+            //Map<String, Integer> 형식(fileId, seq)
+            Map<String, Integer> fileMap = Map.of(
+                    "fileId", Integer.parseInt(allRequestParams.get(fileIdKey)),
+                    "seq", Integer.parseInt(allRequestParams.get(seqKey))
+            );
+            //Map을 list에 담음.
+            delFileList.add(fileMap);
         }
-        mvcBbsService.bbsEditPost(mvcBbsDto);
+
+        mvcBbsDto.setDelFileList(delFileList);
+        //TODO.end
+
+//        if (files != null && !files.isEmpty()) {
+//            for (int i = 1; i < files.size() + 1; i++) {
+//                MultipartFile file = files.get(i - 1);
+//                MvcAtchFileDto mvcAtchFileDto = mvcAtchFileService.editSetDtoAndUploadFile(file, mvcBbsDto, mvcBbsDto.getAtchFileId());  // // dto를 서비스에서 설정하고, dto를 참고하여 파일 업로드
+//                mvcBbsDto.setAtchFileId(mvcAtchFileDto.getAtchFileId()); // 파일이 있으므로, 파일id가 없었다면 넣어줘야함(반복 되도, 여기 넣어줘야 새로 번호 부여 X)
+//                mvcAtchFileService.insertAtchFileTable(mvcAtchFileDto); // 받은 dto 기반으로 DB에 저장
+//            }
+//        }
+//        mvcBbsService.bbsEditPost(mvcBbsDto);
         return new ResponseEntity<>("글 수정 성공", HttpStatus.OK);
     }
 
-    @DeleteMapping("/bbsDeletePost")
+    @PostMapping("/bbsDeletePost")
     @Operation(summary = "글 삭제", description = "글 삭제 api, 삭제 유무와 수정 정보만 바꿉니다.")
     public ResponseEntity<String> bbsDeletePost(@RequestBody MvcBbsDto mvcBbsDto) {
         mvcBbsService.bbsDeletePost(mvcBbsDto);
