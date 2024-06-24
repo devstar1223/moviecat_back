@@ -72,15 +72,4 @@ public class MvcMypageContoller {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    @DeleteMapping("/myInfoDelete")
-    @Operation(summary = "회원 탈퇴", description ="deltYn 변경")
-    public ResponseEntity<String> myInfoDelete(@RequestParam long mvcId){
-        try {
-            mvcMyInfoService.myInfoDelete(mvcId);
-            return new ResponseEntity<>("탈퇴 완료", HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 }
