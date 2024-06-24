@@ -4,7 +4,9 @@ import com.moviecat.www.dto.MvcAtchFileDto;
 import com.moviecat.www.dto.MvcBbsDto;
 import com.moviecat.www.entity.MvcAtchFile;
 import com.moviecat.www.entity.MvcAtchFilePK;
+import com.moviecat.www.entity.MvcBbs;
 import com.moviecat.www.repository.MvcAtchFileRepository;
+import com.moviecat.www.repository.MvcBbsRepository;
 import com.moviecat.www.util.FileUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,15 +24,16 @@ public class MvcAtchFileService {
 
     private final MvcAtchFileRepository mvcAtchFileRepository;
     private final MvcFileUploadService mvcFileUploadService;
+    private final MvcBbsRepository mvcBbsRepository;
     private final FileUtils fileUtils;
     @Transactional
     public MvcAtchFileDto writeSetDtoAndUploadFile(MultipartFile multipartFile, MvcBbsDto mvcBbsDto, int i){
         Optional<MvcAtchFile> fileIdOptional = mvcAtchFileRepository.findTopByOrderByAtchFileIdCkAtchFileIdDesc(); // 복합키 id에서 가장 큰 값을 가져온다
         long fileId; // 먼저 fileId 선언
-        if(fileIdOptional.isPresent() && i == 1){
+        if(fileIdOptional.isPresent() && i == 0){
             fileId = fileIdOptional.get().getAtchFileIdCk().getAtchFileId() + 1; // 등록된 파일이 하나라도 있고, 리스트중 첫번째 파일이면, 최신번호+1 부여
         }
-        else if(fileIdOptional.isPresent() && i > 1) {
+        else if(fileIdOptional.isPresent() && i > 0) {
             fileId = fileIdOptional.get().getAtchFileIdCk().getAtchFileId(); // 등록된 파일이 있고, 리스트중 두번째 파일이면, 최신번호 부여
         }
         else{
@@ -82,20 +85,24 @@ public class MvcAtchFileService {
     }
 
     @Transactional
-    public MvcAtchFileDto editSetDtoAndUploadFile(MultipartFile multipartFile, MvcBbsDto mvcBbsDto, Long atchFileId){
+    public MvcAtchFileDto editSetDtoAndUploadFile(MultipartFile multipartFile, MvcBbsDto mvcBbsDto){
         MvcAtchFileDto newFileDto = new MvcAtchFileDto(); // dto를 만들어서 값을 넣자
+        Optional<MvcBbs> editPost = mvcBbsRepository.findById(mvcBbsDto.getPstId());
         long recentSeq;
-        if(atchFileId == null){
+        long atchFileId;
+        if(editPost.get().getAtchFileid() == null){
+            System.out.println("여기");
             Optional<MvcAtchFile> fileIdOptional = mvcAtchFileRepository.findTopByOrderByAtchFileIdCkAtchFileIdDesc(); // 복합키 id에서 가장 큰 값을 가져온다.
             if(fileIdOptional.isPresent()) {
-                atchFileId = fileIdOptional.get().getAtchFileIdCk().getAtchFileId()+1; // 등록된 파일이 있으면 최신번호+1 부여
+                atchFileId = fileIdOptional.get().getAtchFileIdCk().getAtchFileId()+1; // 테이블에 등록된 파일이 있으면 최신번호+1 부여
             }
             else{
-                atchFileId = (long)1; // 등록된 파일이 하나도 없다면 1번 부여
+                atchFileId = (long)1; // 테이블에 등록된 파일이 하나도 없다면 1번 부여
             }
             recentSeq = 0;
         }
         else{
+            atchFileId = editPost.get().getAtchFileid();
             Optional<MvcAtchFile> recentSeqOptional = mvcAtchFileRepository.findTopByAtchFileIdCkAtchFileIdOrderByAtchFileIdCkSeqDesc(atchFileId); // id와 일치하는 가장 큰 seq 갑을 가져온다.
             recentSeq = recentSeqOptional.get().getAtchFileIdCk().getSeq();
         }

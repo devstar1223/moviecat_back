@@ -149,7 +149,7 @@ public class MvcBbsService {
         if (postInfoOptional.isPresent()) {
             MvcBbs postInfo = postInfoOptional.get(); // 글 정보 가져오기
             long fileId = postInfo.getAtchFileid();
-            List<MvcAtchFile> filesList = mvcAtchFileRepository.findAllByAtchFileIdCkAtchFileIdOrderByAtchFileIdCkSeqAsc(fileId); // 파일 id로 파일 리스트 검색
+            List<MvcAtchFile> filesList = mvcAtchFileRepository.findAllByAtchFileIdCkAtchFileIdAndDeltYnOrderByAtchFileIdCkSeqAsc(fileId,"N"); // 파일 id로 파일 리스트 검색
             int seq = 0;
             List<Map<String, Object>> atchFileList = new ArrayList<>(); // 파일 정보 넣을 리스트 만들기
             Map<String, Object> atchFileMap = new HashMap<>();
@@ -173,6 +173,33 @@ public class MvcBbsService {
             emptyMap.put("total", 0);
             emptyMap.put("data", new ArrayList<>());
             return emptyMap;
+        }
+    }
+
+    @Transactional
+    public void editPostFileDelete(Map<String, String> allRequestParams) {
+        int i = 0;
+        while (true) {
+            String fileIdKey = "delFileList[" + i + "][fileId]";
+            String seqKey = "delFileList[" + i + "][seq]";
+
+            if (!allRequestParams.containsKey(fileIdKey) || !allRequestParams.containsKey(seqKey)) {
+                break;
+            }
+
+            long fileIdValue = Long.parseLong(allRequestParams.get(fileIdKey));
+            int seqValue = Integer.parseInt(allRequestParams.get(seqKey));
+
+            List<MvcAtchFile> fileList = mvcAtchFileRepository.findAllByAtchFileIdCkAtchFileIdAndAtchFileIdCkSeq(fileIdValue, seqValue);
+            if (!fileList.isEmpty()) {
+                MvcAtchFile editFile = fileList.get(0);
+                editFile.setDeltYn("Y");
+                editFile.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
+                editFile.setMdfcnUserNm(editFile.getRgstUserNm());
+                editFile.setMdfcnUserId(editFile.getRgstUserId());
+                mvcAtchFileRepository.save(editFile);
+            }
+            i++;
         }
     }
 }

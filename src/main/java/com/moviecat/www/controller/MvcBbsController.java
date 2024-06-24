@@ -6,6 +6,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moviecat.www.dto.MvcAtchFileDto;
 import com.moviecat.www.dto.MvcBbsDto;
+import com.moviecat.www.entity.MvcAtchFile;
+import com.moviecat.www.repository.MvcAtchFileRepository;
 import com.moviecat.www.service.MvcAtchFileService;
 import com.moviecat.www.service.MvcBbsService;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +30,7 @@ import java.util.Map;
 public class MvcBbsController {
     private final MvcBbsService mvcBbsService;
     private final MvcAtchFileService mvcAtchFileService;
+    private final MvcAtchFileRepository mvcAtchFileRepository;
 
     @PostMapping("/bbsWritePost")
     @Operation(summary = "글 작성", description = "글 작성 api")
@@ -33,8 +38,8 @@ public class MvcBbsController {
         MvcAtchFileDto mvcAtchFileDto = null;
         try {
             if (files != null && !files.isEmpty()) {
-                for (int i = 1; i < files.size() + 1; i++) {
-                    MultipartFile file = files.get(i - 1);
+                for (int i = 0; i < files.size(); i++) {
+                    MultipartFile file = files.get(i);
                     mvcAtchFileDto = mvcAtchFileService.writeSetDtoAndUploadFile(file, mvcBbsDto, i);  // dto를 서비스에서 설정하고, dto를 참고하여 파일 업로드
                     mvcAtchFileService.insertAtchFileTable(mvcAtchFileDto); // 받은 dto 기반으로 DB에 저장
                 }
@@ -50,42 +55,20 @@ public class MvcBbsController {
     }
 
     @PostMapping("/bbsEditPost")
-    @Operation(summary = "글 수정", description = "글 수정 api, 파일 id 무조건 들어와야, 새 파일 id 만들어지지 않습니다.")
+    @Operation(summary = "글 수정", description = "글 수정 api")
     public ResponseEntity<String> bbsEditPost(@ModelAttribute MvcBbsDto mvcBbsDto
             , @RequestPart(value = "files", required = false) List<MultipartFile> files
             , @RequestParam Map<String, String> allRequestParams) {
 
-        //TODO. 삭제할 파일 정보들입니다. start
-        List<Map<String, Integer>> delFileList = new ArrayList<>();
-
-        // delFileList 파싱
-        for (int i = 0; ; i++) {
-            String fileIdKey = "delFileList[" + i + "][fileId]";
-            String seqKey = "delFileList[" + i + "][seq]";
-            if (!allRequestParams.containsKey(fileIdKey) || !allRequestParams.containsKey(seqKey)) {
-                break;
+        mvcBbsService.editPostFileDelete(allRequestParams); // 수정중, 삭제된 파일 제거
+        if (files != null && files.size() > 0) {
+            for (MultipartFile file : files) {
+                MvcAtchFileDto mvcAtchFileDto = mvcAtchFileService.editSetDtoAndUploadFile(file, mvcBbsDto);  // // dto를 서비스에서 설정하고, dto를 참고하여 파일 업로드
+                mvcBbsDto.setAtchFileId(mvcAtchFileDto.getAtchFileId()); // 파일이 있으므로, 파일id가 없었다면 넣어줘야함(반복 되도, 여기 넣어줘야 새로 번호 부여 X)
+                mvcAtchFileService.insertAtchFileTable(mvcAtchFileDto); // 받은 dto 기반으로 DB에 저장
             }
-            //Map<String, Integer> 형식(fileId, seq)
-            Map<String, Integer> fileMap = Map.of(
-                    "fileId", Integer.parseInt(allRequestParams.get(fileIdKey)),
-                    "seq", Integer.parseInt(allRequestParams.get(seqKey))
-            );
-            //Map을 list에 담음.
-            delFileList.add(fileMap);
         }
-
-        mvcBbsDto.setDelFileList(delFileList);
-        //TODO.end
-
-//        if (files != null && !files.isEmpty()) {
-//            for (int i = 1; i < files.size() + 1; i++) {
-//                MultipartFile file = files.get(i - 1);
-//                MvcAtchFileDto mvcAtchFileDto = mvcAtchFileService.editSetDtoAndUploadFile(file, mvcBbsDto, mvcBbsDto.getAtchFileId());  // // dto를 서비스에서 설정하고, dto를 참고하여 파일 업로드
-//                mvcBbsDto.setAtchFileId(mvcAtchFileDto.getAtchFileId()); // 파일이 있으므로, 파일id가 없었다면 넣어줘야함(반복 되도, 여기 넣어줘야 새로 번호 부여 X)
-//                mvcAtchFileService.insertAtchFileTable(mvcAtchFileDto); // 받은 dto 기반으로 DB에 저장
-//            }
-//        }
-//        mvcBbsService.bbsEditPost(mvcBbsDto);
+        mvcBbsService.bbsEditPost(mvcBbsDto);
         return new ResponseEntity<>("글 수정 성공", HttpStatus.OK);
     }
 
