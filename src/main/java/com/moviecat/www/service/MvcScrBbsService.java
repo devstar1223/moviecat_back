@@ -134,6 +134,7 @@ public class MvcScrBbsService {
             int rcmdTotal = columnValueMapper.pstIdAndMenuIdToRcmdTotal(scr.getScrId(), scr.getMenuId());
             map.put("rmcdTotal", rcmdTotal);
             map.put("nickNm", columnValueMapper.mbrIdToNickNm(scr.getRgstUserId()));
+            map.put("mvcId", columnValueMapper.mbrIdToMvcId(scr.getRgstUserId()));
             //TODO.좋아요 총 갯수 추가 필요
             map.put("likeCnt", 10);
             //TODO.해당 mvcID로 좋아요 눌렀는지 여부(Y,N) 추가 필요(파라미터에 mvcID 추가해놨음)
