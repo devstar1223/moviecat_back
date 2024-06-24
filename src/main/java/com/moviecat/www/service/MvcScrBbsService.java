@@ -36,8 +36,10 @@ public class MvcScrBbsService {
     public void scrBbsWrite(MvcScrBbsDto mvcScrBbsDto){
         MvcScrBbs newScr = new MvcScrBbs();
         newScr.setMenuId(mvcScrBbsDto.getMenuId());
+        newScr.setVdoCode(mvcScrBbsDto.getVdoCode());
         newScr.setVdoNm(mvcScrBbsDto.getVdoNm());
-        newScr.setOpngDay(mvcScrBbsDto.getOpngDay());
+        newScr.setVdoNmEn(mvcScrBbsDto.getVdoNmEn());
+        newScr.setOpngYear(mvcScrBbsDto.getOpngYear());
         newScr.setScr(mvcScrBbsDto.getScr());
         newScr.setVdoEvl(mvcScrBbsDto.getVdoEvl());
         newScr.setRgstUserId(mvcScrBbsDto.getMbrId());
@@ -113,34 +115,36 @@ public class MvcScrBbsService {
     }
 
     @Transactional
-    public String scrList(long menuId, int page) throws JsonProcessingException {
+    public String scrList(long menuId, String mvcId, int page) throws Exception {
+
         List<MvcScrBbs> scrListOrigin = mvcScrBbsRepository.findByMenuIdAndDeltYnOrderByScrIdDesc(menuId, "N");
         List<Map<String,Object>> scrList = new ArrayList<>();
-        int scrNumber = scrListOrigin.size();
-        for(MvcScrBbs scr : scrListOrigin){
+
+        for(MvcScrBbs scr : scrListOrigin) {
+
             Map<String,Object> map = new LinkedHashMap<>();
-            map.put("scrNumber", scrNumber--);
+
             map.put("scrId",scr.getScrId());
             map.put("vdoNm",scr.getVdoNm());
-            map.put("OpngDay",scr.getOpngDay());
-            String[] rgstTime = timeFormat.formatDateToday(scr.getRgstDay());
-            map.put("new",rgstTime[1]);
-            map.put("rgstDate", rgstTime[0]);
+            map.put("vdoNmEn", scr.getVdoNmEn());
+            map.put("opngYear",scr.getOpngYear());
+            map.put("scr", scr.getScr());
+            map.put("rgstDate", timeFormat.formatDate(scr.getRgstDay()));
             map.put("vdoEvl",scr.getVdoEvl());
             int rcmdTotal = columnValueMapper.pstIdAndMenuIdToRcmdTotal(scr.getScrId(), scr.getMenuId());
-            map.put("rmcdTotal", (rcmdTotal > 5)? "5+" : String.valueOf(rcmdTotal));
+            map.put("rmcdTotal", rcmdTotal);
             map.put("nickNm", columnValueMapper.mbrIdToNickNm(scr.getRgstUserId()));
+            //TODO.좋아요 총 갯수 추가 필요
+            map.put("likeCnt", 10);
+            //TODO.해당 mvcID로 좋아요 눌렀는지 여부(Y,N) 추가 필요(파라미터에 mvcID 추가해놨음)
+            map.put("likeYn", "Y");
             scrList.add(map);
         }
-        List<Map<String, Object>> pagedPostList;
-        try {
-            pagedPostList = paginationUtil.getPage(scrList, page);
-        } catch (Exception e) {
-            throw e;
-        }
-        long total = scrList.size();
+
+        List<Map<String, Object>> pagedPostList = paginationUtil.getPage(scrList, page);
+
         Map<String, Object> result = new HashMap<>();
-        result.put("total", total);
+        result.put("total", scrList.size());
         result.put("data", pagedPostList);
 
         ObjectMapper objectMapper = new ObjectMapper();

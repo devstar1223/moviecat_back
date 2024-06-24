@@ -18,11 +18,17 @@ public class MvcScrBbs {
     @Column(name = "menu_id", nullable = false)
     private long menuId; // 메뉴 ID (4번 고정이나, 확장성을 고려)
 
+    @Column(name = "vdo_code", nullable = false)
+    private String vdoCode; // 영화 code
+
     @Column(name = "vdo_nm", nullable = false, length = 200)
     private String vdoNm; // 영화명
 
-    @Column(name = "opng_day", nullable = false)
-    private String opngDay; // 개봉일
+    @Column(name = "vdo_en_nm", length = 200)
+    private String vdoNmEn; // 영화영문명
+
+    @Column(name = "opng_year", nullable = true)
+    private String opngYear; // 개봉년도
 
     @Column(name = "scr", nullable = false)
     private int scr; // 평점

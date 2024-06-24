@@ -27,6 +27,7 @@ public class MvcScrBbsController {
         }
     }
 
+    //TODO. 삭제 필요
     @GetMapping("/scrboard/{menuId}/{scrId}")
     @Operation(summary = "평점 글 조회", description ="평점 글 조회")
     public ResponseEntity<String> scrBbsRead(@PathVariable("scrId") long scrId) {
@@ -38,6 +39,7 @@ public class MvcScrBbsController {
         }
     }
 
+    //TODO.삭제 필요
     @PatchMapping("/scrBbsEdit")
     @Operation(summary = "평점 수정", description = "평점 수정 api")
     public ResponseEntity<String> scrBbsEdit(@ModelAttribute MvcScrBbsDto mvcScrBbsDto) {
@@ -50,9 +52,9 @@ public class MvcScrBbsController {
         }
     }
 
-    @DeleteMapping("/scrBbsDelete")
+    @PostMapping("/scrBbsDelete")
     @Operation(summary = "평점 삭제", description = "평점 삭제 api")
-    public ResponseEntity<String> scrBbsDelete(@ModelAttribute MvcScrBbsDto mvcScrBbsDto) {
+    public ResponseEntity<String> scrBbsDelete(@RequestBody MvcScrBbsDto mvcScrBbsDto) {
         mvcScrBbsService.scrBbsDelete(mvcScrBbsDto);
         try{
             return new ResponseEntity<>("평점 삭제 성공", HttpStatus.OK);
@@ -64,12 +66,20 @@ public class MvcScrBbsController {
 
     @GetMapping("/scrboard/{menuId}")
     @Operation(summary = "평점 목록 조회", description ="평점 목록 조회")
-    public ResponseEntity<String> scrList(@PathVariable("menuId") long menuId, @RequestParam(value = "page", defaultValue = "1") int page) {
+    //TODO.limit으로 보여줘야 할 리스트 수 파라미터 보냅니다. limit으로 받아서 처리해주세요.
+    public ResponseEntity<String> scrList(@PathVariable("menuId") long menuId
+            , @RequestParam(value = "page", defaultValue = "1") int page
+            , @RequestParam(value = "mvcId") String mvcId) {
+
         try {
-            String jsonScrList = mvcScrBbsService.scrList(menuId, page);
+
+            String jsonScrList = mvcScrBbsService.scrList(menuId, mvcId, page);
             return new ResponseEntity<>(jsonScrList, HttpStatus.OK);
+
         } catch (Exception e) {
             return new ResponseEntity<>("오류 발생", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    //TODO. 평점 좋아요 클릭 시 좋아요 +1, -1 기능 필요
 }

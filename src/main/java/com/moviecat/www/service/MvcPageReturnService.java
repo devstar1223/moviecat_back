@@ -83,7 +83,7 @@ public class MvcPageReturnService {
             searchResultMap.put("scrNumber", scrNumber--);
             searchResultMap.put("scrId", searchResult.getScrId());
             searchResultMap.put("vdoNm", searchResult.getVdoEvl());
-            searchResultMap.put("OpngDay", searchResult.getOpngDay());
+            searchResultMap.put("OpngDay", searchResult.getOpngYear());
             String[] rgstTime = timeFormat.formatDateToday(searchResult.getRgstDay());
             searchResultMap.put("new",rgstTime[1]);
             searchResultMap.put("rgstDate", rgstTime[0]);
