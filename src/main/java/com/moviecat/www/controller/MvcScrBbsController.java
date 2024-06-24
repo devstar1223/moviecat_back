@@ -17,7 +17,7 @@ public class MvcScrBbsController {
 
     @PostMapping("/scrBbsWrite")
     @Operation(summary = "평점 작성", description ="평점 작성")
-    public ResponseEntity<String> scrBbsWrite (@ModelAttribute MvcScrBbsDto mvcScrBbsDto){
+    public ResponseEntity<String> scrBbsWrite (@RequestBody MvcScrBbsDto mvcScrBbsDto){
         try {
             mvcScrBbsService.scrBbsWrite(mvcScrBbsDto); //.
             return new ResponseEntity<>("작성 성공", HttpStatus.OK);
