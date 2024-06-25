@@ -43,9 +43,9 @@ public class MvcMypageContoller {
     }
     @GetMapping("/myPostRead")
     @Operation(summary = "내 게시글 보기", description ="게시판명, 스포, 제목, 댓글, 추천, 작성일")
-    public ResponseEntity<String> myPostRead(@RequestParam String mbrId,@RequestParam(value = "page", defaultValue = "1") int page){
+    public ResponseEntity<String> myPostRead(@RequestParam String mbrId,@RequestParam(value = "page", defaultValue = "1") int page, int limit){
         try {
-            String jsonMyPost = mvcMyInfoService.myPostRead(mbrId,page);
+            String jsonMyPost = mvcMyInfoService.myPostRead(mbrId,page, limit);
             return new ResponseEntity<>(jsonMyPost, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -54,9 +54,9 @@ public class MvcMypageContoller {
 
     @GetMapping("/myCmntRead")
     @Operation(summary = "내 댓글 보기", description ="게시판명, 댓글, 작성일")
-    public ResponseEntity<String> myCmntRead(@RequestParam String mbrId,@RequestParam(value = "page", defaultValue = "1") int page){
+    public ResponseEntity<String> myCmntRead(@RequestParam String mbrId,@RequestParam(value = "page", defaultValue = "1") int page, int limit){
         try {
-            String jsonMyCmnt = mvcMyInfoService.myCmntRead(mbrId,page);
+            String jsonMyCmnt = mvcMyInfoService.myCmntRead(mbrId,page, limit);
             return new ResponseEntity<>(jsonMyCmnt, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -64,9 +64,9 @@ public class MvcMypageContoller {
     }
     @GetMapping("/myScrRead")
     @Operation(summary = "내 평점 보기", description ="영화명, 평점, 작성일")
-    public ResponseEntity<String> myScrRead(@RequestParam String mbrId,@RequestParam(value = "page", defaultValue = "1") int page){
+    public ResponseEntity<String> myScrRead(@RequestParam String mbrId,@RequestParam(value = "page", defaultValue = "1") int page, int limit){
         try {
-            String jsonMyScr = mvcMyInfoService.myScrRead(mbrId,page);
+            String jsonMyScr = mvcMyInfoService.myScrRead(mbrId,page,limit);
             return new ResponseEntity<>(jsonMyScr, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

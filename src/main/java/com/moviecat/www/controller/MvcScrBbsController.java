@@ -66,20 +66,17 @@ public class MvcScrBbsController {
 
     @GetMapping("/scrboard/{menuId}")
     @Operation(summary = "평점 목록 조회", description ="평점 목록 조회")
-    //TODO.limit으로 보여줘야 할 리스트 수 파라미터 보냅니다. limit으로 받아서 처리해주세요.
     public ResponseEntity<String> scrList(@PathVariable("menuId") long menuId
             , @RequestParam(value = "page", defaultValue = "1") int page
-            , @RequestParam(value = "mvcId") String mvcId) {
+            , @RequestParam(value = "mvcId") long mvcId
+            , @RequestParam(value = "limit") int limit) {
 
         try {
-
-            String jsonScrList = mvcScrBbsService.scrList(menuId, mvcId, page);
+            String jsonScrList = mvcScrBbsService.scrList(menuId, mvcId, page, limit);
             return new ResponseEntity<>(jsonScrList, HttpStatus.OK);
 
         } catch (Exception e) {
             return new ResponseEntity<>("오류 발생", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    //TODO. 평점 좋아요 클릭 시 좋아요 +1, -1 기능 필요
 }

@@ -82,7 +82,7 @@ public class MvcMyInfoService {
         }
     }
 
-    public String myPostRead(String mbrId, int page) throws JsonProcessingException {
+    public String myPostRead(String mbrId, int page, int limit) throws JsonProcessingException {
 
         List<MvcBbs> postListOrigin = mvcBbsRepository.findByRgstUserIdAndDeltYnOrderByRgstDayDesc(mbrId, "N");
         if(!postListOrigin.isEmpty()){
@@ -102,7 +102,7 @@ public class MvcMyInfoService {
             }
             List<Map<String, Object>> pagedMyPostList;
             try {
-                pagedMyPostList = paginationUtil.getPage(myPostList, page);
+                pagedMyPostList = paginationUtil.getPageLimit(myPostList, page, limit);
             } catch (Exception e) {
                 throw e;
             }
@@ -121,7 +121,7 @@ public class MvcMyInfoService {
         }
     }
 
-    public String myCmntRead(String mbrId, int page) throws JsonProcessingException {
+    public String myCmntRead(String mbrId, int page, int limit) throws JsonProcessingException {
         List<MvcBbsCmnt> cmntListOrigin = mvcBbsCmntRepository.findByRgstUserIdAndDeltYnOrderByRgstDayDesc(mbrId, 'N');
         if(!cmntListOrigin.isEmpty()){
             List<Map<String,Object>> myCmntList = new ArrayList<>();
@@ -137,7 +137,7 @@ public class MvcMyInfoService {
             }
             List<Map<String, Object>> pagedMyCmntList;
             try {
-                pagedMyCmntList = paginationUtil.getPage(myCmntList, page);
+                pagedMyCmntList = paginationUtil.getPageLimit(myCmntList, page, limit);
             } catch (Exception e) {
                 throw e;
             }
@@ -156,7 +156,7 @@ public class MvcMyInfoService {
         }
     }
 
-    public String myScrRead(String mbrId, int page) throws JsonProcessingException {
+    public String myScrRead(String mbrId, int page, int limit) throws JsonProcessingException {
         List<MvcScrBbs> scrListOrigin = mvcScrBbsRepository.findByRgstUserIdAndDeltYnOrderByRgstDayDesc(mbrId, "N");
         if(!scrListOrigin.isEmpty()){
             List<Map<String,Object>> myScrList = new ArrayList<>();
@@ -173,7 +173,7 @@ public class MvcMyInfoService {
             }
             List<Map<String, Object>> pagedMyScrList;
             try {
-                pagedMyScrList = paginationUtil.getPage(myScrList, page);
+                pagedMyScrList = paginationUtil.getPageLimit(myScrList, page, limit);
             } catch (Exception e) {
                 throw e;
             }

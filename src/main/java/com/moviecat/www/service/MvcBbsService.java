@@ -80,7 +80,7 @@ public class MvcBbsService {
     }
 
     @Transactional
-    public String bbsReadBoard(long menuId, int page) throws JsonProcessingException {
+    public String bbsReadBoard(long menuId, int page, int limit) throws JsonProcessingException {
         List<MvcBbs> postListOrigin = mvcBbsRepository.findByMenuIdAndDeltYnOrderByPstIdDesc(menuId, "N");
         List<Map<String,Object>> postList = new ArrayList<>();
         int postNumber = postListOrigin.size();
@@ -101,7 +101,7 @@ public class MvcBbsService {
         }
         List<Map<String, Object>> pagedPostList;
         try {
-            pagedPostList = paginationUtil.getPage(postList, page);
+            pagedPostList = paginationUtil.getPageLimit(postList, page, limit);
         } catch (Exception e) {
             throw e;
         }

@@ -31,6 +31,7 @@ public class MvcScrBbsService {
     private final TimeFormat timeFormat;
     private final ColumnValueMapper columnValueMapper;
     private final PaginationUtil paginationUtil;
+    private final MvcRcmdtnInfoService mvcRcmdtnInfoService;
 
     @Transactional
     public void scrBbsWrite(MvcScrBbsDto mvcScrBbsDto){
@@ -115,7 +116,7 @@ public class MvcScrBbsService {
     }
 
     @Transactional
-    public String scrList(long menuId, String mvcId, int page) throws Exception {
+    public String scrList(long menuId, long mvcId, int page, int limit) throws Exception {
 
         List<MvcScrBbs> scrListOrigin = mvcScrBbsRepository.findByMenuIdAndDeltYnOrderByScrIdDesc(menuId, "N");
         List<Map<String,Object>> scrList = new ArrayList<>();
@@ -131,18 +132,25 @@ public class MvcScrBbsService {
             map.put("scr", scr.getScr());
             map.put("rgstDate", timeFormat.formatDate(scr.getRgstDay()));
             map.put("vdoEvl",scr.getVdoEvl());
+//            map.put("nickNm", columnValueMapper.mbrIdToNickNm(scr.getRgstUserId()));
+//            map.put("mvcId", columnValueMapper.mbrIdToMvcId(scr.getRgstUserId()));
+
+            //기존의 rcmdTatal을 이름만 likeCnt로 바꿔서 데이터 보냄
             int rcmdTotal = columnValueMapper.pstIdAndMenuIdToRcmdTotal(scr.getScrId(), scr.getMenuId());
-            map.put("rmcdTotal", rcmdTotal);
-            map.put("nickNm", columnValueMapper.mbrIdToNickNm(scr.getRgstUserId()));
-            map.put("mvcId", columnValueMapper.mbrIdToMvcId(scr.getRgstUserId()));
-            //TODO.좋아요 총 갯수 추가 필요
-            map.put("likeCnt", 10);
-            //TODO.해당 mvcID로 좋아요 눌렀는지 여부(Y,N) 추가 필요(파라미터에 mvcID 추가해놨음)
-            map.put("likeYn", "Y");
+            map.put("likeCnt", rcmdTotal);
+
+            //boolean으로 반환 필요할시 변경 가능.
+            String likeYn = "N";
+            Optional<MvcMbrInfo> likeOptional = mvcMbrInfoRepository.findById(mvcId);
+            String nowLoginMbrId = likeOptional.get().getMbrId();
+            if(mvcRcmdtnInfoService.rcmdCheck(menuId,scr.getScrId(),nowLoginMbrId)){
+                likeYn = "Y";
+            }
+            map.put("likeYn", likeYn);
             scrList.add(map);
         }
 
-        List<Map<String, Object>> pagedPostList = paginationUtil.getPage(scrList, page);
+        List<Map<String, Object>> pagedPostList = paginationUtil.getPageLimit(scrList, page, limit);
 
         Map<String, Object> result = new HashMap<>();
         result.put("total", scrList.size());

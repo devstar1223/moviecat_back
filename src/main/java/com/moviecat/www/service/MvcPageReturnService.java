@@ -21,7 +21,7 @@ public class MvcPageReturnService {
     private final TimeFormat timeFormat;
     private final PaginationUtil paginationUtil;
     private final ColumnValueMapper columnValueMapper;
-    public Map<String, Object> boardPageReturn(List<MvcBbs> resultList, int page) {
+    public Map<String, Object> boardPageReturn(List<MvcBbs> resultList, int page, int limit) {
         if (resultList == null || resultList.isEmpty()) {
             throw new NoSuchElementException("검색결과가 없습니다.");
         }
@@ -50,14 +50,13 @@ public class MvcPageReturnService {
             searchResultList.add(searchResultMap);
         }
 
-        int pageSize = PaginationUtil.PAGE_SIZE;
-        int totalPages = (int) Math.ceil((double) totalSize / pageSize);
+        int totalPages = (int) Math.ceil((double) totalSize / limit);
 
         if (page > totalPages) {
             throw new RuntimeException("페이지를 초과합니다.");
         }
 
-        List<Map<String, Object>> pagedResultList = paginationUtil.getPage(searchResultList, page); // 여러 글 담은 리스트 페이징 해주기
+        List<Map<String, Object>> pagedResultList = paginationUtil.getPageLimit(searchResultList, page, limit); // 여러 글 담은 리스트 페이징 해주기
 
         Map<String, Object> responseMap = new LinkedHashMap<>();
         responseMap.put("total", totalSize);
@@ -66,7 +65,7 @@ public class MvcPageReturnService {
         return responseMap;
     }
 
-    public Map<String, Object> scrPageReturn(List<MvcScrBbs> resultList, int page) {
+    public Map<String, Object> scrPageReturn(List<MvcScrBbs> resultList, int page, int limit) {
         if (resultList == null || resultList.isEmpty()) {
             throw new NoSuchElementException("검색결과가 없습니다.");
         }
@@ -96,14 +95,13 @@ public class MvcPageReturnService {
             searchResultList.add(searchResultMap);
         }
 
-        int pageSize = PaginationUtil.PAGE_SIZE;
-        int totalPages = (int) Math.ceil((double) totalSize / pageSize);
+        int totalPages = (int) Math.ceil((double) totalSize / limit);
 
         if (page > totalPages) {
             throw new RuntimeException("페이지를 초과합니다.");
         }
 
-        List<Map<String, Object>> pagedResultList = paginationUtil.getPage(searchResultList, page); // 여러 글 담은 리스트 페이징 해주기
+        List<Map<String, Object>> pagedResultList = paginationUtil.getPageLimit(searchResultList, page, limit); // 여러 글 담은 리스트 페이징 해주기
 
         Map<String, Object> responseMap = new LinkedHashMap<>();
         responseMap.put("total", totalSize);
