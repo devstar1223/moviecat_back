@@ -22,13 +22,10 @@ public class MvcPageReturnService {
 
     public Map<String, Object> boardPageReturn(List<MvcBbs> resultList, int page, int limit) {
         if (resultList == null || resultList.isEmpty()) {
-            throw new NoSuchElementException("검색결과가 없습니다.");
+            return Collections.singletonMap("total", 0); // 검색 결과가 없을 때 0개의 결과와 빈 데이터 반환, 사실 앞에서 한번 검사함.
         }
 
         int totalSize = resultList.size();
-        if (totalSize == 0) {
-            throw new NoSuchElementException("검색결과가 없습니다.");
-        }
 
         List<Map<String, Object>> searchResultList = new ArrayList<>(); // 글 여러개 담을 리스트
         int postNumber = totalSize;
@@ -67,13 +64,10 @@ public class MvcPageReturnService {
 
     public Map<String, Object> scrPageReturn(List<MvcScrBbs> resultList, int page, int limit) {
         if (resultList == null || resultList.isEmpty()) {
-            throw new NoSuchElementException("검색결과가 없습니다.");
+            return Collections.singletonMap("total", 0); // 검색 결과가 없을 때 0개의 결과와 빈 데이터 반환, 사실 앞에서 한번 검사함.
         }
 
         int totalSize = resultList.size();
-        if (totalSize == 0) {
-            throw new NoSuchElementException("검색결과가 없습니다.");
-        }
 
         List<Map<String, Object>> searchResultList = new ArrayList<>(); // 글 여러개 담을 리스트
         int scrNumber = totalSize;

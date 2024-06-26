@@ -52,53 +52,53 @@ public class MvcScrBbsService {
         mvcScrBbsRepository.save(newScr);
     }
 
-    @Transactional
-    public String scrBbsRead(long scrId) throws JsonProcessingException {
-        Optional<MvcScrBbs> scrOptional = mvcScrBbsRepository.findByScrIdAndDeltYn(scrId,"N");
+//    @Transactional
+//    public String scrBbsRead(long scrId) throws JsonProcessingException {
+//        Optional<MvcScrBbs> scrOptional = mvcScrBbsRepository.findByScrIdAndDeltYn(scrId,"N");
+//
+//        if(scrOptional.isPresent()){
+//            MvcScrBbs scr = scrOptional.get();
+//            Map<String, Object> scrMap = new LinkedHashMap<>();
+//            scrMap.put("scr", scr.getScr());
+//            scrMap.put("vdoNm", scr.getVdoNm());
+//            scrMap.put("vdoNmEn", scr.getVdoNmEn());
+//            scrMap.put("vdoEvl", scr.getVdoEvl());
+//
+//            String rgstTime = timeFormat.formatDate(scr.getRgstDay());
+//            scrMap.put("rgstDate", rgstTime);
+//
+//            List<MvcRcmdtnInfo> rcmdList = mvcRcmdtnInfoRepository.findByRcmdtnSeIdAndMenuIdAndDeltYn(scr.getScrId(), scr.getMenuId(), "N"); // 해당되는 추천 리스트로 받아와서
+//            scrMap.put("rcmd", rcmdList.size()); // 사이즈 만큼 좋아요 수 할당
+//
+//            Optional<MvcMbrInfo> mbrInfoOptional = mvcMbrInfoRepository.findByRgstUserId(scr.getRgstUserId()); // 등록id로 유저 찾아오기
+//            MvcMbrInfo mbrInfo = mbrInfoOptional.get();
+//            scrMap.put("profileUrl", mbrInfo.getAtchFileUrl()); // url 찾아 넣기 (없으면 null 넣음)
+//            scrMap.put("nickNm", mbrInfo.getNickNm()); // nickNm 찾아 넣기
+//
+//            // ObjectMapper를 사용하여 맵을 JSON으로 변환
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            return objectMapper.writeValueAsString(scrMap);
+//        } else {
+//            // Optional이 비어있는 경우 처리
+//            throw new NoSuchElementException("해당 게시글이 존재하지 않습니다.");
+//        }
+//    }
 
-        if(scrOptional.isPresent()){
-            MvcScrBbs scr = scrOptional.get();
-            Map<String, Object> scrMap = new LinkedHashMap<>();
-            scrMap.put("scr", scr.getScr());
-            scrMap.put("vdoNm", scr.getVdoNm());
-            scrMap.put("vdoNmEn", scr.getVdoNmEn());
-            scrMap.put("vdoEvl", scr.getVdoEvl());
-
-            String rgstTime = timeFormat.formatDate(scr.getRgstDay());
-            scrMap.put("rgstDate", rgstTime);
-
-            List<MvcRcmdtnInfo> rcmdList = mvcRcmdtnInfoRepository.findByRcmdtnSeIdAndMenuIdAndDeltYn(scr.getScrId(), scr.getMenuId(), "N"); // 해당되는 추천 리스트로 받아와서
-            scrMap.put("rcmd", rcmdList.size()); // 사이즈 만큼 좋아요 수 할당
-
-            Optional<MvcMbrInfo> mbrInfoOptional = mvcMbrInfoRepository.findByRgstUserId(scr.getRgstUserId()); // 등록id로 유저 찾아오기
-            MvcMbrInfo mbrInfo = mbrInfoOptional.get();
-            scrMap.put("profileUrl", mbrInfo.getAtchFileUrl()); // url 찾아 넣기 (없으면 null 넣음)
-            scrMap.put("nickNm", mbrInfo.getNickNm()); // nickNm 찾아 넣기
-
-            // ObjectMapper를 사용하여 맵을 JSON으로 변환
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.writeValueAsString(scrMap);
-        } else {
-            // Optional이 비어있는 경우 처리
-            throw new NoSuchElementException("해당 게시글이 존재하지 않습니다.");
-        }
-    }
-
-    @Transactional
-    public void scrBbsEdit(MvcScrBbsDto mvcScrBbsDto) {
-        Optional<MvcScrBbs> scrOptional = mvcScrBbsRepository.findById(mvcScrBbsDto.getScrId());
-        if(scrOptional.isPresent()){
-            MvcScrBbs scr = scrOptional.get();
-            scr.setScr(mvcScrBbsDto.getScr());
-            scr.setVdoEvl(mvcScrBbsDto.getVdoEvl());
-            scr.setMdfcnUserId(mvcScrBbsDto.getMbrId());
-            scr.setMdfcnUserNm(mvcScrBbsDto.getMbrNm());
-            scr.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
-            mvcScrBbsRepository.save(scr);
-        } else {
-            throw new NoSuchElementException("해당 평점이 존재하지 않습니다.");
-        }
-    }
+//    @Transactional
+//    public void scrBbsEdit(MvcScrBbsDto mvcScrBbsDto) {
+//        Optional<MvcScrBbs> scrOptional = mvcScrBbsRepository.findById(mvcScrBbsDto.getScrId());
+//        if(scrOptional.isPresent()){
+//            MvcScrBbs scr = scrOptional.get();
+//            scr.setScr(mvcScrBbsDto.getScr());
+//            scr.setVdoEvl(mvcScrBbsDto.getVdoEvl());
+//            scr.setMdfcnUserId(mvcScrBbsDto.getMbrId());
+//            scr.setMdfcnUserNm(mvcScrBbsDto.getMbrNm());
+//            scr.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
+//            mvcScrBbsRepository.save(scr);
+//        } else {
+//            throw new NoSuchElementException("해당 평점이 존재하지 않습니다.");
+//        }
+//    }
 
     @Transactional
     public void scrBbsDelete(MvcScrBbsDto mvcScrBbsDto) {
