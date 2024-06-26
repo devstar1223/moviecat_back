@@ -132,7 +132,7 @@ public class MvcScrBbsService {
             map.put("scr", scr.getScr());
             map.put("rgstDate", timeFormat.formatDate(scr.getRgstDay()));
             map.put("vdoEvl",scr.getVdoEvl());
-//            map.put("nickNm", columnValueMapper.mbrIdToNickNm(scr.getRgstUserId()));
+            map.put("nickNm", columnValueMapper.mbrIdToNickNm(scr.getRgstUserId()));
 //            map.put("mvcId", columnValueMapper.mbrIdToMvcId(scr.getRgstUserId()));
 
             //기존의 rcmdTatal을 이름만 likeCnt로 바꿔서 데이터 보냄
