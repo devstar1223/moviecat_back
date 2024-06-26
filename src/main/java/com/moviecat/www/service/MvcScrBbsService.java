@@ -116,7 +116,7 @@ public class MvcScrBbsService {
     }
 
     @Transactional
-    public String scrList(long menuId, long mvcId, int page, int limit) throws Exception {
+    public String scrList(long menuId, String mbrId, int page, int limit) throws Exception {
 
         List<MvcScrBbs> scrListOrigin = mvcScrBbsRepository.findByMenuIdAndDeltYnOrderByScrIdDesc(menuId, "N");
         List<Map<String,Object>> scrList = new ArrayList<>();
@@ -141,9 +141,7 @@ public class MvcScrBbsService {
 
             //boolean으로 반환 필요할시 변경 가능.
             String likeYn = "N";
-            Optional<MvcMbrInfo> likeOptional = mvcMbrInfoRepository.findById(mvcId);
-            String nowLoginMbrId = likeOptional.get().getMbrId();
-            if(mvcRcmdtnInfoService.rcmdCheck(menuId,scr.getScrId(),nowLoginMbrId)){
+            if(mvcRcmdtnInfoService.rcmdCheck(menuId,scr.getScrId(),mbrId)){
                 likeYn = "Y";
             }
             map.put("likeYn", likeYn);

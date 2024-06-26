@@ -68,11 +68,11 @@ public class MvcScrBbsController {
     @Operation(summary = "평점 목록 조회", description ="평점 목록 조회")
     public ResponseEntity<String> scrList(@PathVariable("menuId") long menuId
             , @RequestParam(value = "page", defaultValue = "1") int page
-            , @RequestParam(value = "mvcId") long mvcId
+            , @RequestParam(value = "mbrId") String mbrId
             , @RequestParam(value = "limit") int limit) {
 
         try {
-            String jsonScrList = mvcScrBbsService.scrList(menuId, mvcId, page, limit);
+            String jsonScrList = mvcScrBbsService.scrList(menuId, mbrId, page, limit);
             return new ResponseEntity<>(jsonScrList, HttpStatus.OK);
 
         } catch (Exception e) {
