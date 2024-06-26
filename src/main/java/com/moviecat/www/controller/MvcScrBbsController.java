@@ -70,7 +70,7 @@ public class MvcScrBbsController {
     @Operation(summary = "평점 목록 조회 + 평점 검색", description ="평점 목록 조회, 검색시에는 srchWord")
     public ResponseEntity<String> scrList(@PathVariable("menuId") long menuId
             , @RequestParam(value = "page", defaultValue = "1") int page
-            , @RequestParam(value = "mbrId") String mbrId
+            , @RequestParam(value = "mbrId", defaultValue = "") String mbrId
             , @RequestParam(value = "limit") int limit
             , @RequestParam(required = false) String srchWord) {
 
