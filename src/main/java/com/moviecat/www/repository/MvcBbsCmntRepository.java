@@ -20,7 +20,7 @@ public interface MvcBbsCmntRepository extends JpaRepository<MvcBbsCmnt,Long> {
     List<MvcBbsCmnt> findByPstIdOrderByCmntGroupAscSeqAsc(long pstId);
     List<MvcBbsCmnt> findByPstIdAndDeltYnAndCmntLyrOrderByCmntGroupAscSeqAsc(long pstId, char deltYn, int lyr);
 
-    Optional<MvcBbsCmnt> findByUpCmntIdAndDeltYn(long upCmntId, char deltYn);
+    Optional<MvcBbsCmnt> findByCmntGroupAndDeltYn(long cmntGroup, char deltYn);
 
     List<MvcBbsCmnt> findByRgstUserIdAndDeltYnOrderByRgstDayDesc(String rgstUserId, char deltYn);
     Optional<MvcBbsCmnt> findTopByUpCmntIdOrderBySeqDesc(long upCmntId);
