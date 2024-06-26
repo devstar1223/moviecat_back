@@ -1,13 +1,7 @@
 package com.moviecat.www.util;
 
-import com.moviecat.www.entity.MvcBbs;
-import com.moviecat.www.entity.MvcBbsCmnt;
-import com.moviecat.www.entity.MvcMbrInfo;
-import com.moviecat.www.entity.MvcRcmdtnInfo;
-import com.moviecat.www.repository.MvcBbsCmntRepository;
-import com.moviecat.www.repository.MvcBbsRepository;
-import com.moviecat.www.repository.MvcMbrInfoRepository;
-import com.moviecat.www.repository.MvcRcmdtnInfoRepository;
+import com.moviecat.www.entity.*;
+import com.moviecat.www.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +17,7 @@ public class ColumnValueMapper {
     private final MvcRcmdtnInfoRepository mvcRcmdtnInfoRepository;
     private final MvcBbsCmntRepository mvcBbsCmntRepository;
     private final MvcBbsRepository mvcBbsRepository;
+    private final MvcMenuRepository mvcMenuRepository;
     // 회원 ID -> 회원 이름
     public String mbrIdToMbrNm(String mbrId) { // mbrId 주면, 실명 반환
         Optional<MvcMbrInfo> mbrNmOptional = mvcMbrInfoRepository.findByMbrId(mbrId);
@@ -81,6 +76,16 @@ public class ColumnValueMapper {
         }
         else {
             throw new NoSuchElementException("회원 정보가 유효하지 않습니다.");
+        }
+    }
+
+    public String menuIdToMenuNm(long menuId){
+        Optional<MvcMenu> mvcMenuNmOptional = mvcMenuRepository.findById(menuId);
+        if(mvcMenuNmOptional.isPresent()){
+            return mvcMenuNmOptional.get().getMenuNm();
+        }
+        else {
+            throw new NoSuchElementException("메뉴 정보가 유효하지 않습니다.");
         }
     }
 
