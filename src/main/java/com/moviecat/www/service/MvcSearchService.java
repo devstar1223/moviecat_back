@@ -74,21 +74,11 @@ public class MvcSearchService {
 
 
     @Transactional(readOnly = true)
-    public String searchTotal(int div, String srchWord, int page, int limit) {
+    public String searchTotal(String srchWord, int page, int limit) {
         try {
             List<MvcBbs> resultList = null;
 
-            if (div == 1) {
-                resultList = mvcBbsRepository.findByDeltYnAndTtlContainingOrderByRgstDayDesc("N", srchWord); // 제목 전체 검색
-            } else if (div == 2) {
-                resultList = mvcBbsRepository.findByDeltYnAndTtlContainingOrDeltYnAndCnContainingOrderByRgstDayDesc("N", srchWord, "N", srchWord); // 제목 + 내용 전체 검색
-            } else if (div == 3) {
-                Optional<MvcMbrInfo> mbrInfoOptional = mvcMbrInfoRepository.findByNickNm(srchWord);
-                String writerId = mbrInfoOptional.isPresent() ? mbrInfoOptional.get().getMbrId() : null;
-                if (writerId != null) {
-                    resultList = mvcBbsRepository.findByDeltYnAndRgstUserIdOrderByRgstDayDesc("N", writerId); // 닉네임 전체 검색
-                }
-            }
+            resultList = mvcBbsRepository.findByDeltYnAndTtlContainingOrderByRgstDayDesc("N", srchWord); // 제목 전체 검색
 
             if (resultList == null || resultList.isEmpty()) {
                 // 검색 결과가 없을 때 처리
