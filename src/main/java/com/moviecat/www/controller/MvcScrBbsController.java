@@ -27,30 +27,30 @@ public class MvcScrBbsController {
         }
     }
 
-    //TODO. 삭제 필요
-    @GetMapping("/scrboard/{menuId}/{scrId}")
-    @Operation(summary = "평점 글 조회", description ="평점 글 조회")
-    public ResponseEntity<String> scrBbsRead(@PathVariable("scrId") long scrId) {
-        try {
-            String jsonScr = mvcScrBbsService.scrBbsRead(scrId);
-            return new ResponseEntity<>(jsonScr, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("오류 발생", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+    //사용 X
+//    @GetMapping("/scrboard/{menuId}/{scrId}")
+//    @Operation(summary = "평점 글 조회", description ="평점 글 조회")
+//    public ResponseEntity<String> scrBbsRead(@PathVariable("scrId") long scrId) {
+//        try {
+//            String jsonScr = mvcScrBbsService.scrBbsRead(scrId);
+//            return new ResponseEntity<>(jsonScr, HttpStatus.OK);
+//        } catch (Exception e) {
+//            return new ResponseEntity<>("오류 발생", HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 
-    //TODO.삭제 필요
-    @PatchMapping("/scrBbsEdit")
-    @Operation(summary = "평점 수정", description = "평점 수정 api")
-    public ResponseEntity<String> scrBbsEdit(@ModelAttribute MvcScrBbsDto mvcScrBbsDto) {
-        mvcScrBbsService.scrBbsEdit(mvcScrBbsDto);
-        try{
-            return new ResponseEntity<>("평점 수정 성공", HttpStatus.OK);
-        }
-        catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
-        }
-    }
+    //사용 X
+//    @PatchMapping("/scrBbsEdit")
+//    @Operation(summary = "평점 수정", description = "평점 수정 api")
+//    public ResponseEntity<String> scrBbsEdit(@ModelAttribute MvcScrBbsDto mvcScrBbsDto) {
+//        mvcScrBbsService.scrBbsEdit(mvcScrBbsDto);
+//        try{
+//            return new ResponseEntity<>("평점 수정 성공", HttpStatus.OK);
+//        }
+//        catch (Exception e){
+//            return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
+//        }
+//    }
 
     @PostMapping("/scrBbsDelete")
     @Operation(summary = "평점 삭제", description = "평점 삭제 api")
