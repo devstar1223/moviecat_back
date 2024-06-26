@@ -76,16 +76,14 @@ public class MvcSearchService {
     @Transactional(readOnly = true)
     public String searchTotal(String srchWord, int page, int limit) {
         try {
-            List<MvcBbs> resultList = null;
-
-            resultList = mvcBbsRepository.findByDeltYnAndTtlContainingOrderByRgstDayDesc("N", srchWord); // 제목 전체 검색
+            List<MvcBbs> resultList = mvcBbsRepository.findByDeltYnAndTtlContainingOrderByRgstDayDesc("N", srchWord); // 제목 전체 검색
 
             if (resultList == null || resultList.isEmpty()) {
                 // 검색 결과가 없을 때 처리
                 return "{\"total\": 0, \"data\": []}";
             }
 
-            Map<String, Object> pagedSearchResultMap = mvcPageReturnService.boardPageReturn(resultList, page, limit); // 페이징된 결과 가져오기
+            Map<String, Object> pagedSearchResultMap = mvcPageReturnService.totalSearchReturn(resultList, page, limit); // 페이징된 결과 가져오기
 
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.writeValueAsString(pagedSearchResultMap); // JSON 형태로 반환
