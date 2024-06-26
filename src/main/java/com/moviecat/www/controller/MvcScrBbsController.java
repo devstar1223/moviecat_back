@@ -2,6 +2,7 @@ package com.moviecat.www.controller;
 
 import com.moviecat.www.dto.MvcScrBbsDto;
 import com.moviecat.www.service.MvcScrBbsService;
+import com.moviecat.www.service.MvcSearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class MvcScrBbsController {
 
     private final MvcScrBbsService mvcScrBbsService;
+    private final MvcSearchService mvcSearchService;
 
     @PostMapping("/scrBbsWrite")
     @Operation(summary = "평점 작성", description ="평점 작성")
@@ -65,18 +67,29 @@ public class MvcScrBbsController {
     }
 
     @GetMapping("/scrboard/{menuId}")
-    @Operation(summary = "평점 목록 조회", description ="평점 목록 조회")
+    @Operation(summary = "평점 목록 조회 + 평점 검색", description ="평점 목록 조회, 검색시에는 srchWord")
     public ResponseEntity<String> scrList(@PathVariable("menuId") long menuId
             , @RequestParam(value = "page", defaultValue = "1") int page
             , @RequestParam(value = "mbrId") String mbrId
-            , @RequestParam(value = "limit") int limit) {
+            , @RequestParam(value = "limit") int limit
+            , @RequestParam(required = false) String srchWord) {
 
-        try {
-            String jsonScrList = mvcScrBbsService.scrList(menuId, mbrId, page, limit);
-            return new ResponseEntity<>(jsonScrList, HttpStatus.OK);
+        if(srchWord!=null){
+            try {
+                String jsonSearchResult = mvcSearchService.searchScr(srchWord,page,limit);
+                return new ResponseEntity<>(jsonSearchResult, HttpStatus.OK);
+            } catch (Exception e) {
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+        else{
+            try {
+                String jsonScrList = mvcScrBbsService.scrList(menuId, mbrId, page, limit);
+                return new ResponseEntity<>(jsonScrList, HttpStatus.OK);
 
-        } catch (Exception e) {
-            return new ResponseEntity<>("오류 발생", HttpStatus.INTERNAL_SERVER_ERROR);
+            } catch (Exception e) {
+                return new ResponseEntity<>("오류 발생", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
     }
 }
