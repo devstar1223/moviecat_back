@@ -10,6 +10,7 @@ import com.moviecat.www.entity.MvcAtchFile;
 import com.moviecat.www.repository.MvcAtchFileRepository;
 import com.moviecat.www.service.MvcAtchFileService;
 import com.moviecat.www.service.MvcBbsService;
+import com.moviecat.www.service.MvcSearchService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +32,7 @@ public class MvcBbsController {
     private final MvcBbsService mvcBbsService;
     private final MvcAtchFileService mvcAtchFileService;
     private final MvcAtchFileRepository mvcAtchFileRepository;
+    private final MvcSearchService mvcSearchService;
 
     @PostMapping("/bbsWritePost")
     @Operation(summary = "글 작성", description = "글 작성 api")
@@ -80,13 +82,26 @@ public class MvcBbsController {
     }
 
     @GetMapping("/movieboard/{menuId}")
-    @Operation(summary = "게시판 글 목록", description = "/1 처럼 게시판 번호로 요청하면 글 목록 json으로 줍니다. 페이지(기본 1)와, 한번에 보여줄 갯수도 줘야합니다 ")
-    public ResponseEntity<String> bbsList(@PathVariable("menuId") Long menuId,@RequestParam(value = "page", defaultValue = "1") int page, @RequestParam int limit) {
-        try {
-            String jsonPostList = mvcBbsService.bbsReadBoard(menuId, page, limit);
-            return new ResponseEntity<>(jsonPostList, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    @Operation(summary = "게시판 글 목록&검색", description = "/1 처럼 게시판 번호로 요청하면 글 목록 json으로 줍니다. 페이지(기본 1)와, 한번에 보여줄 갯수도 줘야합니다. 검색할땐 div(제목1, 제목+내용2, 작성자3) 값과 srchWord 필요 ")
+    public ResponseEntity<String> bbsList(@PathVariable("menuId") Long menuId,
+                                          @RequestParam(value = "page", defaultValue = "1") int page,
+                                          @RequestParam int limit,
+                                          @RequestParam(required = false) Integer div,
+                                          @RequestParam(required = false) String srchWord) {
+        if(srchWord != null && !srchWord.isEmpty()){
+            try {
+                String jsonSearchResult = mvcSearchService.search(menuId, div != null ? div : 1, srchWord, page, limit);
+                return new ResponseEntity<>(jsonSearchResult, HttpStatus.OK);
+            } catch (Exception e) {
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } else {
+            try {
+                String jsonPostList = mvcBbsService.bbsReadBoard(menuId, page, limit);
+                return new ResponseEntity<>(jsonPostList, HttpStatus.OK);
+            } catch (Exception e) {
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
     }
 
