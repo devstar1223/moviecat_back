@@ -61,10 +61,21 @@ public class MvcSearchController {
     }
 
     @GetMapping("/searchScr")
-    @Operation(summary = "영화 평점 검색", description = "영화 이름으로만 검색합니다.")
+    @Operation(summary = "영화 평점 검색", description = "영화 이름(또는 영문 이름)으로만 검색합니다.")
     public ResponseEntity<String> searchScr(@RequestBody MvcSearchDto mvcSearchDto) {
         try {
-            String jsonSearchResult = mvcSearchService.search(mvcSearchDto.getMenuId(), mvcSearchDto.getDiv(), mvcSearchDto.getSrchWord(),mvcSearchDto.getPage(), mvcSearchDto.getLimit());
+            String jsonSearchResult = mvcSearchService.searchScr(mvcSearchDto.getSrchWord(),mvcSearchDto.getPage(), mvcSearchDto.getLimit());
+            return new ResponseEntity<>(jsonSearchResult, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/searchTotal")
+    @Operation(summary = "전체 검색", description = "전체 검색, 제목1, 제목+내용2, 작성자3")
+    public ResponseEntity<String> searchTotal(@RequestBody MvcSearchDto mvcSearchDto) {
+        try {
+            String jsonSearchResult = mvcSearchService.searchTotal(mvcSearchDto.getDiv(), mvcSearchDto.getSrchWord(),mvcSearchDto.getPage(), mvcSearchDto.getLimit());
             return new ResponseEntity<>(jsonSearchResult, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

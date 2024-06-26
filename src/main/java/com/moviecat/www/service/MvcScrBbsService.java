@@ -62,6 +62,7 @@ public class MvcScrBbsService {
             Map<String, Object> scrMap = new LinkedHashMap<>();
             scrMap.put("scr", scr.getScr());
             scrMap.put("vdoNm", scr.getVdoNm());
+            scrMap.put("vdoNmEn", scr.getVdoNmEn());
             scrMap.put("vdoEvl", scr.getVdoEvl());
 
             String rgstTime = timeFormat.formatDate(scr.getRgstDay());

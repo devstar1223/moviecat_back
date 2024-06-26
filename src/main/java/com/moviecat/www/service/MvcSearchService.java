@@ -87,21 +87,21 @@ public class MvcSearchService {
 //            throw new RuntimeException("검색결과가 없습니다.");
 //        }
 //    }
-//
-//    @Transactional
-//    public String searchScr(Long menuId, String srchWord, int page, int limit) {
-//        try {
-//            List<MvcScrBbs> scrList = mvcScrBbsRepository.findByVdoNmOrderByRgstDayDesc(srchWord); // 부분일치로 하려면 VdoNm 뒤에 Containing
-//            if(scrList.isEmpty()) {
-//                throw new RuntimeException("검색 결과가 없습니다.");
-//            }
-//            Map<String, Object> pagedSearchResultMap = mvcPageReturnService.scrPageReturn(scrList, page, limit); //모든 행 넘겨주면, 페이징된 Map으로 받음
-//            ObjectMapper objectMapper = new ObjectMapper();
-//            return objectMapper.writeValueAsString(pagedSearchResultMap); // json으로 파싱해서 반환
-//        } catch (JsonProcessingException e) {
-//            throw new RuntimeException("JSON 처리 중 오류가 발생했습니다.", e);
-//        }
-//    }
+
+    @Transactional
+    public String searchScr(String srchWord, int page, int limit) {
+        try {
+            List<MvcScrBbs> scrList = mvcScrBbsRepository.findByDeltYnAndVdoNmContainingOrVdoNmEnContainingOrderByRgstDayDesc("N", srchWord, srchWord); // 한글이름 부분일치 or 영문이름 부분일치
+            if(scrList.isEmpty()) {
+                throw new RuntimeException("검색 결과가 없습니다.");
+            }
+            Map<String, Object> pagedSearchResultMap = mvcPageReturnService.scrPageReturn(scrList, page, limit); //모든 행 넘겨주면, 페이징된 Map으로 받음
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.writeValueAsString(pagedSearchResultMap); // json으로 파싱해서 반환
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("JSON 처리 중 오류가 발생했습니다.", e);
+        }
+    }
 
     @Transactional
     public String search(Long menuId, int div, String srchWord, int page, int limit) { // 제목 검색으로, 요청 들어오면
@@ -118,6 +118,33 @@ public class MvcSearchService {
                 Optional<MvcMbrInfo> mbrInfoOptional = mvcMbrInfoRepository.findByNickNm(srchWord);
                 String writerId = mbrInfoOptional.get().getMbrId();
                 resultList = mvcBbsRepository.findByMenuIdAndDeltYnAndRgstUserIdOrderByRgstDayDesc(menuId, "N", writerId); //찾고
+            }
+            if(resultList.size() == 0) {
+                throw new RuntimeException("검색 결과가 없습니다.");
+            }
+            Map<String, Object> pagedSearchResultMap = mvcPageReturnService.boardPageReturn(resultList, page, limit); //모든 행 넘겨주면, 페이징된 Map으로 받음
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.writeValueAsString(pagedSearchResultMap); // json으로 파싱해서 반환
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("JSON 처리 중 오류가 발생했습니다.", e);
+        }
+    }
+
+    @Transactional
+    public String searchTotal(int div, String srchWord, int page, int limit) { // 제목 검색으로, 요청 들어오면
+        try {
+            List<MvcBbs> resultList = null;
+            if(div == 1){
+                resultList = mvcBbsRepository.findByDeltYnAndTtlContainingOrderByRgstDayDesc("N", srchWord); // 제목 전체 검색
+            }
+            else if(div == 2){
+                resultList = mvcBbsRepository.findByDeltYnAndTtlContainingOrDeltYnAndCnContainingOrderByRgstDayDesc("N", srchWord, "N", srchWord); // 제목 + 내용 전체 검색
+
+            }
+            else if(div == 3){
+                Optional<MvcMbrInfo> mbrInfoOptional = mvcMbrInfoRepository.findByNickNm(srchWord);
+                String writerId = mbrInfoOptional.get().getMbrId();
+                resultList = mvcBbsRepository.findByDeltYnAndRgstUserIdOrderByRgstDayDesc("N", writerId); // 닉네임 전체 검색 (정확히 일치만 가능...)
             }
             if(resultList.size() == 0) {
                 throw new RuntimeException("검색 결과가 없습니다.");

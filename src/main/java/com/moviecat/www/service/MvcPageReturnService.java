@@ -81,7 +81,8 @@ public class MvcPageReturnService {
             Map<String, Object> searchResultMap = new LinkedHashMap<>(); // LinkedHashMap을 사용하여 순서를 보장
             searchResultMap.put("scrNumber", scrNumber--);
             searchResultMap.put("scrId", searchResult.getScrId());
-            searchResultMap.put("vdoNm", searchResult.getVdoEvl());
+            searchResultMap.put("vdoNm", searchResult.getVdoNm());
+            searchResultMap.put("vdoNmEn", searchResult.getVdoNmEn());
             searchResultMap.put("OpngDay", searchResult.getOpngYear());
             String[] rgstTime = timeFormat.formatDateToday(searchResult.getRgstDay());
             searchResultMap.put("new",rgstTime[1]);
