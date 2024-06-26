@@ -24,7 +24,7 @@ public class MvcScrBbs {
     @Column(name = "vdo_nm", nullable = false, length = 200)
     private String vdoNm; // 영화명
 
-    @Column(name = "vdo_en_nm", length = 200)
+    @Column(name = "vdo_nm_en", length = 200)
     private String vdoNmEn; // 영화영문명
 
     @Column(name = "opng_year", nullable = true)
