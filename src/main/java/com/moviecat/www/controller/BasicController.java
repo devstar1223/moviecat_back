@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
@@ -38,9 +39,9 @@ public class BasicController {
 
     @GetMapping("/mainBoard")
     @Operation(summary = "메인 화면", description = "영화리뷰(1) 인기글3 일반7, 영화토크(2) 인기글3 일반7, 영화평점(4) 일반8")
-    public ResponseEntity<String> mainBoard() {
+    public ResponseEntity<String> mainBoard(@RequestParam long menuId1,@RequestParam long menuId2,@RequestParam long menuId3) {
         try {
-            String jsonMainBoard = mainBoardService.mainBoard();
+            String jsonMainBoard = mainBoardService.mainBoard(menuId1,menuId2,menuId3);
             return new ResponseEntity<>(jsonMainBoard, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("메인화면 출력 실패", HttpStatus.INTERNAL_SERVER_ERROR);

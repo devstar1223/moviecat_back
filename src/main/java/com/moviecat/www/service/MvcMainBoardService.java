@@ -1,17 +1,23 @@
 package com.moviecat.www.service;
 
-import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moviecat.www.entity.MvcBbs;
 import com.moviecat.www.entity.MvcScrBbs;
+import com.moviecat.www.entity.MvcMenu;
 import com.moviecat.www.repository.MvcBbsRepository;
 import com.moviecat.www.repository.MvcScrBbsRepository;
+import com.moviecat.www.repository.MvcMenuRepository;
 import com.moviecat.www.util.ColumnValueMapper;
 import com.moviecat.www.util.TimeFormat;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,18 +25,57 @@ public class MvcMainBoardService {
 
     private final MvcBbsRepository mvcBbsRepository;
     private final MvcScrBbsRepository mvcScrBbsRepository;
+    private final MvcMenuRepository mvcMenuRepository;
     private final ColumnValueMapper columnValueMapper;
     private final TimeFormat timeFormat;
+    private final static int mainHotPostCount = 3;
+    private final static int mainGeneralPostCount = 7;
+    private final static int mainMovieScoreCount = 8;
 
-    public String mainBoard() throws JacksonException {
-        Map<String, List<Map<String, Object>>> mainListMap = new LinkedHashMap<>();
+    public String mainBoard(long menuId1, long menuId2, long menuId3) {
+        Map<String, Object> mainListMap = new LinkedHashMap<>();
 
-        mainListMap.put("영화 리뷰", getBbsData(1L, 10));
-        mainListMap.put("영화 토크", getBbsData(2L, 10));
-        mainListMap.put("영화 평점", getScrData(8));
+        addMenuInfo(mainListMap, "menu1", menuId1, mainGeneralPostCount, mainHotPostCount);
+        addMenuInfo(mainListMap, "menu2", menuId2, mainGeneralPostCount, mainHotPostCount);
+        addMovieScore(mainListMap, mainMovieScoreCount, menuId3);
 
         ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsString(mainListMap);
+        try {
+            return objectMapper.writeValueAsString(mainListMap);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("JSON 처리 중 오류가 발생했습니다.", e);
+        }
+    }
+
+    private void addMenuInfo(Map<String, Object> mainListMap, String category, Long menuId, int generalLimit, int hotLimit) {
+        List<Map<String, Object>> hotList = getBbsData(3L, hotLimit);
+        List<Map<String, Object>> generalList = getBbsData(menuId, generalLimit);
+
+        Map<String, Object> categoryMap = new LinkedHashMap<>();
+        categoryMap.put("menuInfo", createMenuInfo(menuId));
+        categoryMap.put("hot", hotList);
+        categoryMap.put("general", generalList);
+
+        mainListMap.put(category, categoryMap);
+    }
+
+    private void addMovieScore(Map<String, Object> mainListMap, int limit, long menuId3) {
+        List<MvcScrBbs> scrListOrigin = mvcScrBbsRepository.findByDeltYnOrderByScrIdDesc("N");
+        List<Map<String, Object>> scrList = new ArrayList<>();
+        int number = limit;
+
+        for (MvcScrBbs scr : scrListOrigin) {
+            if (number == 0) {
+                break;
+            }
+            scrList.add(createScrMap(scr, number--));
+        }
+
+        Map<String, Object> movieScoreMap = new LinkedHashMap<>();
+        movieScoreMap.put("menuInfo", createMenuInfo(menuId3));
+        movieScoreMap.put("general", scrList);
+
+        mainListMap.put("menu3", movieScoreMap);
     }
 
     private List<Map<String, Object>> getBbsData(Long menuId, int limit) {
@@ -87,5 +132,18 @@ public class MvcMainBoardService {
         map.put("new", rgstTime[1]);
         map.put("rgstDate", rgstTime[0]);
         return map;
+    }
+
+    private Map<String, Object> createMenuInfo(Long menuId) {
+        Optional<MvcMenu> menuOptional = mvcMenuRepository.findById(menuId);
+        if (menuOptional.isPresent()) {
+            MvcMenu menu = menuOptional.get();
+            Map<String, Object> menuInfo = new LinkedHashMap<>();
+            menuInfo.put("menuId", menu.getMenuId());
+            menuInfo.put("menuNm", menu.getMenuNm());
+            return menuInfo;
+        } else {
+            throw new IllegalArgumentException("Menu not found for menuId: " + menuId);
+        }
     }
 }

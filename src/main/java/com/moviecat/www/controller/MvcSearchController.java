@@ -18,9 +18,11 @@ public class MvcSearchController {
 
     @GetMapping("/searchTotal")
     @Operation(summary = "전체 검색", description = "전체 검색, 제목1, 제목+내용2, 작성자3")
-    public ResponseEntity<String> searchTotal(@RequestBody MvcSearchDto mvcSearchDto) {
+    public ResponseEntity<String> searchTotal(@RequestParam String srchWord,
+                                              @RequestParam(value = "page", defaultValue = "1") int page,
+                                              @RequestParam int limit) {
         try {
-            String jsonSearchResult = mvcSearchService.searchTotal(mvcSearchDto.getDiv(), mvcSearchDto.getSrchWord(),mvcSearchDto.getPage(), mvcSearchDto.getLimit());
+            String jsonSearchResult = mvcSearchService.searchTotal(srchWord,page,limit);
             return new ResponseEntity<>(jsonSearchResult, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
