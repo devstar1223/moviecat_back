@@ -3,7 +3,6 @@ package com.moviecat.www.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moviecat.www.dto.MvcScrBbsDto;
-import com.moviecat.www.entity.MvcBbs;
 import com.moviecat.www.entity.MvcMbrInfo;
 import com.moviecat.www.entity.MvcRcmdtnInfo;
 import com.moviecat.www.entity.MvcScrBbs;
@@ -79,12 +78,13 @@ public class MvcScrBbsService {
             // ObjectMapper를 사용하여 맵을 JSON으로 변환
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.writeValueAsString(scrMap);
-        }else {
+        } else {
             // Optional이 비어있는 경우 처리
             throw new NoSuchElementException("해당 게시글이 존재하지 않습니다.");
         }
     }
 
+    @Transactional
     public void scrBbsEdit(MvcScrBbsDto mvcScrBbsDto) {
         Optional<MvcScrBbs> scrOptional = mvcScrBbsRepository.findById(mvcScrBbsDto.getScrId());
         if(scrOptional.isPresent()){
@@ -95,12 +95,12 @@ public class MvcScrBbsService {
             scr.setMdfcnUserNm(mvcScrBbsDto.getMbrNm());
             scr.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
             mvcScrBbsRepository.save(scr);
-        }
-        else {
+        } else {
             throw new NoSuchElementException("해당 평점이 존재하지 않습니다.");
         }
     }
 
+    @Transactional
     public void scrBbsDelete(MvcScrBbsDto mvcScrBbsDto) {
         Optional<MvcScrBbs> scrOptional = mvcScrBbsRepository.findById(mvcScrBbsDto.getScrId());
         if(scrOptional.isPresent()){
@@ -110,8 +110,7 @@ public class MvcScrBbsService {
             scr.setMdfcnUserNm(mvcScrBbsDto.getMbrNm());
             scr.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
             mvcScrBbsRepository.save(scr);
-        }
-        else {
+        } else {
             throw new NoSuchElementException("해당 평점이 존재하지 않습니다.");
         }
     }
@@ -123,26 +122,21 @@ public class MvcScrBbsService {
         List<Map<String,Object>> scrList = new ArrayList<>();
 
         for(MvcScrBbs scr : scrListOrigin) {
-
             Map<String,Object> map = new LinkedHashMap<>();
-
-            map.put("scrId",scr.getScrId());
-            map.put("vdoNm",scr.getVdoNm());
+            map.put("scrId", scr.getScrId());
+            map.put("vdoNm", scr.getVdoNm());
             map.put("vdoNmEn", scr.getVdoNmEn());
-            map.put("opngYear",scr.getOpngYear());
+            map.put("opngYear", scr.getOpngYear());
             map.put("scr", scr.getScr());
             map.put("rgstDate", timeFormat.formatDate(scr.getRgstDay()));
-            map.put("vdoEvl",scr.getVdoEvl());
+            map.put("vdoEvl", scr.getVdoEvl());
             map.put("nickNm", columnValueMapper.mbrIdToNickNm(scr.getRgstUserId()));
-//            map.put("mvcId", columnValueMapper.mbrIdToMvcId(scr.getRgstUserId()));
 
-            //기존의 rcmdTatal을 이름만 likeCnt로 바꿔서 데이터 보냄
             int rcmdTotal = columnValueMapper.pstIdAndMenuIdToRcmdTotal(scr.getScrId(), scr.getMenuId());
             map.put("likeCnt", rcmdTotal);
 
-            //boolean으로 반환 필요할시 변경 가능.
             String likeYn = "N";
-            if(mvcRcmdtnInfoService.rcmdCheck(menuId,scr.getScrId(),mbrId)){
+            if (mvcRcmdtnInfoService.rcmdCheck(menuId, scr.getScrId(), mbrId)) {
                 likeYn = "Y";
             }
             map.put("likeYn", likeYn);
@@ -156,8 +150,6 @@ public class MvcScrBbsService {
         result.put("data", pagedPostList);
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String jsonScrList = objectMapper.writeValueAsString(result);
-
-        return jsonScrList;
+        return objectMapper.writeValueAsString(result);
     }
 }
