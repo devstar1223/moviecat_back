@@ -81,39 +81,45 @@ public class MvcBbsService {
 
     @Transactional
     public String bbsReadBoard(long menuId, int page, int limit) throws JsonProcessingException {
+        // 원본 데이터 조회
         List<MvcBbs> postListOrigin = mvcBbsRepository.findByMenuIdAndDeltYnOrderByPstIdDesc(menuId, "N");
-        List<Map<String,Object>> postList = new ArrayList<>();
-        int postNumber = postListOrigin.size();
-        for(MvcBbs post : postListOrigin){
-            Map<String,Object> map = new LinkedHashMap<>();
+
+        // 페이징 처리
+        List<MvcBbs> pagedPostList = paginationUtil.getPageLimit(postListOrigin, page, limit);
+
+        // 총 데이터 수
+        long total = postListOrigin.size();
+
+        // 결과 맵 구성
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("total", total);
+        result.put("data", formatPostList(pagedPostList));
+
+        // JSON 변환
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(result);
+    }
+
+    private List<Map<String, Object>> formatPostList(List<MvcBbs> postList) {
+        List<Map<String, Object>> formattedPostList = new ArrayList<>();
+        int postNumber = postList.size();
+
+        for (MvcBbs post : postList) {
+            Map<String, Object> map = new LinkedHashMap<>();
             map.put("postNumber", postNumber--);
-            map.put("pstId",post.getPstId());
+            map.put("pstId", post.getPstId());
             String[] rgstTime = timeFormat.formatDateToday(post.getRgstDay());
-            map.put("new",rgstTime[1]);
+            map.put("new", rgstTime[1]);
             map.put("rgstDate", rgstTime[0]);
-            map.put("spoYn",post.getSpoYn());
-            map.put("ttl",post.getTtl());
+            map.put("spoYn", post.getSpoYn());
+            map.put("ttl", post.getTtl());
             map.put("cmntTotal", columnValueMapper.pstIdToCmntTotal(post.getPstId()));
             int rcmdTotal = columnValueMapper.pstIdAndMenuIdToRcmdTotal(post.getPstId(), post.getMenuId());
-            map.put("rmcdTotal", (rcmdTotal > 5)? "5+" : String.valueOf(rcmdTotal));
+            map.put("rmcdTotal", (rcmdTotal > 5) ? "5+" : String.valueOf(rcmdTotal));
             map.put("nickNm", columnValueMapper.mbrIdToNickNm(post.getRgstUserId()));
-            postList.add(map);
+            formattedPostList.add(map);
         }
-        List<Map<String, Object>> pagedPostList;
-        try {
-            pagedPostList = paginationUtil.getPageLimit(postList, page, limit);
-        } catch (Exception e) {
-            throw e;
-        }
-        long total = postList.size();
-        Map<String, Object> result = new HashMap<>();
-        result.put("total", total);
-        result.put("data", pagedPostList);
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonPostList = objectMapper.writeValueAsString(result);
-
-        return jsonPostList;
+        return formattedPostList;
     }
 
     public String bbsReadPost(long menuId,long pstId) throws JsonProcessingException {

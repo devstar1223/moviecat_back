@@ -16,7 +16,7 @@ public class PaginationUtil {
             throw new IndexOutOfBoundsException("페이지 범위 초과");
         }
         if (page <= 0) {
-            throw new IllegalArgumentException("페이지 값으로 0이 오는것은 유효하지 않음");
+            throw new IllegalArgumentException("페이지 값으로 0이 오는 것은 유효하지 않음");
         }
         return list.subList(start, end);
     }

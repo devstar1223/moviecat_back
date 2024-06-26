@@ -8,9 +8,7 @@ import com.moviecat.www.util.PaginationUtil;
 import com.moviecat.www.util.TimeFormat;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.moviecat.www.entity.MvcMbrInfo;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -21,6 +19,7 @@ public class MvcPageReturnService {
     private final TimeFormat timeFormat;
     private final PaginationUtil paginationUtil;
     private final ColumnValueMapper columnValueMapper;
+
     public Map<String, Object> boardPageReturn(List<MvcBbs> resultList, int page, int limit) {
         if (resultList == null || resultList.isEmpty()) {
             throw new NoSuchElementException("검색결과가 없습니다.");
@@ -30,21 +29,22 @@ public class MvcPageReturnService {
         if (totalSize == 0) {
             throw new NoSuchElementException("검색결과가 없습니다.");
         }
-        int postNumber = totalSize;
+
         List<Map<String, Object>> searchResultList = new ArrayList<>(); // 글 여러개 담을 리스트
+        int postNumber = totalSize;
         for (MvcBbs searchResult : resultList) { // 받아온 글 목록 하나씩 for 문으로 처리하기
             Map<String, Object> searchResultMap = new LinkedHashMap<>(); // LinkedHashMap을 사용하여 순서를 보장
             searchResultMap.put("menuId", searchResult.getMenuId());
             searchResultMap.put("postNumber", postNumber--);
             searchResultMap.put("pstId", searchResult.getPstId());
             String[] rgstTime = timeFormat.formatDateToday(searchResult.getRgstDay());
-            searchResultMap.put("new",rgstTime[1]);
+            searchResultMap.put("new", rgstTime[1]);
             searchResultMap.put("rgstDate", rgstTime[0]);
             searchResultMap.put("spoYn", searchResult.getSpoYn());
             searchResultMap.put("ttl", searchResult.getTtl());
             searchResultMap.put("cmntTotal", columnValueMapper.pstIdToCmntTotal(searchResult.getPstId()));
             int rcmdTotal = columnValueMapper.pstIdAndMenuIdToRcmdTotal(searchResult.getPstId(), searchResult.getMenuId());
-            searchResultMap.put("rmcdTotal", (rcmdTotal > 5)? "5+" : String.valueOf(rcmdTotal));
+            searchResultMap.put("rmcdTotal", (rcmdTotal > 5) ? "5+" : String.valueOf(rcmdTotal));
             searchResultMap.put("nickNm", columnValueMapper.mbrIdToNickNm(searchResult.getRgstUserId()));
 
             searchResultList.add(searchResultMap);
@@ -85,12 +85,12 @@ public class MvcPageReturnService {
             searchResultMap.put("vdoNmEn", searchResult.getVdoNmEn());
             searchResultMap.put("OpngDay", searchResult.getOpngYear());
             String[] rgstTime = timeFormat.formatDateToday(searchResult.getRgstDay());
-            searchResultMap.put("new",rgstTime[1]);
+            searchResultMap.put("new", rgstTime[1]);
             searchResultMap.put("rgstDate", rgstTime[0]);
             searchResultMap.put("vdoEvl", searchResult.getVdoEvl());
 
             int rcmdTotal = columnValueMapper.pstIdAndMenuIdToRcmdTotal(searchResult.getScrId(), searchResult.getMenuId());
-            searchResultMap.put("rmcdTotal", (rcmdTotal > 5)? "5+" : String.valueOf(rcmdTotal));
+            searchResultMap.put("rmcdTotal", (rcmdTotal > 5) ? "5+" : String.valueOf(rcmdTotal));
             searchResultMap.put("nickNm", columnValueMapper.mbrIdToNickNm(searchResult.getRgstUserId()));
 
             searchResultList.add(searchResultMap);
