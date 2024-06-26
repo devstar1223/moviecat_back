@@ -118,6 +118,7 @@ public class MvcPageReturnService {
         for (MvcBbs searchResult : resultList) { // 받아온 글 목록 하나씩 for 문으로 처리하기
             Map<String, Object> searchResultMap = new LinkedHashMap<>(); // LinkedHashMap을 사용하여 순서를 보장
             searchResultMap.put("menuId", searchResult.getMenuId()); // 평점일땐 4로 반환
+            searchResultMap.put("menuNm", columnValueMapper.menuIdToMenuNm(searchResult.getMenuId())); // 메뉴 id 넣어서 메뉴명 반환
             searchResultMap.put("pstId", searchResult.getPstId());
             String[] rgstTime = timeFormat.formatDateToday(searchResult.getRgstDay());
             searchResultMap.put("rgstDate", rgstTime[0]);
