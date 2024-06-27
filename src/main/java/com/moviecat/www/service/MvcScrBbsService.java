@@ -136,7 +136,7 @@ public class MvcScrBbsService {
             map.put("likeCnt", rcmdTotal);
 
             String likeYn = "N";
-            if ("".equals(mbrId) && mvcRcmdtnInfoService.rcmdCheck(menuId, scr.getScrId(), mbrId)) {
+            if (!"".equals(mbrId) && mvcRcmdtnInfoService.rcmdCheck(menuId, scr.getScrId(), mbrId)) {
                 likeYn = "Y";
             }
             map.put("likeYn", likeYn);

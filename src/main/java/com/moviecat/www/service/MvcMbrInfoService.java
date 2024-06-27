@@ -20,11 +20,11 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.mail.MailSender;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -68,6 +68,65 @@ public class MvcMbrInfoService {
             mvcMbrInfo.setAtchFileUrl(fileInfo[2]);
         }
         mvcMbrInfoRepository.save(mvcMbrInfo);
+    }
+
+    public String myInfoRead(long mvcId) throws JsonProcessingException {
+        Optional<MvcMbrInfo> userInfoOptional = mvcMbrInfoRepository.findById(mvcId);
+        if(userInfoOptional.isPresent()){
+            MvcMbrInfo userInfo = userInfoOptional.get();
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("atchFileUrl",userInfo.getAtchFileUrl());
+
+            String maskedMbrId = userInfo.getMbrId().substring(0,userInfo.getMbrId().length()-2) + "**";
+            map.put("mbrId",maskedMbrId);
+            map.put("mbrNm",userInfo.getMbrNm());
+            map.put("nickNm",userInfo.getNickNm());
+            map.put("phoneNo",userInfo.getPhoneNo());
+            map.put("email",userInfo.getEmail());
+            map.put("intrIntcn",userInfo.getIntrIntrcn());
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.writeValueAsString(map);
+        }
+        else{
+            throw new NoSuchElementException("회원 정보가 없습니다.");
+        }
+    }
+
+    @Transactional
+    public void myInfoUpdate(MvcMbrInfoDto mvcMbrInfoDto, MultipartFile multipartFile) {
+        Optional<MvcMbrInfo> userInfoOptional = mvcMbrInfoRepository.findByMbrId(mvcMbrInfoDto.getMbrId());
+        if(userInfoOptional.isPresent()){
+            MvcMbrInfo mbrInfo = userInfoOptional.get();
+            mbrInfo.setNickNm(mvcMbrInfoDto.getNickNm());
+            mbrInfo.setPswd(passwordEncoder.encode(mvcMbrInfoDto.getPswd()));
+            mbrInfo.setEmail(mvcMbrInfoDto.getEmail());
+            mbrInfo.setPhoneNo((mvcMbrInfoDto.getPhoneNo()).replaceAll("-", ""));
+            mbrInfo.setIntrIntrcn(mvcMbrInfoDto.getIntrIntrcn());
+            if(mvcMbrInfoDto.getProfileImage() != null){
+                String[] fileInfo = mvcFileUploadService.uploadFile(multipartFile,"profile");
+                mbrInfo.setAtchFileUrl(fileInfo[2]);
+            }
+            mbrInfo.setMdfcnUserNm(mvcMbrInfoDto.getNickNm());
+            mbrInfo.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
+            mvcMbrInfoRepository.save(mbrInfo);
+        }
+        else{
+            throw new NoSuchElementException("회원 정보가 없습니다.");
+        }
+    }
+
+    public void myInfoDelete(long mvcId) {
+        Optional<MvcMbrInfo> userInfoOptional = mvcMbrInfoRepository.findById(mvcId);
+        if(userInfoOptional.isPresent()){
+            MvcMbrInfo mbrInfo = userInfoOptional.get();
+            mbrInfo.setDeltYn("Y");
+            mbrInfo.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
+            mvcMbrInfoRepository.save(mbrInfo);
+        }
+        else{
+            throw new NoSuchElementException("회원 정보가 없습니다.");
+        }
     }
 
     @Transactional

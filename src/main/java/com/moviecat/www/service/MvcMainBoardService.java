@@ -48,7 +48,7 @@ public class MvcMainBoardService {
     }
 
     private void addMenuInfo(Map<String, Object> mainListMap, String category, Long menuId, int generalLimit, int hotLimit) {
-        List<Map<String, Object>> hotList = getBbsData(3L, hotLimit);
+        List<Map<String, Object>> hotList = getBbsData(menuId, hotLimit);
         List<Map<String, Object>> generalList = getBbsData(menuId, generalLimit);
 
         Map<String, Object> categoryMap = new LinkedHashMap<>();
@@ -108,11 +108,11 @@ public class MvcMainBoardService {
 
     private Map<String, Object> createBbsMap(MvcBbs bbs, int number) {
         Map<String, Object> map = new LinkedHashMap<>();
-        map.put("scrNumber", number);
         map.put("scrId", bbs.getPstId());
         map.put("ttl", bbs.getTtl());
         map.put("cmntTotal", columnValueMapper.pstIdToCmntTotal(bbs.getPstId()));
         map.put("rcmdTotal", columnValueMapper.pstIdAndMenuIdToRcmdTotal(bbs.getPstId(), bbs.getMenuId()));
+        map.put("nickNm", columnValueMapper.mbrIdToNickNm(bbs.getRgstUserId()));
         String[] rgstTime = timeFormat.formatDateToday(bbs.getRgstDay());
         map.put("new", rgstTime[1]);
         map.put("rgstDate", rgstTime[0]);
@@ -121,7 +121,7 @@ public class MvcMainBoardService {
 
     private Map<String, Object> createScrMap(MvcScrBbs scr, int number) {
         Map<String, Object> map = new LinkedHashMap<>();
-        map.put("scrNumber", number);
+//        map.put("scrNumber", number);
         map.put("scrId", scr.getScrId());
         map.put("vdoNm", scr.getVdoNm());
         map.put("vdoEvl", scr.getVdoEvl());

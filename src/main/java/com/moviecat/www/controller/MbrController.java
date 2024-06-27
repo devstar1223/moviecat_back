@@ -83,4 +83,38 @@ public class MbrController {
         }
 
     }
+
+    @GetMapping("/myInfoRead")
+    @Operation(summary = "회원 정보", description ="회원 정보 조회")
+    public ResponseEntity<String> myInfoRead(@RequestParam long mvcId){
+        try {
+            String jsonMyInfo = mvcMbrInfoService.myInfoRead(mvcId);
+            return new ResponseEntity<>(jsonMyInfo, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/myInfoUpdate")
+    @Operation(summary = "회원 정보 수정", description ="사진, mbrId, mbrNm, nickNm, phoneNo, email, intrIntcn")
+    public ResponseEntity<String> myInfoUpdate(@ModelAttribute MvcMbrInfoDto mvcMbrInfoDto, @RequestPart(required = false) MultipartFile profileImage){
+        System.out.println(mvcMbrInfoDto.getMbrId());
+        try {
+            mvcMbrInfoService.myInfoUpdate(mvcMbrInfoDto,profileImage);
+            return new ResponseEntity<>("수정 완료", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/myInfoDelete")
+    @Operation(summary = "회원 탈퇴", description ="deltYn 변경")
+    public ResponseEntity<String> myInfoDelete(@RequestParam long mvcId){
+        try {
+            mvcMbrInfoService.myInfoDelete(mvcId);
+            return new ResponseEntity<>("탈퇴 완료", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
