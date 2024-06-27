@@ -25,14 +25,14 @@ public class MvcSearchService {
     private final MvcScrBbsRepository mvcScrBbsRepository;
 
     @Transactional
-    public String searchScr(String srchWord, int page, int limit) {
+    public String searchScr(String srchWord, int page, int limit,String mbrId) {
         try {
             List<MvcScrBbs> scrList = mvcScrBbsRepository.findByDeltYnAndVdoNmContainingOrVdoNmEnContainingOrderByRgstDayDesc("N", srchWord, srchWord); // 한글이름 부분일치 or 영문이름 부분일치
             if (scrList.isEmpty()) {
                 // 검색 결과가 없을 때 처리000
                 return "{\"total\": 0, \"data\": []}";
             }
-            Map<String, Object> pagedSearchResultMap = mvcPageReturnService.scrPageReturn(scrList, page, limit); // 페이징된 결과 가져오기
+            Map<String, Object> pagedSearchResultMap = mvcPageReturnService.scrPageReturn(scrList, page, limit, mbrId); // 페이징된 결과 가져오기
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.writeValueAsString(pagedSearchResultMap); // JSON 형태로 반환
         } catch (JsonProcessingException e) {

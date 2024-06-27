@@ -19,6 +19,7 @@ public class MvcPageReturnService {
     private final TimeFormat timeFormat;
     private final PaginationUtil paginationUtil;
     private final ColumnValueMapper columnValueMapper;
+    private final MvcRcmdtnInfoService mvcRcmdtnInfoService;
 
     public Map<String, Object> boardPageReturn(List<MvcBbs> resultList, int page, int limit) {
         if (resultList == null || resultList.isEmpty()) {
@@ -62,7 +63,7 @@ public class MvcPageReturnService {
         return responseMap;
     }
 
-    public Map<String, Object> scrPageReturn(List<MvcScrBbs> resultList, int page, int limit) {
+    public Map<String, Object> scrPageReturn(List<MvcScrBbs> resultList, int page, int limit, String mbrId) {
         if (resultList == null || resultList.isEmpty()) {
             return Collections.singletonMap("total", 0); // 검색 결과가 없을 때 0개의 결과와 빈 데이터 반환, 사실 앞에서 한번 검사함.
         }
@@ -70,21 +71,25 @@ public class MvcPageReturnService {
         int totalSize = resultList.size();
 
         List<Map<String, Object>> searchResultList = new ArrayList<>(); // 글 여러개 담을 리스트
-        int scrNumber = totalSize;
         for (MvcScrBbs searchResult : resultList) { // 받아온 글 목록 하나씩 for 문으로 처리하기
             Map<String, Object> searchResultMap = new LinkedHashMap<>(); // LinkedHashMap을 사용하여 순서를 보장
-            searchResultMap.put("scrNumber", scrNumber--);
             searchResultMap.put("scrId", searchResult.getScrId());
             searchResultMap.put("vdoNm", searchResult.getVdoNm());
             searchResultMap.put("vdoNmEn", searchResult.getVdoNmEn());
-            searchResultMap.put("OpngDay", searchResult.getOpngYear());
+            searchResultMap.put("opngYear", searchResult.getOpngYear());
+            searchResultMap.put("scr", searchResult.getScr());
             String[] rgstTime = timeFormat.formatDateToday(searchResult.getRgstDay());
             searchResultMap.put("new", rgstTime[1]);
             searchResultMap.put("rgstDate", rgstTime[0]);
             searchResultMap.put("vdoEvl", searchResult.getVdoEvl());
 
             int rcmdTotal = columnValueMapper.pstIdAndMenuIdToRcmdTotal(searchResult.getScrId(), searchResult.getMenuId());
-            searchResultMap.put("rmcdTotal", (rcmdTotal > 5) ? "5+" : String.valueOf(rcmdTotal));
+            searchResultMap.put("likeCnt", (rcmdTotal > 5) ? "5+" : String.valueOf(rcmdTotal));
+            String likeYn = "N";
+            if (!"".equals(mbrId) && mvcRcmdtnInfoService.rcmdCheck(4, searchResult.getScrId(), mbrId)) {
+                likeYn = "Y";
+            }
+            searchResultMap.put("likeYn", likeYn);
             searchResultMap.put("nickNm", columnValueMapper.mbrIdToNickNm(searchResult.getRgstUserId()));
 
             searchResultList.add(searchResultMap);

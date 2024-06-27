@@ -76,7 +76,7 @@ public class MvcScrBbsController {
 
         if(srchWord!=null){
             try {
-                String jsonSearchResult = mvcSearchService.searchScr(srchWord,page,limit);
+                String jsonSearchResult = mvcSearchService.searchScr(srchWord,page,limit,mbrId);
                 return new ResponseEntity<>(jsonSearchResult, HttpStatus.OK);
             } catch (Exception e) {
                 return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
