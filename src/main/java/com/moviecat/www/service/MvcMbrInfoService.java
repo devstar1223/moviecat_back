@@ -107,10 +107,14 @@ public class MvcMbrInfoService {
 
         mbrInfo.setMvcId(mvcMbrInfoDto.getMvcId());
 
-        // 패스워드가 있는 경우 인코딩 진행
+        //패스워드가 있는 경우 인코딩 진행
         if (mvcMbrInfoDto.getPswd() != null && !mvcMbrInfoDto.getPswd().isEmpty()) {
             mbrInfo.setPswd(passwordEncoder.encode(mvcMbrInfoDto.getPswd()));
+        //패스워드가 없는 경우 빈값 인코딩 진행
+        } else {
+            mbrInfo.setPswd(passwordEncoder.encode(""));
         }
+
         //일반회원이면서 프로필사진이 있는경우
         if(mvcMbrInfoDto.getProfileImage() != null) {
             String[] fileInfo = mvcFileUploadService.uploadFile(multipartFile,"profile");
