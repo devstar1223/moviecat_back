@@ -7,6 +7,7 @@ import com.moviecat.www.dto.MvcLoginDto;
 import com.moviecat.www.dto.MvcMbrInfoDto;
 import com.moviecat.www.entity.MvcMbrInfo;
 import com.moviecat.www.repository.MvcMbrInfoRepository;
+import com.moviecat.www.util.FormatUtils;
 import com.moviecat.www.util.JwtTokenProvider;
 import com.moviecat.www.util.PasswordGenerator;
 import lombok.RequiredArgsConstructor;
@@ -71,49 +72,58 @@ public class MvcMbrInfoService {
     }
 
     public String myInfoRead(long mvcId) throws JsonProcessingException {
+
         Optional<MvcMbrInfo> userInfoOptional = mvcMbrInfoRepository.findById(mvcId);
-        if(userInfoOptional.isPresent()){
+
+        if(userInfoOptional.isPresent()) {
+
             MvcMbrInfo userInfo = userInfoOptional.get();
             Map<String, Object> map = new LinkedHashMap<>();
-            map.put("atchFileUrl",userInfo.getAtchFileUrl());
 
             String maskedMbrId = userInfo.getMbrId().substring(0,userInfo.getMbrId().length()-2) + "**";
+
+            map.put("mvcId",userInfo.getMvcId());
             map.put("mbrId",maskedMbrId);
             map.put("mbrNm",userInfo.getMbrNm());
             map.put("nickNm",userInfo.getNickNm());
-            map.put("phoneNo",userInfo.getPhoneNo());
+            map.put("phoneNo", FormatUtils.formatPhoneNumber(userInfo.getPhoneNo()));
             map.put("email",userInfo.getEmail());
-            map.put("intrIntcn",userInfo.getIntrIntrcn());
+            map.put("intrIntrcn",Optional.ofNullable(userInfo.getIntrIntrcn()).orElse(""));
+            map.put("mbrSe",userInfo.getMbrSe());
+            map.put("atchFileUrl",userInfo.getAtchFileUrl());
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.writeValueAsString(map);
-        }
-        else{
+            return new ObjectMapper().writeValueAsString(map);
+        } else {
             throw new NoSuchElementException("회원 정보가 없습니다.");
         }
     }
 
     @Transactional
-    public void myInfoUpdate(MvcMbrInfoDto mvcMbrInfoDto, MultipartFile multipartFile) {
-        Optional<MvcMbrInfo> userInfoOptional = mvcMbrInfoRepository.findByMbrId(mvcMbrInfoDto.getMbrId());
-        if(userInfoOptional.isPresent()){
-            MvcMbrInfo mbrInfo = userInfoOptional.get();
-            mbrInfo.setNickNm(mvcMbrInfoDto.getNickNm());
+    public void myInfoUpdate(MvcMbrInfoDto mvcMbrInfoDto
+            , MultipartFile multipartFile) {
+
+        MvcMbrInfo mbrInfo = mvcMbrInfoRepository.findByMvcId(mvcMbrInfoDto.getMvcId())
+                .orElseThrow(() -> new NoSuchElementException("회원 정보가 없습니다."));
+
+        mbrInfo.setMvcId(mvcMbrInfoDto.getMvcId());
+
+        // 패스워드가 있는 경우 인코딩 진행
+        if (mvcMbrInfoDto.getPswd() != null && !mvcMbrInfoDto.getPswd().isEmpty()) {
             mbrInfo.setPswd(passwordEncoder.encode(mvcMbrInfoDto.getPswd()));
-            mbrInfo.setEmail(mvcMbrInfoDto.getEmail());
-            mbrInfo.setPhoneNo((mvcMbrInfoDto.getPhoneNo()).replaceAll("-", ""));
-            mbrInfo.setIntrIntrcn(mvcMbrInfoDto.getIntrIntrcn());
-            if(mvcMbrInfoDto.getProfileImage() != null){
-                String[] fileInfo = mvcFileUploadService.uploadFile(multipartFile,"profile");
-                mbrInfo.setAtchFileUrl(fileInfo[2]);
-            }
-            mbrInfo.setMdfcnUserNm(mvcMbrInfoDto.getNickNm());
-            mbrInfo.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
-            mvcMbrInfoRepository.save(mbrInfo);
         }
-        else{
-            throw new NoSuchElementException("회원 정보가 없습니다.");
+        //일반회원이면서 프로필사진이 있는경우
+        if(mvcMbrInfoDto.getProfileImage() != null) {
+            String[] fileInfo = mvcFileUploadService.uploadFile(multipartFile,"profile");
+            mbrInfo.setAtchFileUrl(fileInfo[2]);
         }
+
+        mbrInfo.setNickNm(mvcMbrInfoDto.getNickNm());
+        mbrInfo.setPhoneNo((mvcMbrInfoDto.getPhoneNo()).replaceAll("-", ""));
+        mbrInfo.setIntrIntrcn(mvcMbrInfoDto.getIntrIntrcn());
+        mbrInfo.setMdfcnUserNm(mvcMbrInfoDto.getNickNm());
+        mbrInfo.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now()));
+
+        mvcMbrInfoRepository.save(mbrInfo);
     }
 
     public void myInfoDelete(long mvcId) {
@@ -157,7 +167,7 @@ public class MvcMbrInfoService {
         Optional<MvcMbrInfo> pswdOptional = mvcMbrInfoRepository.findByMbrIdAndMbrNmAndEmail(mbrId, mbrNm, email); // ID 있는지 확인
         if (pswdOptional.isPresent()) {
             MvcMbrInfo foundPswdMbr = pswdOptional.get();
-            String newPswd = passwordGenerator.generatePassword(10);
+            String newPswd = PasswordGenerator.generatePassword(10);
             foundPswdMbr.setPswd(passwordEncoder.encode(newPswd));
             foundPswdMbr.setMdfcnUserId("admin"); // admin으로 수정 ID 변경
             foundPswdMbr.setMdfcnUserNm("운영자"); // 운영자로 수정자 변경
@@ -302,7 +312,7 @@ public class MvcMbrInfoService {
             kakaoMbr.setEmail(email);
             kakaoMbr.setNickNm(nickNm);
             kakaoMbr.setAtchFileUrl(atchFileUrl);
-            kakaoMbr.setPhoneNo(formatPhoneNumber(phoneNo));
+            kakaoMbr.setPhoneNo(FormatUtils.formatPhoneNumber(phoneNo));
             kakaoMbr.setMbrSe(1); // 카카오는 1
             kakaoMbr.setMbrNm(mbrNm);
             kakaoMbr.setPswd(passwordEncoder.encode("")); // 카카오 로그인 비밀번호 X
@@ -318,21 +328,6 @@ public class MvcMbrInfoService {
             mvcMbrInfoRepository.save(kakaoMbr);
         }
 
-        return new MvcLoginDto(mvcId, kakaoIdPlusK, nickNm, mbrNm, email, atchFileUrl, jwtTokenProvider.generateToken(mvcId.toString()));
-    }
-
-    //+82 01 형식을 010으로 수정
-    public static String formatPhoneNumber(String input) {
-
-        if (input.startsWith("+82 10")) {
-            input = input.substring(6).trim();
-        }
-        input = input.replaceAll("[^\\d]", "");
-
-        if (!input.startsWith("010")) {
-            input = "010" + input;
-        }
-
-        return input;
+        return new MvcLoginDto(mvcId, kakaoIdPlusK, nickNm, mbrNm, email, atchFileUrl, JwtTokenProvider.generateToken(mvcId.toString()));
     }
 }

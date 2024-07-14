@@ -96,12 +96,15 @@ public class MbrController {
     }
 
     @PostMapping("/myInfoUpdate")
-    @Operation(summary = "회원 정보 수정", description ="사진, mbrId, mbrNm, nickNm, phoneNo, email, intrIntcn")
-    public ResponseEntity<String> myInfoUpdate(@ModelAttribute MvcMbrInfoDto mvcMbrInfoDto, @RequestPart(required = false) MultipartFile profileImage){
-        System.out.println(mvcMbrInfoDto.getMbrId());
+    @Operation(summary = "회원 정보 수정", description ="일반회원 - mvcId, profileImg, pssword, nickNm, phoneNo, intrIntcn/SNS회원 - mvcId, phoneNo, intrIntcn")
+    public ResponseEntity<String> myInfoUpdate(@ModelAttribute MvcMbrInfoDto mvcMbrInfoDto
+            , @RequestPart(required = false) MultipartFile profileImage){
+
         try {
-            mvcMbrInfoService.myInfoUpdate(mvcMbrInfoDto,profileImage);
+
+            mvcMbrInfoService.myInfoUpdate(mvcMbrInfoDto, profileImage);
             return new ResponseEntity<>("수정 완료", HttpStatus.OK);
+
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
