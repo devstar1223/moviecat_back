@@ -16,6 +16,8 @@ import com.moviecat.www.util.FileUtils;
 import com.moviecat.www.util.PaginationUtil;
 import com.moviecat.www.util.TimeFormat;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,28 +83,31 @@ public class MvcBbsService {
 
     @Transactional
     public String bbsReadBoard(long menuId, int page, int limit) throws JsonProcessingException {
-        // 원본 데이터 조회
-        List<MvcBbs> postListOrigin = mvcBbsRepository.findByMenuIdAndDeltYnOrderByPstIdDesc(menuId, "N");
+        // 페이징 처리해서 가져옴
+        PageRequest pageRequest = PageRequest.of(page-1, limit);
+        Page<MvcBbs> resultPage = mvcBbsRepository.findByMenuIdAndDeltYnOrderByRgstDayDesc(menuId, "N", pageRequest);
 
-        // 페이징 처리
-        List<MvcBbs> pagedPostList = paginationUtil.getPageLimit(postListOrigin, page, limit);
+        long total = resultPage.getTotalElements();
 
-        // 총 데이터 수
-        long total = postListOrigin.size();
+        // 페이징된 데이터를 pagedPostList로 변환
+        List<MvcBbs> pagedPostList = resultPage.getContent();
 
-        // 결과 맵 구성
+        // pagedPostList를 포맷팅
+        List<Map<String, Object>> formattedPostList = formatPostList(pagedPostList, page, limit, total);
+
+        // 포맷팅한 List를 총 게시물 수와 함께 Map에 등록
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("total", total);
-        result.put("data", formatPostList(pagedPostList));
+        result.put("data", formattedPostList);
 
-        // JSON 변환
+        // Map -> JSON 변환
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(result);
     }
 
-    private List<Map<String, Object>> formatPostList(List<MvcBbs> postList) {
+    private List<Map<String, Object>> formatPostList(List<MvcBbs> postList, int page, int limit, long total) {
         List<Map<String, Object>> formattedPostList = new ArrayList<>();
-        int postNumber = postList.size();
+        long postNumber = total - ((page-1)*limit);
 
         for (MvcBbs post : postList) {
             Map<String, Object> map = new LinkedHashMap<>();
@@ -113,10 +118,13 @@ public class MvcBbsService {
             map.put("rgstDate", rgstTime[0]);
             map.put("spoYn", post.getSpoYn());
             map.put("ttl", post.getTtl());
-            map.put("cmntTotal", columnValueMapper.pstIdToCmntTotal(post.getPstId()));
-            int rcmdTotal = columnValueMapper.pstIdAndMenuIdToRcmdTotal(post.getPstId(), post.getMenuId());
-            map.put("rmcdTotal", (rcmdTotal > 5) ? "5+" : String.valueOf(rcmdTotal));
-            map.put("nickNm", columnValueMapper.mbrIdToNickNm(post.getRgstUserId()));
+//            map.put("cmntTotal", columnValueMapper.pstIdToCmntTotal(post.getPstId()));
+//            int rcmdTotal = columnValueMapper.pstIdAndMenuIdToRcmdTotal(post.getPstId(), post.getMenuId());
+//            map.put("rmcdTotal", (rcmdTotal > 5) ? "5+" : String.valueOf(rcmdTotal));
+//            map.put("nickNm", columnValueMapper.mbrIdToNickNm(post.getRgstUserId()));
+            map.put("rcmdTotal", 1);
+            map.put("cmntTotal", 1);
+            map.put("nickNm", "작성자");
             formattedPostList.add(map);
         }
         return formattedPostList;

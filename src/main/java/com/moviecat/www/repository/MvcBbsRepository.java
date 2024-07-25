@@ -1,7 +1,10 @@
 package com.moviecat.www.repository;
 
 import com.moviecat.www.entity.MvcBbs;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
@@ -31,4 +34,8 @@ public interface MvcBbsRepository extends JpaRepository<MvcBbs, Long> {
     List<MvcBbs> findByMenuIdAndDeltYnAndRgstUserIdOrderByRgstDayDesc(Long menuId, String deltYn, String rgstUserId);
     // 작성자(rgstUserId) 기준 - 전체 검색
     List<MvcBbs> findByDeltYnAndRgstUserIdOrderByRgstDayDesc(String deltYn, String rgstUserId);
+
+    @Query("SELECT m FROM MvcBbs m WHERE m.deltYn = :deltYn AND m.menuId = :menuId ORDER BY m.rgstDay DESC")
+    Page<MvcBbs> findByMenuIdAndDeltYnOrderByRgstDayDesc(@Param("menuId") long menuId, @Param("deltYn") String deltYn, Pageable pageable);
+
 }
