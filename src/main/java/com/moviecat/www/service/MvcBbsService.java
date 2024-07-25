@@ -7,10 +7,7 @@ import com.moviecat.www.entity.MvcAtchFile;
 import com.moviecat.www.entity.MvcBbs;
 import com.moviecat.www.entity.MvcMbrInfo;
 import com.moviecat.www.entity.MvcRcmdtnInfo;
-import com.moviecat.www.repository.MvcAtchFileRepository;
-import com.moviecat.www.repository.MvcBbsRepository;
-import com.moviecat.www.repository.MvcMbrInfoRepository;
-import com.moviecat.www.repository.MvcRcmdtnInfoRepository;
+import com.moviecat.www.repository.*;
 import com.moviecat.www.util.ColumnValueMapper;
 import com.moviecat.www.util.FileUtils;
 import com.moviecat.www.util.PaginationUtil;
@@ -37,6 +34,7 @@ public class MvcBbsService {
     private final PaginationUtil paginationUtil;
     private final FileUtils fileUtils;
     private final ColumnValueMapper columnValueMapper;
+    private final MvcBbsCmntRepository mvcBbsCmntRepository;
 
     @Transactional
     public void bbsWritePost(MvcBbsDto mvcBbsDto) {
@@ -93,7 +91,7 @@ public class MvcBbsService {
         List<MvcBbs> pagedPostList = resultPage.getContent();
 
         // pagedPostList를 포맷팅
-        List<Map<String, Object>> formattedPostList = formatPostList(pagedPostList, page, limit, total);
+        List<Map<String, Object>> formattedPostList = formatPostList(pagedPostList, page, limit, total, menuId);
 
         // 포맷팅한 List를 총 게시물 수와 함께 Map에 등록
         Map<String, Object> result = new LinkedHashMap<>();
@@ -105,7 +103,7 @@ public class MvcBbsService {
         return objectMapper.writeValueAsString(result);
     }
 
-    private List<Map<String, Object>> formatPostList(List<MvcBbs> postList, int page, int limit, long total) {
+    private List<Map<String, Object>> formatPostList(List<MvcBbs> postList, int page, int limit, long total, long menuId) {
         List<Map<String, Object>> formattedPostList = new ArrayList<>();
         long postNumber = total - ((page-1)*limit);
 
@@ -118,13 +116,11 @@ public class MvcBbsService {
             map.put("rgstDate", rgstTime[0]);
             map.put("spoYn", post.getSpoYn());
             map.put("ttl", post.getTtl());
-//            map.put("cmntTotal", columnValueMapper.pstIdToCmntTotal(post.getPstId()));
-//            int rcmdTotal = columnValueMapper.pstIdAndMenuIdToRcmdTotal(post.getPstId(), post.getMenuId());
-//            map.put("rmcdTotal", (rcmdTotal > 5) ? "5+" : String.valueOf(rcmdTotal));
-//            map.put("nickNm", columnValueMapper.mbrIdToNickNm(post.getRgstUserId()));
-            map.put("rcmdTotal", 1);
-            map.put("cmntTotal", 1);
-            map.put("nickNm", "작성자");
+            Long cmntTotal = mvcBbsCmntRepository.totalCmnt('N',post.getPstId());
+            map.put("cmntTotal", cmntTotal);
+            Long rcmdTotal = mvcRcmdtnInfoRepository.totalRcmdtn("N", menuId, post.getPstId());
+            map.put("rmcdTotal", (rcmdTotal > 5) ? "5+" : String.valueOf(rcmdTotal));
+            map.put("nickNm", post.getNickNm());
             formattedPostList.add(map);
         }
         return formattedPostList;

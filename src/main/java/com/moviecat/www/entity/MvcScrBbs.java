@@ -56,4 +56,7 @@ public class MvcScrBbs {
 
     @Column(name = "delt_yn", nullable = false, length = 1)
     private String deltYn = "N"; // 삭제유무, 기본 "N"
+
+    @Column(name = "nickNm", nullable = false, length = 24)
+    private String nickNm; // 등록자 닉네임(등록 시점, 닉네임 변경시에도 유지)
 }

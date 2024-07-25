@@ -29,7 +29,7 @@ public interface MvcBbsCmntRepository extends JpaRepository<MvcBbsCmnt,Long> {
 
     Optional<MvcBbsCmnt> findByPstId(long pstId);
 
-    @Query("SELECT COUNT(c) FROM MvcBbsCmnt c WHERE c.pstId = :pstId AND c.deltYn = 'N'")
-    int countByPstIdAndDeltYn(@Param("pstId") long pstId);
-
+    @Query("SELECT COUNT(m) FROM MvcBbsCmnt m WHERE m.deltYn = :deltYn AND m.pstId = :pstId")
+    Long totalCmnt(@Param("deltYn") Character deltYn,
+                   @Param("pstId") Long pstId);
 }
