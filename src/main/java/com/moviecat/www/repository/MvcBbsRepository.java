@@ -38,4 +38,34 @@ public interface MvcBbsRepository extends JpaRepository<MvcBbs, Long> {
     @Query("SELECT m FROM MvcBbs m WHERE m.deltYn = :deltYn AND m.menuId = :menuId ORDER BY m.rgstDay DESC")
     Page<MvcBbs> findByMenuIdAndDeltYnOrderByRgstDayDesc(@Param("menuId") long menuId, @Param("deltYn") String deltYn, Pageable pageable);
 
+    @Query(
+            "SELECT b.pstId AS pstId, " +
+                    "       b.ttl AS ttl, " +
+                    "       b.nickNm AS nickNm, " +
+                    "       b.rgstDay AS rgstDay, " +
+                    "       COALESCE(rc.count, 0) AS rcmdtnCount, " +
+                    "       COALESCE(cmt.commentCount, 0) AS commentCount " +
+                    "FROM MvcBbs b " +
+                    "LEFT JOIN ( " +
+                    "    SELECT r.rcmdtnSeId AS pstId, " +
+                    "           r.menuId AS menuId, " +
+                    "           COUNT(r) AS count " +
+                    "    FROM MvcRcmdtnInfo r " +
+                    "    WHERE r.deltYn = 'N' " +
+                    "    GROUP BY r.rcmdtnSeId, r.menuId " +
+                    ") rc ON b.pstId = rc.pstId AND b.menuId = rc.menuId " +
+                    "LEFT JOIN ( " +
+                    "    SELECT c.pstId AS pstId, " +
+                    "           COUNT(c) AS commentCount " +
+                    "    FROM MvcBbsCmnt c " +
+                    "    WHERE c.deltYn = 'N' " +
+                    "    GROUP BY c.pstId " +
+                    ") cmt ON b.pstId = cmt.pstId " +
+                    "WHERE b.deltYn = 'N' " +
+                    "AND b.menuId = :menuId " +
+                    "ORDER BY b.rgstDay DESC"
+    )
+    Page<Object[]> findWithCountsByMenuIdAndDeltYn(@Param("menuId") long menuId, Pageable pageable);
+    // 메뉴 ID와 페이징정보로 받은다음, 목록에 보여줄 정보(게시물번호,제목,닉네임,등록일,추천합,댓글합) 리스트로 반환
+
 }

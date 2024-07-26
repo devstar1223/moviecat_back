@@ -18,6 +18,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import com.moviecat.www.config.StaticConstantConfig;
+
 
 @Service
 @RequiredArgsConstructor
@@ -28,16 +30,17 @@ public class MvcMainBoardService {
     private final MvcMenuRepository mvcMenuRepository;
     private final ColumnValueMapper columnValueMapper;
     private final TimeFormat timeFormat;
-    private final static int mainHotPostCount = 3;
-    private final static int mainGeneralPostCount = 7;
-    private final static int mainMovieScoreCount = 8;
 
     public String mainBoard(long menuId1, long menuId2, long menuId3) {
         Map<String, Object> mainListMap = new LinkedHashMap<>();
 
-        addMenuInfo(mainListMap, "menu1", menuId1, mainGeneralPostCount, mainHotPostCount);
-        addMenuInfo(mainListMap, "menu2", menuId2, mainGeneralPostCount, mainHotPostCount);
-        addMovieScore(mainListMap, mainMovieScoreCount, menuId3);
+        int hotPostCount = StaticConstantConfig.MAIN_HOT_POST_COUNT;
+        int generalPostCount = StaticConstantConfig.MAIN_GENERAL_POST_COUNT;
+        int movieScoreCount = StaticConstantConfig.MAIN_MOVIE_SCORE_COUNT;
+
+        addMenuInfo(mainListMap, "menu1", menuId1, generalPostCount, hotPostCount);
+        addMenuInfo(mainListMap, "menu2", menuId2, generalPostCount, hotPostCount);
+        addMovieScore(mainListMap, movieScoreCount, menuId3);
 
         ObjectMapper objectMapper = new ObjectMapper();
         try {

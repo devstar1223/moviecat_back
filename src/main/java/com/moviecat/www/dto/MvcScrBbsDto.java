@@ -24,4 +24,5 @@ public class MvcScrBbsDto {
     private String vdoEvl; // 영화평 C U
     private String mbrId; // 등록자 id C U D
     private String mbrNm; // 등록자 실명 C U D
+    private String nickNm; // 등록자 닉네임
 }

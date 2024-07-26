@@ -1,5 +1,6 @@
 package com.moviecat.www.util;
 
+import com.moviecat.www.config.StaticConstantConfig;
 import com.moviecat.www.entity.*;
 import com.moviecat.www.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -88,5 +89,4 @@ public class ColumnValueMapper {
             throw new NoSuchElementException("메뉴 정보가 유효하지 않습니다.");
         }
     }
-
 }

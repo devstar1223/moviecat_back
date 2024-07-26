@@ -2,6 +2,7 @@ package com.moviecat.www.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.moviecat.www.config.StaticConstantConfig;
 import com.moviecat.www.dto.MvcBbsDto;
 import com.moviecat.www.entity.MvcAtchFile;
 import com.moviecat.www.entity.MvcBbs;
@@ -49,6 +50,7 @@ public class MvcBbsService {
         newPost.setRgstDay(Timestamp.valueOf(LocalDateTime.now())); // 현재시간
         newPost.setMdfcnUserId(mvcBbsDto.getMbrId());
         newPost.setMdfcnUserNm(mvcBbsDto.getMbrNm());
+        newPost.setNickNm(columnValueMapper.mbrIdToNickNm(mvcBbsDto.getMbrId()));
         newPost.setMdfcnDay(Timestamp.valueOf(LocalDateTime.now())); // 현재시간 (수정 api 따로)
         newPost.setDeltYn("N"); // 글 쓰기 이므로, 기본적으로 "N"으로 설정
         mvcBbsRepository.save(newPost);
@@ -82,16 +84,16 @@ public class MvcBbsService {
     @Transactional
     public String bbsReadBoard(long menuId, int page, int limit) throws JsonProcessingException {
         // 페이징 처리해서 가져옴
-        PageRequest pageRequest = PageRequest.of(page-1, limit);
-        Page<MvcBbs> resultPage = mvcBbsRepository.findByMenuIdAndDeltYnOrderByRgstDayDesc(menuId, "N", pageRequest);
+        PageRequest pageRequest = PageRequest.of(page - 1, limit);
+        Page<Object[]> resultPage = mvcBbsRepository.findWithCountsByMenuIdAndDeltYn(menuId, pageRequest);
 
         long total = resultPage.getTotalElements();
 
-        // 페이징된 데이터를 pagedPostList로 변환
-        List<MvcBbs> pagedPostList = resultPage.getContent();
+        // 페이징된 데이터를 postList로 변환
+        List<Object[]> postList = resultPage.getContent();
 
-        // pagedPostList를 포맷팅
-        List<Map<String, Object>> formattedPostList = formatPostList(pagedPostList, page, limit, total, menuId);
+        // postList를 포맷팅
+        List<Map<String, Object>> formattedPostList = formatPostList(postList, page, limit, total, menuId);
 
         // 포맷팅한 List를 총 게시물 수와 함께 Map에 등록
         Map<String, Object> result = new LinkedHashMap<>();
@@ -103,24 +105,25 @@ public class MvcBbsService {
         return objectMapper.writeValueAsString(result);
     }
 
-    private List<Map<String, Object>> formatPostList(List<MvcBbs> postList, int page, int limit, long total, long menuId) {
+    private List<Map<String, Object>> formatPostList(List<Object[]> postList, int page, int limit, long total, long menuId) {
         List<Map<String, Object>> formattedPostList = new ArrayList<>();
-        long postNumber = total - ((page-1)*limit);
+        long postNumber = total - ((page - 1) * limit);
 
-        for (MvcBbs post : postList) {
+        for (Object[] post : postList) {
             Map<String, Object> map = new LinkedHashMap<>();
             map.put("postNumber", postNumber--);
-            map.put("pstId", post.getPstId());
-            String[] rgstTime = timeFormat.formatDateToday(post.getRgstDay());
+            map.put("pstId", post[0]); // pstId
+            map.put("ttl", post[1]);   // ttl
+            map.put("nickNm", post[2]); // nickNm
+            String[] rgstTime = timeFormat.formatDateToday((Timestamp) post[3]); // rgstDay
             map.put("new", rgstTime[1]);
             map.put("rgstDate", rgstTime[0]);
-            map.put("spoYn", post.getSpoYn());
-            map.put("ttl", post.getTtl());
-            Long cmntTotal = mvcBbsCmntRepository.totalCmnt('N',post.getPstId());
-            map.put("cmntTotal", cmntTotal);
-            Long rcmdTotal = mvcRcmdtnInfoRepository.totalRcmdtn("N", menuId, post.getPstId());
-            map.put("rmcdTotal", (rcmdTotal > 5) ? "5+" : String.valueOf(rcmdTotal));
-            map.put("nickNm", post.getNickNm());
+            map.put("rmcdTotal",  ((Long) post[4] > StaticConstantConfig.RCMDTN_LIMIT)
+                    ? StaticConstantConfig.RCMDTN_LIMIT + "+"
+                    : post[4]);
+            map.put("cmntTotal", ((Long) post[5] > StaticConstantConfig.CMNT_LIMIT)
+                    ? StaticConstantConfig.CMNT_LIMIT + "+"
+                    : post[5]);
             formattedPostList.add(map);
         }
         return formattedPostList;
@@ -139,7 +142,7 @@ public class MvcBbsService {
             postMap.put("rgstDate", rgstTime);
             postMap.put("rcmd", columnValueMapper.pstIdAndMenuIdToRcmdTotal(post.getPstId(), post.getMenuId())); // 좋아요 수 구해오기
             postMap.put("profileUrl", columnValueMapper.mbrIdToAtchFileUrl(post.getRgstUserId())); // 등록 id로 프로필 url 찾아 넣기
-            postMap.put("nickNm", columnValueMapper.mbrIdToNickNm(post.getRgstUserId())); // 등록 id로 nickNm 찾아 넣기(없으면 null)
+            postMap.put("nickNm", post.getNickNm()); // 등록 id로 nickNm 찾아 넣기(없으면 null)
             postMap.put("mvcId", columnValueMapper.mbrIdToMvcId(post.getRgstUserId())); // 등록 id로 mvcId 찾아 넣기
             postMap.put("atchFileId", post.getAtchFileid());
             // ObjectMapper를 사용하여 맵을 JSON으로 변환

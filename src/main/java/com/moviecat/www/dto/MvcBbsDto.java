@@ -31,4 +31,5 @@ public class MvcBbsDto {
     private String mdfcnUserNm; // 수정자
     private Timestamp mdfcnDay; // 수정일
     private String deltYn; // 삭제유무
+    private String nickNm; // 등록자 닉네임
 }
