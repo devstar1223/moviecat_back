@@ -76,6 +76,8 @@ public class MvcScrBbsService {
         PageRequest pageRequest = PageRequest.of(page-1, limit);
         Page<Object[]> resultPage = mvcScrBbsRepository.findWithCountsAndLikeYnByUserId(mbrId,menuId, pageRequest);
 
+        long total = resultPage.getTotalElements();
+
         // 페이징된 데이터를 pagedPostList로 변환
         List<Object[]> pagedScrList = resultPage.getContent();
 
@@ -98,7 +100,7 @@ public class MvcScrBbsService {
         }
 
         Map<String, Object> result = new HashMap<>();
-        result.put("total", scrList.size());
+        result.put("total", total);
         result.put("data", scrList);
 
         ObjectMapper objectMapper = new ObjectMapper();
