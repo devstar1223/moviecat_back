@@ -13,6 +13,8 @@ import com.moviecat.www.util.ColumnValueMapper;
 import com.moviecat.www.util.PaginationUtil;
 import com.moviecat.www.util.TimeFormat;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,36 +72,34 @@ public class MvcScrBbsService {
     @Transactional
     public String scrList(long menuId, String mbrId, int page, int limit) throws Exception {
 
-        List<MvcScrBbs> scrListOrigin = mvcScrBbsRepository.findByMenuIdAndDeltYnOrderByScrIdDesc(menuId, "N");
-        List<Map<String,Object>> scrList = new ArrayList<>();
+        // 페이징 처리해서 가져옴
+        PageRequest pageRequest = PageRequest.of(page-1, limit);
+        Page<Object[]> resultPage = mvcScrBbsRepository.findWithCountsAndLikeYnByUserId(mbrId,menuId, pageRequest);
 
-        for(MvcScrBbs scr : scrListOrigin) {
+        // 페이징된 데이터를 pagedPostList로 변환
+        List<Object[]> pagedScrList = resultPage.getContent();
+
+        // 포맷팅된 List를 담을 새로운 List 생성
+        List<Map<String, Object>> scrList = new ArrayList<>();
+
+        for(Object[] scr : pagedScrList) {
             Map<String,Object> map = new LinkedHashMap<>();
-            map.put("scrId", scr.getScrId());
-            map.put("vdoNm", scr.getVdoNm());
-            map.put("vdoNmEn", scr.getVdoNmEn());
-            map.put("opngYear", scr.getOpngYear());
-            map.put("scr", scr.getScr());
-            map.put("rgstDate", timeFormat.formatDate(scr.getRgstDay()));
-            map.put("vdoEvl", scr.getVdoEvl());
-            map.put("nickNm", columnValueMapper.mbrIdToNickNm(scr.getRgstUserId()));
-
-            int rcmdTotal = columnValueMapper.pstIdAndMenuIdToRcmdTotal(scr.getScrId(), scr.getMenuId());
-            map.put("likeCnt", rcmdTotal);
-
-            String likeYn = "N";
-            if (!"".equals(mbrId) && mvcRcmdtnInfoService.rcmdCheck(menuId, scr.getScrId(), mbrId)) {
-                likeYn = "Y";
-            }
-            map.put("likeYn", likeYn);
+            map.put("scrId", scr[0]);
+            map.put("vdoNm", scr[1]);
+            map.put("vdoNmEn", scr[2]);
+            map.put("opngYear", scr[3]);
+            map.put("scr", scr[4]);
+            map.put("rgstDate", timeFormat.formatDate((Timestamp)scr[5]));
+            map.put("vdoEvl", scr[6]);
+            map.put("nickNm", scr[7]);
+            map.put("likeCnt", scr[8]);
+            map.put("likeYn", scr[9]);
             scrList.add(map);
         }
 
-        List<Map<String, Object>> pagedPostList = paginationUtil.getPageLimit(scrList, page, limit);
-
         Map<String, Object> result = new HashMap<>();
         result.put("total", scrList.size());
-        result.put("data", pagedPostList);
+        result.put("data", scrList);
 
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(result);
